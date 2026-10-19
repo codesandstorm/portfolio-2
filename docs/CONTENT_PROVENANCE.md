@@ -33,4 +33,8 @@ All site content lives in `src/content/data.ts` and is derived from `docs/resear
 ## Missing
 
 - Exact LinkedIn post URLs (activity ids were in the previous build's data file, which is gone). Signals link to her activity feed and say so. Add `sourceUrl` per signal to restore exact links.
-- Any photograph. `profile.portrait` is `null`; the identity scene uses an abstract placeholder silhouette until a real photo is set.
+
+## Updates (19 Oct 2026)
+
+- **Portrait:** Akshita's photograph supplied by the site owner, stored at `public/akshita/portrait.jpg`. The pink graphics in the source image are masked out at runtime; only her head-and-shoulders silhouette feeds the hologram and point cloud.
+- **People:** at the owner's request, the people she credits are shown only as roles (for example "Mentor · IIT Indore"). Names remain only in `docs/research`. A test fails if a name reappears in shipped content.

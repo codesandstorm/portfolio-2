@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef } from "react";
-import { getEntity, getNode, signalUrl, formatDate } from "@/content/graph";
+import { getEntity, getNode, signalUrl, formatDate, summarizePeople } from "@/content/graph";
 import type { LinkedInSignal } from "@/content/types";
 import { useUI } from "@/lib/store";
 
@@ -65,8 +65,8 @@ export function SignalReader() {
 
             {!!s.people?.length && (
               <div className="mt-8">
-                <h3 className="mono text-faint">She named</h3>
-                <p className="mt-2 leading-relaxed text-mist">{s.people.map((p) => getNode(p)?.label).join(" · ")}</p>
+                <h3 className="mono text-faint">She credited by name</h3>
+                <p className="mt-2 leading-relaxed text-mist">{summarizePeople(s.people)} — named in the original post.</p>
               </div>
             )}
             {!!related.length && (

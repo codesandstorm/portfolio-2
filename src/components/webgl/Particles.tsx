@@ -65,6 +65,7 @@ export function Particles({ count }: { count: number }) {
   const stiffness = useMemo(() => Float32Array.from({ length: count }, () => 5 + Math.random() * 11), [count]);
   const look = useRef({ opacity: 0, size: 1 });
   const lastIntro = useRef(0);
+  const portraitColor = useRef<Float32Array | null>(null);
 
   const { geometry, baseColor } = useMemo(() => {
     const g = new THREE.BufferGeometry();
@@ -134,7 +135,10 @@ export function Particles({ count }: { count: number }) {
     targets.current.web = webTarget(count);
     targets.current.seed = seedTarget(count);
     void getPortraitCanvas(profile.portrait).then((c) => {
-      targets.current.portrait = portraitTarget(count, c, 6.6, [0, 0.2, 0.6]);
+      const p = portraitTarget(count, c, 6.6, [0, 0.2, 0.6]);
+      targets.current.portrait = p.pos;
+      // A real photograph lends its own colours to the point cloud.
+      if (profile.portrait) portraitColor.current = p.col;
     });
   }, [count]);
 
@@ -298,6 +302,8 @@ export function Particles({ count }: { count: number }) {
     // Fire and ice keep their identity in the name, then lean warm as the story goes on.
     const merge = t < 1.5 ? amt.crisp * 0.45 : t < 9 ? 0.6 : 0.3;
     const toward = t < 1.5 ? MERGED : GOLD;
+    const photo = mode === "portrait" ? portraitColor.current : null;
+    const ck = 1 - Math.exp(-dt * 2.5);
     for (let i = 0; i < count; i++) {
       const fire = i < half;
       const k = fire ? i : i - half;
@@ -312,7 +318,12 @@ export function Particles({ count }: { count: number }) {
       const isRem = mode === "glyph" && t < 1 && seeds[i * 3 + 2] > 0.9;
       al[i] = isRem ? 0.55 : a;
       const m = isRem ? 0 : merge;
-      for (let j = 0; j < 3; j++) cl[i * 3 + j] = baseColor[i * 3 + j] + (toward[j] - baseColor[i * 3 + j]) * m;
+      for (let j = 0; j < 3; j++) {
+        const k = i * 3 + j;
+        // Her photo, lifted and warmed a touch so it reads as light, not a print.
+        const want = photo ? Math.min(1, photo[k] * 1.35 + 0.06) * 0.8 + GOLD[j] * 0.2 : baseColor[k] + (toward[j] - baseColor[k]) * m;
+        cl[k] += (want - cl[k]) * (photo || mode === "portrait" || t >= 1.5 ? ck : 1);
+      }
     }
     alpha.needsUpdate = true;
     col.needsUpdate = true;

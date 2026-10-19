@@ -44,10 +44,9 @@ export function ConnectChapter() {
           <p className="max-w-[24rem] border-l border-gold/50 pl-4 text-sm leading-relaxed text-mist">
             <span className="mono mb-1 block text-gold">Bridges</span>
             <button type="button" className="text-ivory underline decoration-gold/40 underline-offset-4 hover:text-gold" onClick={() => select(bridges[0].id)} data-cursor="link">
-              {bridges[0].name}
+              One person
             </button>{" "}
-            appears in more than one of her stories —{" "}
-            {joinWords(getStoriesForPerson(bridges[0].id).map((h) => getNode(h)?.label ?? ""))}.
+            runs through two of her stories — {joinWords(getStoriesForPerson(bridges[0].id).map((h) => getNode(h)?.label ?? ""))}. The network bends back on itself.
           </p>
         )}
 

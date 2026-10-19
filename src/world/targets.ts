@@ -172,13 +172,23 @@ export async function portraitCanvas(src: string | null): Promise<HTMLCanvasElem
     const img = new Image();
     img.src = src;
     await img.decode();
-    const s = Math.min(img.width, img.height);
-    ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, S, S);
-    // Luminance becomes alpha so the point cloud follows the light in the photo.
+    // Head-and-shoulders crop of the square photo.
+    const s = Math.min(img.width, img.height) * 0.72;
+    ctx.drawImage(img, (img.width - s) / 2, img.height * 0.04, s, s, 0, 0, S, S);
+    // Light becomes presence: bright, neutral-to-warm pixels (her face, hands, the
+    // edges of her hair) stay; the dark backdrop and the saturated pink graphics
+    // around her in the source image fall away.
     const d = ctx.getImageData(0, 0, S, S);
     for (let i = 0; i < d.data.length; i += 4) {
-      const l = (d.data[i] + d.data[i + 1] + d.data[i + 2]) / 3;
-      d.data[i + 3] = l;
+      const r = d.data[i] / 255, g = d.data[i + 1] / 255, b = d.data[i + 2] / 255;
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      const magenta = Math.min(1, Math.max(0, (Math.min(r, b) - g) * 6 + (r - g > 0.35 && b > g ? 0.6 : 0)));
+      // A soft head-and-shoulders silhouette: the graphics around her fall outside it.
+      const u = (i / 4) % S / S, v = Math.floor(i / 4 / S) / S;
+      const blob = (cx: number, cy: number, rx: number, ry: number) => Math.max(0, 1 - Math.pow(Math.hypot((u - cx) / rx, (v - cy) / ry), 6));
+      const figure = Math.max(blob(0.6, 0.38, 0.25, 0.33), blob(0.56, 0.98, 0.44, 0.42));
+      const a = Math.min(1, Math.max(0, (lum - 0.06) / 0.4)) * (1 - magenta) * figure;
+      d.data[i + 3] = Math.round(Math.pow(a, 0.8) * 255);
     }
     ctx.putImageData(d, 0, 0);
     return c;
@@ -213,16 +223,41 @@ export async function portraitCanvas(src: string | null): Promise<HTMLCanvasElem
   return c;
 }
 
+/**
+ * A depth-mapped point cloud of the portrait: brighter pixels sit nearer the
+ * viewer, and each point carries the colour of the photo where it was sampled.
+ */
 export function portraitTarget(n: number, canvas: HTMLCanvasElement, height: number, center: [number, number, number]) {
-  // Keep the faint, dissolving pixels in play so the fade still reads as a figure.
-  const { pixels } = litPixels((ctx) => ctx.drawImage(canvas, 0, 0, 256, 256), 256, 256, 1);
-  for (let k = 2; k < pixels.length; k += 3) pixels[k] = Math.max(pixels[k], 0.25);
+  const R = 256;
+  const c = document.createElement("canvas");
+  c.width = c.height = R;
+  const ctx = c.getContext("2d", { willReadFrequently: true })!;
+  ctx.drawImage(canvas, 0, 0, R, R);
+  const data = ctx.getImageData(0, 0, R, R).data;
+  const pts: number[] = [];
+  for (let y = 0; y < R; y++)
+    for (let x = 0; x < R; x++) {
+      const i = (y * R + x) * 4;
+      // Faint dissolving pixels stay in play so the edges read as a figure.
+      const a = data[i + 3] / 255;
+      if (a > 0.08) pts.push(x / R, y / R, Math.max(a, 0.25), data[i] / 255, data[i + 1] / 255, data[i + 2] / 255);
+    }
+  const count = pts.length / 6;
+  const pos = new Float32Array(n * 3);
+  const col = new Float32Array(n * 3);
   const [cx, cy, cz] = center;
-  return fill(n, pixels, (u, v, out, i) => {
-    out[i * 3] = cx + (u - 0.5) * height;
-    out[i * 3 + 1] = cy - (v - 0.5) * height;
-    out[i * 3 + 2] = cz + rand(-0.15, 0.15) + (1 - Math.abs(u - 0.5) * 2) * 0.4;
-  });
+  for (let i = 0; i < n && count; i++) {
+    let k = Math.floor(Math.random() * count);
+    for (let t = 0; t < 3 && pts[k * 6 + 2] < Math.random(); t++) k = Math.floor(Math.random() * count);
+    const u = pts[k * 6] + rand(-0.002, 0.002), v = pts[k * 6 + 1] + rand(-0.002, 0.002);
+    const r = pts[k * 6 + 3], g = pts[k * 6 + 4], b = pts[k * 6 + 5];
+    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+    pos[i * 3] = cx + (u - 0.5) * height;
+    pos[i * 3 + 1] = cy - (v - 0.5) * height;
+    pos[i * 3 + 2] = cz + lum * 1.1 + (1 - Math.abs(u - 0.5) * 2) * 0.35 + rand(-0.06, 0.06);
+    col.set([r, g, b], i * 3);
+  }
+  return { pos, col };
 }
 
 /** Particles strung along every thread of the constellation. */

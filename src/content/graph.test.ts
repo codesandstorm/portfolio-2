@@ -57,6 +57,12 @@ describe("content integrity", () => {
     expect(experiences.find((e) => e.id === "x-isoftzone")?.period).toBe("Jun – Jul 2026");
   });
 
+  it("shows the people she credits as roles, never by name", () => {
+    for (const p of people) expect(p.name, p.id).toMatch(/ · /);
+    const blob = JSON.stringify({ people, signals, experiences, projects });
+    for (const name of ["Saikat", "Sandarbh", "Bhasin", "Subhash", "Marathe", "Shrivash"]) expect(blob).not.toContain(name);
+  });
+
   it("does not credit HR-Enterprise- or expose private contact data", () => {
     const blob = JSON.stringify({ profile, projects, signals, experiences });
     expect(blob).not.toMatch(/HR-Enterprise/);

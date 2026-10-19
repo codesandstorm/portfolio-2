@@ -1,7 +1,7 @@
 "use client";
 
 import { experiences } from "@/content/data";
-import { getAchievementsForExperience, getNode, getPostsForExperience, getSkillsForExperience } from "@/content/graph";
+import { getAchievementsForExperience, summarizePeople, getPostsForExperience, getSkillsForExperience } from "@/content/graph";
 import type { Experience } from "@/content/types";
 import { useUI } from "@/lib/store";
 import { experienceOrder } from "@/world/layout";
@@ -60,8 +60,7 @@ function Memory({ e, i, reveal }: { e: Experience; i: number; reveal: number }) 
               <>
                 <Label>The people</Label>
                 <p className="text-sm leading-relaxed text-mist">
-                  She named {people.length}: {people.slice(0, 4).map((p) => getNode(p)?.label).join(", ")}
-                  {people.length > 4 ? ` and ${people.length - 4} more` : ""}.
+                  She credited {people.length} people by name: {summarizePeople(people)}.
                 </p>
               </>
             ),

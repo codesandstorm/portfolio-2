@@ -28,8 +28,8 @@ export const profile = {
     linkedinActivity: "https://www.linkedin.com/in/akshita-mahajan-73ba56370/recent-activity/all/",
     github: "https://github.com/akshita-mahajan",
   },
-  /** Supply a real photograph here (e.g. "/akshita/portrait.jpg") once approved. */
-  portrait: null as string | null,
+  /** Her photograph (supplied 19 Oct 2026). Set to null to fall back to the abstract silhouette. */
+  portrait: "/akshita/portrait.jpg" as string | null,
 } as const;
 
 export const skills: Skill[] = [
@@ -78,29 +78,33 @@ export const headlineSkills = [
   "s-cpp",
 ];
 
+/**
+ * The people she credits, kept as roles rather than names: their stories are
+ * hers to tell, their names are theirs. Names remain only in the research docs.
+ */
 export const people: Person[] = [
-  { id: "pe-scpal", name: "Dr Subhash Chandra Pal", role: "mentor", context: "Mentor, IIT Indore internship", sources: ["li-p8"] },
-  { id: "pe-dprasad", name: "Dr Durga Prasad", role: "mentor", context: "Mentor, IIT Indore internship", sources: ["li-p8"] },
-  { id: "pe-sdas", name: "Dr Saikat Das", role: "clinical", context: "Radiation oncologist, AIIMS Bhopal — validated the Breast Cancer AI project", sources: ["li-p8"] },
-  { id: "pe-aghosh", name: "Dr Atreyee Ghosh", role: "acknowledged", context: "Thanked in her IIT Indore journey post", sources: ["li-p8"] },
-  { id: "pe-drane", name: "Dr Dheeraj Rane", role: "acknowledged", context: "Thanked in her IIT Indore journey post", sources: ["li-p8"] },
-  { id: "pe-sbhasin", name: "Sandarbh Bhasin", role: "co-intern", context: "Co-intern at IIT Indore; teammate on PRAHARI", sources: ["li-p8", "li-p6", "gh-breastcare-ai"] },
-  { id: "pe-strivedi", name: "Shashwat Trivedi", role: "co-intern", context: "Co-intern, IIT Indore", sources: ["li-p8"] },
-  { id: "pe-hmodi", name: "Heer Modi", role: "co-intern", context: "Co-intern, IIT Indore", sources: ["li-p8"] },
-  { id: "pe-vpatel", name: "Vaidehi Patel", role: "co-intern", context: "Co-intern, IIT Indore", sources: ["li-p8"] },
-  { id: "pe-rkushwaha", name: "Rani Kushwaha", role: "co-intern", context: "Co-intern, IIT Indore", sources: ["li-p8"] },
-  { id: "pe-sbelgahe", name: "Siddharth Belgahe", role: "co-intern", context: "Co-intern, IIT Indore", sources: ["li-p8"] },
-  { id: "pe-aparihar", name: "Anushka Parihar", role: "co-intern", context: "Co-intern, IIT Indore", sources: ["li-p8"] },
-  { id: "pe-jbhatia", name: "Jashndeep Singh Bhatia", role: "teammate", context: "Teammate, Team PRAHARI", sources: ["li-p6"] },
-  { id: "pe-pchouhan", name: "Pavitra Chouhan", role: "teammate", context: "Teammate, Team PRAHARI", sources: ["li-p6"] },
-  { id: "pe-sgupta", name: "Sanskar Gupta", role: "teammate", context: "Teammate, Team PRAHARI", sources: ["li-p6"] },
-  { id: "pe-ajain", name: "Dr Ankita Jain", role: "mentor", context: "Mentor, Team PRAHARI", sources: ["li-p6"] },
-  { id: "pe-vjoshi", name: "Dr Vaishali Joshi", role: "mentor", context: "Mentor, Team PRAHARI", sources: ["li-p6"] },
-  { id: "pe-ymarathe", name: "Yash Marathe", role: "teammate", context: "Teammate, PrakritiOS", sources: ["li-p15"] },
-  { id: "pe-nkhatri", name: "Naman Khatri", role: "teammate", context: "Teammate, PrakritiOS", sources: ["li-p15"] },
-  { id: "pe-ssen", name: "Safal Sen", role: "teammate", context: "Teammate, PrakritiOS", sources: ["li-p15"] },
-  { id: "pe-ngupta", name: "Dr Neha Gupta", role: "organiser", context: "Thanked for the ISRO exhibition at SUAS", sources: ["li-p20"] },
-  { id: "pe-bshrivash", name: "Brajesh Kumar Shrivash", role: "organiser", context: "Thanked for the ISRO exhibition at SUAS", sources: ["li-p20"] },
+  { id: "pe-scpal", name: "Mentor · IIT Indore", role: "mentor", context: "Mentor, IIT Indore internship", sources: ["li-p8"] },
+  { id: "pe-dprasad", name: "Mentor · IIT Indore", role: "mentor", context: "Mentor, IIT Indore internship", sources: ["li-p8"] },
+  { id: "pe-sdas", name: "Clinical validator · AIIMS Bhopal", role: "clinical", context: "Radiation oncologist, AIIMS Bhopal — validated the Breast Cancer AI project", sources: ["li-p8"] },
+  { id: "pe-aghosh", name: "Faculty she thanked · IIT Indore", role: "acknowledged", context: "Thanked in her IIT Indore journey post", sources: ["li-p8"] },
+  { id: "pe-drane", name: "Faculty she thanked · IIT Indore", role: "acknowledged", context: "Thanked in her IIT Indore journey post", sources: ["li-p8"] },
+  { id: "pe-sbhasin", name: "Co-intern · IIT Indore & PRAHARI", role: "co-intern", context: "Co-intern at IIT Indore; teammate on PRAHARI", sources: ["li-p8", "li-p6", "gh-breastcare-ai"] },
+  { id: "pe-strivedi", name: "Co-intern · IIT Indore", role: "co-intern", context: "Co-intern, IIT Indore", sources: ["li-p8"] },
+  { id: "pe-hmodi", name: "Co-intern · IIT Indore", role: "co-intern", context: "Co-intern, IIT Indore", sources: ["li-p8"] },
+  { id: "pe-vpatel", name: "Co-intern · IIT Indore", role: "co-intern", context: "Co-intern, IIT Indore", sources: ["li-p8"] },
+  { id: "pe-rkushwaha", name: "Co-intern · IIT Indore", role: "co-intern", context: "Co-intern, IIT Indore", sources: ["li-p8"] },
+  { id: "pe-sbelgahe", name: "Co-intern · IIT Indore", role: "co-intern", context: "Co-intern, IIT Indore", sources: ["li-p8"] },
+  { id: "pe-aparihar", name: "Co-intern · IIT Indore", role: "co-intern", context: "Co-intern, IIT Indore", sources: ["li-p8"] },
+  { id: "pe-jbhatia", name: "Teammate · PRAHARI", role: "teammate", context: "Teammate, Team PRAHARI", sources: ["li-p6"] },
+  { id: "pe-pchouhan", name: "Teammate · PRAHARI", role: "teammate", context: "Teammate, Team PRAHARI", sources: ["li-p6"] },
+  { id: "pe-sgupta", name: "Teammate · PRAHARI", role: "teammate", context: "Teammate, Team PRAHARI", sources: ["li-p6"] },
+  { id: "pe-ajain", name: "Mentor · PRAHARI", role: "mentor", context: "Mentor, Team PRAHARI", sources: ["li-p6"] },
+  { id: "pe-vjoshi", name: "Mentor · PRAHARI", role: "mentor", context: "Mentor, Team PRAHARI", sources: ["li-p6"] },
+  { id: "pe-ymarathe", name: "Teammate · PrakritiOS", role: "teammate", context: "Teammate, PrakritiOS", sources: ["li-p15"] },
+  { id: "pe-nkhatri", name: "Teammate · PrakritiOS", role: "teammate", context: "Teammate, PrakritiOS", sources: ["li-p15"] },
+  { id: "pe-ssen", name: "Teammate · PrakritiOS", role: "teammate", context: "Teammate, PrakritiOS", sources: ["li-p15"] },
+  { id: "pe-ngupta", name: "Organiser · ISRO exhibition", role: "organiser", context: "Thanked for the ISRO exhibition at SUAS", sources: ["li-p20"] },
+  { id: "pe-bshrivash", name: "Organiser · ISRO exhibition", role: "organiser", context: "Thanked for the ISRO exhibition at SUAS", sources: ["li-p20"] },
 ];
 
 const iitCoInterns = ["pe-sbhasin", "pe-strivedi", "pe-hmodi", "pe-vpatel", "pe-rkushwaha", "pe-sbelgahe", "pe-aparihar"];
@@ -140,7 +144,7 @@ export const experiences: Experience[] = [
       "An AI web platform for breast cancer detection and clinical decision support",
       "React, Node/Express, AI/ML integration, MongoDB + PostgreSQL",
       "Built the landing page, patient dashboards, and the radiologist and nurse dashboards of the role-based front end",
-      "The work was validated with Dr Saikat Das, radiation oncologist at AIIMS Bhopal",
+      "The work was validated with a radiation oncologist at AIIMS Bhopal",
     ],
     people: ["pe-scpal", "pe-dprasad", "pe-sdas", "pe-aghosh", "pe-drane", ...iitCoInterns],
     learning: ["Trust my ideas", "Take ownership", "Ask better questions", "Believe I can do more"],
@@ -343,7 +347,7 @@ export const signals: LinkedInSignal[] = [
   { id: "sig-p5", post: 5, date: "2026-09-26", title: "Hack Devengers 2.0", summary: "Not in the top 3 — posted with a certificate of appreciation, and the same pride.", skills: ["s-teamwork"] },
   { id: "sig-p6", post: 6, date: "2026-09-19", title: "Tech Kutumb 5.0 — 3rd prize", summary: "Team PRAHARI built an intelligence layer on MoSPI’s PAIMANA platform — early warnings for major infrastructure projects — in 24 hours, and advanced to the next round of SIH.", featured: true, projects: ["p-prahari"], skills: ["s-teamwork"], people: ["pe-sbhasin", "pe-jbhatia", "pe-pchouhan", "pe-sgupta", "pe-ajain", "pe-vjoshi"], achievements: ["a-techkutumb"] },
   { id: "sig-p7", post: 7, date: "2026-08-31", title: "Adobe University Hackathon 2026", summary: "Participation — cleared Round 1." },
-  { id: "sig-p8", post: 8, date: "2026-08-24", title: "My IIT Indore journey", summary: "The Breast Cancer AI project, validated with Dr Saikat Das (AIIMS Bhopal). She thanks her mentors and names all seven co-interns. What began as “just another project” became “Ours”. Lessons: trust my ideas, take ownership, ask better questions, believe I can do more.", quote: "“Just another project” → “Ours”.", featured: true, experiences: ["x-iit"], projects: ["p-breastcare"], skills: ["s-teamwork", "s-fullstack"], people: ["pe-sdas", "pe-scpal", "pe-dprasad", "pe-aghosh", "pe-drane", ...iitCoInterns] },
+  { id: "sig-p8", post: 8, date: "2026-08-24", title: "My IIT Indore journey", summary: "The Breast Cancer AI project, validated with a radiation oncologist at AIIMS Bhopal. She thanks her mentors and names all seven co-interns. What began as “just another project” became “Ours”. Lessons: trust my ideas, take ownership, ask better questions, believe I can do more.", quote: "“Just another project” → “Ours”.", featured: true, experiences: ["x-iit"], projects: ["p-breastcare"], skills: ["s-teamwork", "s-fullstack"], people: ["pe-sdas", "pe-scpal", "pe-dprasad", "pe-aghosh", "pe-drane", ...iitCoInterns] },
   { id: "sig-p9", post: 9, date: "2026-08-23", title: "STEM Awareness Program", summary: "With IEEE — school students on campus.", experiences: ["x-ieee"], skills: ["s-teaching"] },
   { id: "sig-p10", post: 10, date: "2026-08-16", title: "Rural school outreach", summary: "With IEEE CS SUAS, taught cybersecurity, STEM and AI in rural schools.", quote: "We went there to teach technology. We came back having learned…", featured: true, experiences: ["x-ieee"], skills: ["s-teaching", "s-communication"] },
   { id: "sig-p11", post: 11, date: "2026-07-30", title: "DRISHTI welcomes its interns", summary: "A repost from IITI DRISHTI CPS Foundation listing her as Project Intern (Full Stack Engineering).", experiences: ["x-iit"] },

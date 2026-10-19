@@ -25,6 +25,7 @@ export function Portrait() {
           uPointer: { value: new THREE.Vector2() },
           uGold: { value: new THREE.Color("#ffb347") },
           uElectric: { value: new THREE.Color("#6fb6ff") },
+          uPhoto: { value: profile.portrait ? 1 : 0 },
         },
         transparent: true,
         depthWrite: false,
@@ -37,6 +38,7 @@ export function Portrait() {
     let tex: THREE.CanvasTexture | null = null;
     void getPortraitCanvas(profile.portrait).then((c) => {
       tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
       material.uniforms.uTex.value = tex;
     });
     return () => {

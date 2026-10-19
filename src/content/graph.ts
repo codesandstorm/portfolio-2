@@ -181,6 +181,25 @@ export function getBridgePeople(): Person[] {
   return people.filter((p) => getStoriesForPerson(p.id).length > 1);
 }
 
+const ROLE_WORD: Record<Person["role"], [string, string]> = {
+  mentor: ["mentor", "mentors"],
+  clinical: ["clinical validator", "clinical validators"],
+  acknowledged: ["faculty member she thanked", "faculty members she thanked"],
+  "co-intern": ["co-intern", "co-interns"],
+  teammate: ["teammate", "teammates"],
+  organiser: ["organiser", "organisers"],
+};
+
+/** "2 mentors, 7 co-interns and a clinical validator" — who, without naming them. */
+export function summarizePeople(ids: string[]): string {
+  const counts = new Map<Person["role"], number>();
+  for (const id of ids) {
+    const p = entityById.get(id) as Person | undefined;
+    if (p) counts.set(p.role, (counts.get(p.role) ?? 0) + 1);
+  }
+  return joinWords([...counts].map(([role, n]) => (n === 1 ? `a ${ROLE_WORD[role][0]}` : `${n} ${ROLE_WORD[role][1]}`)));
+}
+
 export function joinWords(words: string[]) {
   return words.length < 2 ? words.join("") : `${words.slice(0, -1).join(", ")} and ${words[words.length - 1]}`;
 }

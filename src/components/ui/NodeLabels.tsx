@@ -44,7 +44,8 @@ export function NodeLabels() {
 
   const ids = useMemo(() => {
     const set = new Set<string>();
-    if (chapter === chapterIndex.connect) [...byKind("person"), ...byKind("experience")].forEach((id) => set.add(id));
+    // People stay unnamed points of light; only the places and things they share with her are labelled.
+    if (chapter === chapterIndex.connect) [...byKind("experience"), ...byKind("project")].forEach((id) => set.add(id));
     if (chapter === chapterIndex.learn) byKind("skill").forEach((id) => set.add(id));
     const around = (id: string | null, limit: number) => {
       if (!id) return;
