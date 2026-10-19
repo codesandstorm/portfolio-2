@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import type { Tier } from "./capability";
+import type { IntroPhase } from "./intro";
 
 type UIState = {
   tier: Tier | null;
@@ -18,6 +19,8 @@ type UIState = {
   /** LinkedIn signal opened in the reader. */
   reading: string | null;
   indexOpen: boolean;
+  introPhase: IntroPhase;
+  setIntroPhase: (p: IntroPhase) => void;
   setTier: (t: Tier) => void;
   setReady: () => void;
   finishIntro: () => void;
@@ -39,6 +42,8 @@ export const useUI = create<UIState>((set) => ({
   scrollFocus: null,
   reading: null,
   indexOpen: false,
+  introPhase: "void",
+  setIntroPhase: (introPhase) => set((s) => (s.introPhase === introPhase ? s : { introPhase })),
   setTier: (tier) => set({ tier }),
   setReady: () => set({ ready: true }),
   finishIntro: () => set({ introDone: true }),
