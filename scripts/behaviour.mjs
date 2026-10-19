@@ -154,7 +154,7 @@ const scrollTo = (page, y) => page.evaluate((y) => (window.__lenis ? window.__le
   check("tour: AI-voice disclosure shown before it starts", !!disclosed);
   const shots = process.env.SHOTS;
   if (shots) await page.screenshot({ path: shots + "/tour-disclosure.jpg", type: "jpeg", quality: 72 });
-  await page.click("button::-p-text(Begin)");
+  await page.click("button::-p-text(Her story)");
   await sleep(6000);
   if (shots) await page.screenshot({ path: shots + "/tour-stop1.jpg", type: "jpeg", quality: 72 });
   const y0 = await page.evaluate(() => scrollY);

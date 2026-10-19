@@ -34,6 +34,24 @@
     },
     "11-continue": {
       "duration": 9.381
+    },
+    "r1-who": {
+      "duration": 10.495
+    },
+    "r2-work": {
+      "duration": 14.629
+    },
+    "r3-build": {
+      "duration": 9.102
+    },
+    "r4-lead": {
+      "duration": 13.05
+    },
+    "r5-results": {
+      "duration": 5.433
+    },
+    "r6-next": {
+      "duration": 7.523
     }
   }
 }

@@ -11,7 +11,7 @@
  */
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { tour } from "../src/content/tour.ts";
+import { tours } from "../src/content/tour.ts";
 
 const API = "https://api.elevenlabs.io/v1";
 const OUT = "public/tour";
@@ -71,7 +71,7 @@ function words(alignment) {
 mkdirSync(OUT, { recursive: true });
 const force = process.argv.includes("--force");
 const manifest = { voice, model, stops: {} };
-for (let i = 0; i < tour.length; i++) {
+for (const tour of Object.values(tours)) for (let i = 0; i < tour.length; i++) {
   const stop = tour[i];
   const spoken = stop.say ?? stop.text;
   const hash = createHash("sha1").update(`${voice}|${model}|${spoken}`).digest("hex").slice(0, 12);

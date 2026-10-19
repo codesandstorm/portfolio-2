@@ -384,7 +384,8 @@ export function Particles({ count }: { count: number }) {
     look.current.opacity += (want.opacity * aura - look.current.opacity) * e;
     look.current.size += (want.size - look.current.size) * e;
     material.uniforms.uOpacity.value = look.current.opacity;
-    material.uniforms.uSize.value = look.current.size;
+    // Her point cloud swells a little with the narrator's voice.
+    material.uniforms.uSize.value = look.current.size * (mode === "portrait" ? 1 + world.voice * 0.35 : 1);
     material.uniforms.uTime.value = world.time;
     material.uniforms.uPixelRatio.value = gl.getPixelRatio();
   });

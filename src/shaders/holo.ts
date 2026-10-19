@@ -29,6 +29,7 @@ export const holoFragment = /* glsl */ `
   uniform vec3 uElectric;
   uniform float uPhoto;
   uniform float uShatter;
+  uniform float uVoice;
   varying vec2 vUv;
 
   vec2 hash2(vec2 p) {
@@ -98,6 +99,9 @@ export const holoFragment = /* glsl */ `
       col += mix(uGold, uElectric, v.y) * crack * 2.2;
       alpha = alpha * (1.0 - gone) + crack * max(a, 0.2) * 0.9 * (1.0 - gone) * uOpacity;
     }
+    // While the narrator speaks over her portrait, its light breathes with the voice.
+    col *= 1.0 + uVoice * 0.55;
+    alpha = min(1.0, alpha * (1.0 + uVoice * 0.35));
     if (alpha < 0.01) discard;
     gl_FragColor = vec4(col, alpha);
   }

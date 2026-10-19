@@ -89,3 +89,53 @@ export const tour: TourStop[] = [
     text: "Two forces became one person. One person became a network. The next connection hasn't been made yet — draw it, and continue it on LinkedIn.",
   },
 ];
+
+/**
+ * The recruiter cut: about a minute, the facts a hiring manager asks first.
+ * Same rules — every claim from the research.
+ */
+export const recruiterTour: TourStop[] = [
+  {
+    id: "r1-who",
+    from: ["signal", 0],
+    to: ["signal", 0],
+    text: "Akshita Mahajan: a full-stack engineer and public speaker from Indore, studying computer science at Symbiosis University of Applied Sciences.",
+  },
+  {
+    id: "r2-work",
+    from: ["collaborate", 0.6],
+    to: ["collaborate", 1],
+    text: "She has interned twice as a full-stack engineer — at i-SOFTZONE, where she built and deployed an HRMS, and at IIT Indore, on an AI platform for breast cancer detection.",
+    say: "She has interned twice as a full-stack engineer — at i SOFTZONE, where she built and deployed an H R M S, and at I I T Indore, on an A I platform for breast cancer detection.",
+  },
+  {
+    id: "r3-build",
+    from: ["build", 0],
+    to: ["build", 0.14],
+    text: "Her flagship HRMS has thirty-three data models and runs live. Every project here has a demo you can try.",
+    say: "Her flagship H R M S has thirty-three data models and runs live. Every project here has a demo you can try.",
+  },
+  {
+    id: "r4-lead",
+    from: ["lead", 0.42],
+    to: ["lead", 1],
+    text: "She leads, too: Membership Development Vice Chair at ACM-W, coordinator of the first ISRO exhibition in Madhya Pradesh, and anchor of a thirty-six-hour hackathon.",
+    say: "She leads, too: Membership Development Vice Chair at A C M W, coordinator of the first ISRO exhibition in Madhya Pradesh, and anchor of a thirty-six-hour hackathon.",
+  },
+  {
+    id: "r5-results",
+    from: ["converge", 0],
+    to: ["converge", 0.6],
+    text: "Third place at two hackathons, and four internship offers in fifteen days.",
+  },
+  {
+    id: "r6-next",
+    from: ["continue", 0.1],
+    to: ["continue", 0.6],
+    text: "If you're hiring a full-stack engineer who can also hold a room, the next step is yours — connect with her on LinkedIn.",
+  },
+];
+
+export type TourVariant = "full" | "recruiter";
+export const tours: Record<TourVariant, TourStop[]> = { full: tour, recruiter: recruiterTour };
+export const TOUR_LENGTH: Record<TourVariant, string> = { full: "about 2½ minutes", recruiter: "about a minute" };

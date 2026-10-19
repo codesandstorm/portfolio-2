@@ -20,6 +20,8 @@ export const world = {
   shake: 0,
   /** Seconds since page start, advanced by the intro clock (for procedural motion). */
   time: 0,
+  /** Narrator voice level 0 … 1 while the guided tour speaks. */
+  voice: 0,
   /** Where her name sits on screen in the finale (CSS px). */
   finaleScreen: { x: 0, y: 0 },
   /** Hero name rectangle in CSS px, measured from the DOM <h1> for particle alignment. */
@@ -31,6 +33,11 @@ export const world = {
  * the hand-over to the next chapter.
  */
 export const STICKY = 0.88;
+
+/** The narrator's voice level, eased so the world breathes rather than flickers. */
+export function setVoiceLevel(level: number | null) {
+  world.voice = level === null ? world.voice * 0.9 : world.voice + (level - world.voice) * 0.35;
+}
 
 /** Progress through chapter `i`'s pinned content (0 … 1). */
 export function chapterProgress(i: number) {

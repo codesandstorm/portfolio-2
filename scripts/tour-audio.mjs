@@ -31,7 +31,7 @@ await page.goto(base, { waitUntil: "networkidle0" });
 await sleep(2000);
 await page.evaluate(() => [...document.querySelectorAll("button")].find((b) => b.textContent.startsWith("or take the guided tour"))?.click());
 await sleep(600);
-await page.click("button::-p-text(Begin)");
+await page.click(process.argv.includes("--recruiter") ? "button::-p-text(Recruiter cut)" : "button::-p-text(Her story)");
 
 const samples = [];
 for (let i = 0; i < 26; i++) {

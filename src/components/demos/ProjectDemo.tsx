@@ -1,8 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { sfx } from "@/audio/useSound";
+import { useTour } from "@/lib/tour";
 
 /**
  * Micro-demos: each project lets the visitor *use* the idea at its heart for a
@@ -25,6 +26,20 @@ function Frame({ title, hint, children }: { title: string; hint: string; childre
 
 const tap = () => sfx.tick();
 
+/** During the guided tour the demo plays itself, one step at a time; visitors can still take over. */
+function useAutoplay(step: () => void, ms: number) {
+  const playing = useTour((t) => t.status === "playing");
+  const ref = useRef(step);
+  useEffect(() => {
+    ref.current = step;
+  });
+  useEffect(() => {
+    if (!playing) return;
+    const id = setInterval(() => ref.current(), ms);
+    return () => clearInterval(id);
+  }, [playing, ms]);
+}
+
 /* Enterprise HRMS — the permission matrix (RBAC) she built. */
 const ROLES = ["Admin", "HR", "Manager", "Employee"] as const;
 const MODULES = ["Payroll", "Roster", "Hiring", "Profile"] as const;
@@ -39,6 +54,7 @@ const START: Level[][] = [
 function Rbac() {
   const [m, setM] = useState(START);
   const [last, setLast] = useState("Click a cell to change a role's access.");
+  const script = useRef(0);
   const cycle = (r: number, c: number) => {
     tap();
     setM((prev) => {
@@ -48,6 +64,11 @@ function Rbac() {
       return next;
     });
   };
+  useAutoplay(() => {
+    const seq: [number, number][] = [[2, 0], [3, 1], [1, 1], [2, 2]];
+    const [r, c] = seq[script.current++ % seq.length];
+    cycle(r, c);
+  }, 1600);
   return (
     <Frame title="Permission matrix" hint="role × module">
       <table className="w-full border-separate border-spacing-y-1 text-left">
@@ -100,6 +121,7 @@ const PORTALS: { role: string; hers: boolean; rows: string[] }[] = [
 function Portals() {
   const [i, setI] = useState(0);
   const [online, setOnline] = useState(false);
+  useAutoplay(() => setI((k) => (k + 1) % PORTALS.length), 1700);
   const p = PORTALS[i];
   return (
     <Frame title="Seven portals, one platform" hint="switch role">
@@ -149,12 +171,17 @@ const SLOTS = ["Morning", "Noon", "Evening", "Night"];
 function Banquet() {
   const [booked, setBooked] = useState<Set<string>>(() => new Set(["Lawn-Evening"]));
   const [msg, setMsg] = useState("Book a slot. Try one that's taken.");
-  const book = (key: string) => {
+  const plan = useRef(0);
+  useAutoplay(() => {
+    const seq = ["Hall A-Evening", "Terrace-Noon", "Lawn-Evening", "Hall A-Morning"];
+    book(seq[plan.current++ % seq.length]);
+  }, 1500);
+  function book(key: string) {
     tap();
     if (booked.has(key)) return setMsg(`Conflict — ${key.replace("-", " · ")} is already booked.`);
     setBooked((b) => new Set(b).add(key));
     setMsg(`Booked ${key.replace("-", " · ")}. Resources reserved.`);
-  };
+  }
   return (
     <Frame title="Banquet scheduling" hint="venue × slot">
       <div className="grid grid-cols-[auto_repeat(4,1fr)] gap-1 text-[11px]">
@@ -191,6 +218,7 @@ const NOTES = ["Restaurants and menus", "Items in the cart", "Signed in — the 
 function Order() {
   const [s, setS] = useState(0);
   const [fav, setFav] = useState(false);
+  useAutoplay(() => setS((x) => (x + 1) % STEPS.length), 1400);
   return (
     <Frame title="An order, end to end" hint="advance the order">
       <div className="flex items-center gap-1">
@@ -218,6 +246,10 @@ function Order() {
 function Warning() {
   const [delay, setDelay] = useState(12);
   const [cost, setCost] = useState(8);
+  useAutoplay(() => {
+    setDelay((d) => (d >= 40 ? 6 : d + 7));
+    setCost((c) => (c >= 32 ? 4 : c + 5));
+  }, 900);
   const risk = Math.min(100, Math.round(delay * 1.4 + cost * 1.1));
   const state = risk >= 60 ? ["Early warning raised", "text-crimson"] : risk >= 35 ? ["On watch", "text-gold"] : ["On track", "text-electric"];
   const slider = (label: string, v: number, set: (n: number) => void) => (
@@ -249,6 +281,7 @@ function Warning() {
 /* PrakritiOS — Mitti Khata, an environmental passport for a farm. */
 function Passport() {
   const [n, setN] = useState(0);
+  useAutoplay(() => setN((x) => x + 1), 2000);
   const id = `MK-${(4721 + n * 137).toString().padStart(6, "0")}`;
   const vals = [
     ["Soil health", ["Good", "Fair", "Improving"][n % 3]],
@@ -281,6 +314,14 @@ function Passport() {
 /* AI fitness app — posture correction. */
 function Posture() {
   const [lean, setLean] = useState(18);
+  const dir = useRef(-1);
+  useAutoplay(() => {
+    setLean((l) => {
+      if (l <= 2) dir.current = 1;
+      if (l >= 22) dir.current = -1;
+      return l + dir.current * 4;
+    });
+  }, 600);
   const ok = lean < 8;
   const x = 40 + lean;
   return (

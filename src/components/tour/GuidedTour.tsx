@@ -2,10 +2,11 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { tour, TOUR_DISCLOSURE, type TourStop } from "@/content/tour";
+import { TOUR_DISCLOSURE, TOUR_LENGTH, tours, type TourStop } from "@/content/tour";
 import { useTicker } from "@/lib/hooks";
 import { useUI } from "@/lib/store";
 import { useTour } from "@/lib/tour";
+import { setVoiceLevel } from "@/lib/world";
 
 type Timed = { w: string; start: number; end: number };
 type Loaded = { words: Timed[] | null; duration: number; audio: string | null };
@@ -25,6 +26,9 @@ function scrollTo(y: number, smooth: boolean) {
   if (lenis) lenis.scrollTo(y, smooth ? { duration: TRAVEL } : { immediate: true });
   else window.scrollTo({ top: y, behavior: "auto" });
 }
+
+/** Seconds on the page clock (only ever read inside effects and frame callbacks). */
+const nowS = () => performance.now() / 1000;
 
 const ease = (x: number) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
 
@@ -55,7 +59,9 @@ export function GuidedTour() {
   const index = useTour((s) => s.index);
   const reason = useTour((s) => s.reason);
   const { begin, pause, resume, go, finish, exit } = useTour.getState();
+  const variant = useTour((s) => s.variant);
   const tier = useUI((s) => s.tier);
+  const tour = tours[variant];
   const stop = tour[index];
 
   const audio = useRef<HTMLAudioElement | null>(null);
@@ -99,13 +105,13 @@ export function GuidedTour() {
       setTimeout(() => {
         if (cancelled || useTour.getState().status !== "playing" || useTour.getState().index !== index) return;
         c.phase = "speak";
-        c.t0 = performance.now() / 1000;
+        c.t0 = nowS();
         if (data.audio) void audio.current?.play().catch(() => setCaptionsOnly(true));
       }, ms);
     if (c.loadedFor === index && c.data) {
       // Resuming the same stop: carry on speaking, or finish the journey to its start.
       if (c.phase === "speak") {
-        c.t0 = performance.now() / 1000 - c.elapsed;
+        c.t0 = nowS() - c.elapsed;
         if (c.data.audio) void audio.current?.play();
       } else if (c.phase === "travel") {
         scrollTo(c.fromY, tier !== "static");
@@ -146,12 +152,12 @@ export function GuidedTour() {
     return () => {
       cancelled = true;
     };
-  }, [status, index, stop, tier]);
+  }, [status, index, stop, tier, variant]);
 
   // Pausing stops the voice; leaving stops everything.
   useEffect(() => {
     if (status === "paused") {
-      clock.current.elapsed = performance.now() / 1000 - clock.current.t0;
+      clock.current.elapsed = nowS() - clock.current.t0;
       audio.current?.pause();
     }
     if (status === "idle" || status === "done") {
@@ -180,17 +186,19 @@ export function GuidedTour() {
   useTicker(() => {
     const c = clock.current;
     // The spark follows the narrator's voice (or breathes gently without audio).
-    let amp = 0.15 + 0.1 * Math.sin(performance.now() / 400);
+    let amp = 0.15 + 0.1 * Math.sin(nowS() * 2.5);
     if (analyser.current && status === "playing" && c.phase === "speak" && c.data?.audio) {
       analyser.current.getByteTimeDomainData(level.current);
       let sum = 0;
       for (const v of level.current) sum += ((v - 128) / 128) ** 2;
       amp = Math.min(1, Math.sqrt(sum / level.current.length) * 6);
-    }
+      // The world listens too: her hologram pulses with the narrator.
+      setVoiceLevel(amp);
+    } else setVoiceLevel(null);
     if (orb.current) orb.current.style.transform = `scale(${(1 + amp * 0.9).toFixed(3)})`;
 
     if (status !== "playing" || c.phase !== "speak" || !c.data) return;
-    const now = performance.now() / 1000;
+    const now = nowS();
     const elapsed = c.data.audio && audio.current ? audio.current.currentTime : now - c.t0;
     const p = Math.min(1, elapsed / Math.max(0.1, c.data.duration));
     if (tier !== "static") scrollTo(c.fromY + (c.toY - c.fromY) * ease(p), false);
@@ -249,22 +257,26 @@ export function GuidedTour() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
             <span className="h-3 w-3 shrink-0 rounded-full bg-gold shadow-[0_0_14px_#ffb347]" aria-hidden />
             <div className="flex-1">
-              <p className="display text-xl text-ivory">A guided tour · about 2½ minutes</p>
+              <p className="display text-xl text-ivory">A guided tour, narrated</p>
               <p className="mt-1 text-[13px] text-mist">{TOUR_DISCLOSURE} Captions are always on; scroll or press a key at any time to take over.</p>
             </div>
-            <div className="flex gap-4">
-              <button
-                type="button"
-                autoFocus
-                onClick={() => {
-                  ensureAudio();
-                  begin();
-                }}
-                className="mono rounded-full border border-gold/60 px-4 py-2 text-ivory hover:border-gold hover:text-gold"
-                data-cursor="link"
-              >
-                Begin ▸
-              </button>
+            <div className="flex flex-wrap items-center gap-3">
+              {(["full", "recruiter"] as const).map((v, k) => (
+                <button
+                  key={v}
+                  type="button"
+                  autoFocus={k === 0}
+                  onClick={() => {
+                    ensureAudio();
+                    begin(v);
+                  }}
+                  className={`mono rounded-full border px-4 py-2 text-left hover:border-gold hover:text-gold ${k === 0 ? "border-gold/60 text-ivory" : "border-hair text-mist"}`}
+                  data-cursor="link"
+                >
+                  {v === "full" ? "Her story ▸" : "Recruiter cut ▸"}
+                  <span className="block text-[9px] text-faint">{TOUR_LENGTH[v]}</span>
+                </button>
+              ))}
               <button type="button" onClick={exit} className="mono text-faint hover:text-ivory" data-cursor="link">
                 Not now
               </button>

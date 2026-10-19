@@ -28,6 +28,7 @@ export function Portrait() {
           uElectric: { value: new THREE.Color("#6fb6ff") },
           uPhoto: { value: profile.portrait ? 1 : 0 },
           uShatter: { value: 0 },
+          uVoice: { value: 0 },
         },
         transparent: true,
         depthWrite: false,
@@ -58,6 +59,7 @@ export function Portrait() {
     g.visible = inChapter && !!material.uniforms.uTex.value;
     if (!g.visible) return;
     const presence = smooth(i - 0.12, i + 0.05, world.t) * (1 - smooth(SHATTER[1] - 0.15, SHATTER[1], world.t));
+    material.uniforms.uVoice.value = world.voice;
     material.uniforms.uShatter.value = smooth(SHATTER[0], SHATTER[1] - 0.12, world.t);
     material.uniforms.uOpacity.value = presence * 0.9;
     material.uniforms.uReveal.value = smooth(0, 0.3, p) * 1.02;
