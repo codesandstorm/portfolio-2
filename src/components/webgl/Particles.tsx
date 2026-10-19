@@ -59,7 +59,8 @@ const hash = (n: number) => {
 };
 
 export function Particles({ count }: { count: number }) {
-  const { size, gl } = useThree();
+  const { size, gl, camera } = useThree();
+  const projected = useMemo(() => new THREE.Vector3(), []);
   const targets = useRef<Partial<Record<Mode | "seed", Float32Array>>>({});
   const frame = useRef<HeroFrame>(heroFrame(size.width, size.height));
   const half = count >> 1;
@@ -370,6 +371,12 @@ export function Particles({ count }: { count: number }) {
     alpha.needsUpdate = true;
     col.needsUpdate = true;
 
+    if (mode === "finale") {
+      // Tell the DOM where her name is, so the visitor's thread can reach it.
+      projected.set(0, frame.current.tall ? 6 : 1.5, 6).project(camera);
+      world.finaleScreen.x = (projected.x * 0.5 + 0.5) * size.width;
+      world.finaleScreen.y = (-projected.y * 0.5 + 0.5) * size.height;
+    }
     const want = LOOK[mode];
     // Once the crisp name resolves, the particles become its aura.
     const aura = mode === "glyph" && t < 1 ? 1 - amt.crisp * 0.55 : 1;

@@ -1,13 +1,15 @@
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { profile } from "@/content/data";
 import { stats } from "@/content/graph";
 import { finale } from "@/content/story";
 import { chapterIndex } from "@/lib/chapters";
+import { sfx } from "@/audio/useSound";
 import { useTicker } from "@/lib/hooks";
 import { scrollToChapter } from "@/lib/scroll";
 import { chapterProgress, smooth } from "@/lib/world";
+import { LastThread, THREAD_KEY } from "../finale/LastThread";
 import { Chapter, Kicker, useFlow } from "./Chapter";
 
 /** 09 — Continue. The whole structure at once; the next connection is the visitor's. */
@@ -15,8 +17,32 @@ export function ContinueChapter() {
   const flow = useFlow();
   const a = useRef<HTMLDivElement>(null);
   const b = useRef<HTMLDivElement>(null);
+  const [connected, setConnected] = useState(false);
+  const [threadOn, setThreadOn] = useState(false);
+
+  const recalled = useRef(false);
+
+  const connect = useCallback(() => {
+    setConnected(true);
+    sfx.resolve();
+    [0, 2, 4].forEach((n, i) => setTimeout(() => sfx.shimmer(n), 250 + i * 140));
+    try {
+      localStorage.setItem(THREAD_KEY, "1");
+    } catch {
+      /* not remembered — still connected for this visit */
+    }
+  }, []);
 
   useTicker(() => {
+    // A thread drawn on an earlier visit is still there (read after hydration).
+    if (!recalled.current) {
+      recalled.current = true;
+      try {
+        if (localStorage.getItem(THREAD_KEY) === "1") setConnected(true);
+      } catch {
+        /* storage unavailable: the thread simply isn't remembered */
+      }
+    }
     if (flow) return;
     const p = chapterProgress(chapterIndex.continue);
     const show = (el: HTMLElement | null, v: number) => {
@@ -26,16 +52,19 @@ export function ContinueChapter() {
     };
     show(a.current, smooth(0.12, 0.3, p));
     show(b.current, smooth(0.35, 0.55, p));
+    const on = p > 0.3;
+    if (on !== threadOn) setThreadOn(on);
   });
 
   return (
     <Chapter id="continue">
+      {!flow && <LastThread connected={connected} onConnect={connect} visible={threadOn} />}
       {/* Top and bottom hold the words; the middle is left to her name in light. */}
       <div className={flow ? "mx-auto max-w-4xl text-center" : "flex h-full flex-col items-center justify-between pb-[4svh] pt-[13svh] text-center"}>
         <div ref={a} style={flow ? undefined : { opacity: 0 }}>
           <Kicker id="continue" className="justify-center" />
           <p className="mono mt-4 text-faint">
-            {stats.people} people · {stats.projects} builds · {stats.skills} skills · {stats.signals} signals · {stats.edges} threads
+            {stats.people} people · {stats.projects} builds · {stats.skills} skills · {stats.signals} signals · {stats.edges + (connected ? 1 : 0)} threads
           </p>
           <p className="display mt-3 text-base italic text-mist">{finale.thesis}</p>
           <h2 id="continue-title" className="display mt-4 text-[clamp(1.8rem,4vw,3.4rem)] italic leading-[1.02] text-ivory">
@@ -54,10 +83,18 @@ export function ContinueChapter() {
               <span className="absolute inset-0 animate-ping rounded-full bg-gold/50 [animation-duration:2.4s]" />
               <span className="absolute inset-0 rounded-full bg-gold shadow-[0_0_16px_#ffb347]" />
             </span>
-            <span className="display text-[clamp(1.5rem,4vw,3rem)] text-ivory transition-colors group-hover:text-gold">Make the connection on LinkedIn</span>
+            <span className="display text-[clamp(1.5rem,4vw,3rem)] text-ivory transition-colors group-hover:text-gold">
+              {connected ? "Your thread reached her — continue it on LinkedIn" : "Make the connection on LinkedIn"}
+            </span>
             <span className="display text-3xl text-gold transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" aria-hidden>↗</span>
             <span className="absolute inset-x-0 -bottom-1 h-px origin-left scale-x-50 bg-gradient-to-r from-gold to-transparent transition-transform duration-700 group-hover:scale-x-100" aria-hidden />
           </a>
+          {flow && !connected && (
+            <button type="button" onClick={connect} className="mono mt-4 text-gold hover:text-ivory" data-cursor="link">
+              Draw the last thread to her
+            </button>
+          )}
+          {connected && <p className="mono mt-3 text-gold/80" aria-live="polite">One more thread in her network — yours.</p>}
           <div className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2">
             <a href={profile.links.github} target="_blank" rel="noreferrer" className="thread-link mono" data-cursor="external">
               Explore her GitHub <span aria-hidden>↗</span>

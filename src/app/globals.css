@@ -97,6 +97,8 @@ html[data-cursor="on"], html[data-cursor="on"] * { cursor: none !important; }
 .reveal-line { display: block; overflow: hidden; }
 .reveal-line > span { display: block; transform: translateY(calc((1 - var(--r, 1)) * 110%)); opacity: var(--r, 1); }
 
+@keyframes thread-hint { to { stroke-dashoffset: -18; } }
+
 /* Her name: editorial serif, fire on one side, ice on the other, meeting in ivory. */
 .hero-name {
   background-image: linear-gradient(180deg, #ffad5e 0%, #ffd6a6 34%, #f7efe4 50%, #cfe6ff 66%, #84c2ff 100%);

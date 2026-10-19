@@ -20,6 +20,8 @@ export const world = {
   shake: 0,
   /** Seconds since page start, advanced by the intro clock (for procedural motion). */
   time: 0,
+  /** Where her name sits on screen in the finale (CSS px). */
+  finaleScreen: { x: 0, y: 0 },
   /** Hero name rectangle in CSS px, measured from the DOM <h1> for particle alignment. */
   nameRect: null as null | { cx: number; cy: number; w: number; h: number; fontPx: number; spacingPx: number; lines: string[]; lineHeightPx: number },
 };

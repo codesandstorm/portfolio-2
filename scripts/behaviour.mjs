@@ -98,6 +98,51 @@ const scrollTo = (page, y) => page.evaluate((y) => (window.__lenis ? window.__le
   check("keyboard: first 14 tab stops visible and named", stops.every((s) => s.visible && s.name), stops.map((s) => s.name).join(" | "));
   await ctx.close();
 }
+{
+  // The last thread: drag from "You" to her name; the keyboard path does the same.
+  const { ctx, page, errors } = await fresh();
+  await sleep(1500);
+  await page.evaluate(() => [...document.querySelectorAll("button")].find((b) => b.textContent === "Skip intro")?.click());
+  await page.evaluate(() => {
+    const el = document.getElementById("continue");
+    const top = el.getBoundingClientRect().top + scrollY + (el.offsetHeight - innerHeight) * 0.6;
+    window.__lenis ? window.__lenis.scrollTo(top, { immediate: true }) : window.scrollTo(0, top);
+  });
+  await sleep(2500);
+  const shots = process.env.SHOTS;
+  if (shots) await page.screenshot({ path: shots + "/thread-before.jpg", type: "jpeg", quality: 72 });
+  const handle = await page.$('button[aria-label^="Draw the last thread"]');
+  const box = await handle.boundingBox();
+  const start = { x: box.x + 10, y: box.y + box.height / 2 };
+  const target = await page.evaluate(() => {
+    const c = document.querySelector("#continue svg circle");
+    return { x: Number(c.getAttribute("cx")), y: Number(c.getAttribute("cy")) };
+  });
+  await page.mouse.move(start.x, start.y);
+  await page.mouse.down();
+  for (let k = 1; k <= 12; k++) await page.mouse.move(start.x + ((target.x - start.x) * k) / 12, start.y + ((target.y - start.y) * k) / 12);
+  if (shots) await page.screenshot({ path: shots + "/thread-drag.jpg", type: "jpeg", quality: 72 });
+  await page.mouse.up();
+  await sleep(1600);
+  if (shots) await page.screenshot({ path: shots + "/thread-after.jpg", type: "jpeg", quality: 72 });
+  const linked = await page.evaluate(() => document.querySelector("#continue")?.textContent?.includes("Your thread reached her"));
+  check("last thread: dragging to her name connects", !!linked, `target ${Math.round(target.x)},${Math.round(target.y)}`);
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await sleep(2500);
+  const remembered = await page.evaluate(() => document.querySelector("#continue")?.textContent?.includes("Your thread reached her"));
+  check("last thread: remembered on return", !!remembered);
+  await page.evaluate(() => localStorage.removeItem("sutra-last-thread"));
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await sleep(1500);
+  await page.evaluate(() => [...document.querySelectorAll("button")].find((b) => b.textContent === "Skip intro")?.click());
+  await page.focus('button[aria-label^="Draw the last thread"]');
+  await page.keyboard.press("Enter");
+  await sleep(500);
+  const viaKeys = await page.evaluate(() => document.querySelector("#continue")?.textContent?.includes("Your thread reached her"));
+  check("last thread: Enter completes it", !!viaKeys);
+  check("last thread: no errors", errors.length === 0, errors[0]);
+  await ctx.close();
+}
 await browser.close();
 console.log(results.join("\n"));
 process.exit(results.some((r) => r.startsWith("FAIL")) ? 1 : 0);
