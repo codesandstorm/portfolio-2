@@ -204,7 +204,7 @@ export function CinematicLanding() {
                 key={m.n}
                 type="button"
                 onClick={() => scrollToChapter(m.to)}
-                className={`group pointer-events-auto ${flow ? "" : `absolute ${corner}`} max-w-[15rem]`}
+                className={`group pointer-events-auto ${flow ? "self-start text-left" : `absolute ${corner}`} max-w-[15rem]`}
                 data-cursor="link"
               >
                 <span className="mono text-faint">{m.n}</span>
