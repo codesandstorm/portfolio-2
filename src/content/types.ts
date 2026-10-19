@@ -88,7 +88,7 @@ export type Project = {
   github?: string;
   live?: boolean;
   period: string;
-  status: "shipped" | "prototype" | "hackathon";
+  status: "live" | "internship" | "built" | "hackathon";
   artifact: { form: ArtifactForm; count: number; countMeaning: string };
   sources: SourceId[];
 };

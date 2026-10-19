@@ -362,8 +362,8 @@ export const signals: LinkedInSignal[] = [
 export const achievements: Achievement[] = [
   {
     id: "a-offers",
-    title: "Four internship offers",
-    result: "in 15 days",
+    title: "Internship offers in fifteen days",
+    result: "Four",
     date: "Jul 2026",
     detail: "A year after being the quiet student still learning JavaScript — four offers in fifteen days, including IIT Indore.",
     experiences: ["x-iit"],

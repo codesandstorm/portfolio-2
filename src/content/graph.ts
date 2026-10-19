@@ -155,12 +155,23 @@ export function isHeadlineSkill(id: string) {
   return headlineSkills.includes(id);
 }
 
+/** Distinct stories a person belongs to: experiences, or projects outside them. */
+export function getStoriesForPerson(personId: string): string[] {
+  const stories = new Set(getNeighbors(personId, "experience"));
+  for (const pid of getNeighbors(personId, "project")) {
+    const p = entityById.get(pid) as Project;
+    stories.add(p.experience ?? p.id);
+  }
+  return [...stories];
+}
+
 /** People named in more than one story — the bridges in her network. */
 export function getBridgePeople(): Person[] {
-  return people.filter((p) => {
-    const hosts = new Set([...getNeighbors(p.id, "experience"), ...getNeighbors(p.id, "project")]);
-    return hosts.size > 1;
-  });
+  return people.filter((p) => getStoriesForPerson(p.id).length > 1);
+}
+
+export function joinWords(words: string[]) {
+  return words.length < 2 ? words.join("") : `${words.slice(0, -1).join(", ")} and ${words[words.length - 1]}`;
 }
 
 export function signalUrl(s: LinkedInSignal): { href: string; exact: boolean } {
