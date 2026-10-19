@@ -28,8 +28,9 @@ export function LearnChapter() {
             Skills, by <span className="italic text-gold">evidence.</span>
           </h2>
           <p className="mt-5 text-[15px] leading-relaxed text-mist">
-            No percentages. Each skill is a point of light with a thread to every place she used it. Choose one and everything else falls dark — the energy runs
-            out to the projects, internships and posts that prove it, and back.
+            No percentages. Each skill is a point of light with a thread to every place she used it.
+            <span className="hidden sm:inline"> Choose one and everything else falls dark — the energy runs out to the projects, internships and posts that prove it, and back.</span>
+            <span className="sm:hidden"> Tap one to see where.</span>
           </p>
           {!flow && (
             <p className="mono mt-5 flex flex-wrap gap-x-5 gap-y-1 text-faint">

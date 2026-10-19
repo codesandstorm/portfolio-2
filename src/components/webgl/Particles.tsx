@@ -94,7 +94,7 @@ export function Particles({ count }: { count: number }) {
       // Her name re-forms at the centre of the finished structure.
       targets.current.finale = nameTarget(count, {
         width: Math.min(30, visibleWidth(tall ? 58 : 42, fov, aspect) * (tall ? 0.8 : 0.5)),
-        center: [0, 1.5, 6],
+        center: [0, tall ? 6 : 1.5, 6],
         stacked: tall,
       });
       useUI.getState().setReady();

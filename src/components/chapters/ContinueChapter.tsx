@@ -53,7 +53,7 @@ export function ContinueChapter() {
               <span className="absolute inset-0 animate-ping rounded-full bg-gold/50 [animation-duration:2.4s]" />
               <span className="absolute inset-0 rounded-full bg-gold shadow-[0_0_16px_#ffb347]" />
             </span>
-            <span className="display text-[clamp(1.8rem,4vw,3rem)] text-ivory transition-colors group-hover:text-gold">Make the connection on LinkedIn</span>
+            <span className="display text-[clamp(1.5rem,4vw,3rem)] text-ivory transition-colors group-hover:text-gold">Make the connection on LinkedIn</span>
             <span className="display text-3xl text-gold transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" aria-hidden>↗</span>
             <span className="absolute inset-x-0 -bottom-1 h-px origin-left scale-x-50 bg-gradient-to-r from-gold to-transparent transition-transform duration-700 group-hover:scale-x-100" aria-hidden />
           </a>

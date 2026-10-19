@@ -5,7 +5,7 @@ import { getEdgeConfidence, getNode, getSkillsForProject } from "@/content/graph
 import type { Project } from "@/content/types";
 import { useUI } from "@/lib/store";
 import { Chapter, Kicker, useFlow } from "./Chapter";
-import { Arrive, Label, Stepped } from "./Stepped";
+import { Label, Sections, Stepped, type Section } from "./Stepped";
 
 const STATUS: Record<Project["status"], string> = {
   live: "Live",
@@ -33,76 +33,90 @@ function Artifact({ p, i, reveal }: { p: Project; i: number; reveal: number }) {
         Form · {p.artifact.count} {p.artifact.countMeaning}
       </p>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 sm:gap-x-8">
-        {p.problem && (
-          <Arrive at={0.1} reveal={reveal} className="sm:col-span-2">
-            <Label>Why it existed</Label>
-            <p className="text-sm leading-relaxed text-mist">{p.problem}</p>
-          </Arrive>
-        )}
-        <Arrive at={0.2} reveal={reveal}>
-          <Label>What she did</Label>
-          <p className="mb-1 text-sm text-ivory/85">{p.role}</p>
-          <ul className="hidden text-sm leading-snug text-mist sm:block">{p.built.map((b) => <li key={b}>{b}</li>)}</ul>
-        </Arrive>
-        {p.difficult && (
-          <Arrive at={0.34} reveal={reveal}>
-            <Label>The hard part</Label>
-            <p className="text-sm leading-relaxed text-mist">{p.difficult}</p>
-          </Arrive>
-        )}
-        <Arrive at={0.46} reveal={reveal} className="sm:col-span-2">
-          <Label>Technologies</Label>
-          <p className="mono leading-relaxed text-ivory/70">{p.stack.join(" · ")}</p>
-        </Arrive>
-        <Arrive at={0.56} reveal={reveal}>
-          <Label>Skills it strengthened</Label>
-          <p className="flex flex-wrap gap-x-3 gap-y-1">
-            {skills.map((s) => (
-              <button key={s.id} type="button" onClick={() => select(s.id)} className="mono text-mist hover:text-gold" data-cursor="link">
-                {s.name}
-              </button>
-            ))}
-          </p>
-        </Arrive>
-        {(p.experience || p.learned) && (
-          <Arrive at={0.64} reveal={reveal}>
-            {p.experience && (
+      <Sections
+        reveal={reveal}
+        items={[
+          p.problem && {
+            at: 0.08, key: "why", className: "sm:col-span-2",
+            node: (<><Label>Why it existed</Label><p className="text-sm leading-relaxed text-mist">{p.problem}</p></>),
+          },
+          {
+            at: 0.2, key: "did",
+            node: (
               <>
-                <Label>Born in</Label>
-                <button type="button" onClick={() => select(p.experience!)} className="text-sm text-ivory/85 underline decoration-gold/40 underline-offset-4 hover:text-gold" data-cursor="link">
-                  {getNode(p.experience)?.label}
-                </button>
-                {inferred && <span className="mono ml-2 text-faint">inferred from dates</span>}
+                <Label>What she did</Label>
+                <p className="mb-1 text-sm text-ivory/85">{p.role}</p>
+                <ul className="text-sm leading-snug text-mist">{p.built.map((b) => <li key={b}>{b}</li>)}</ul>
               </>
-            )}
-            {p.learned && (
-              <p className="mt-3 text-sm leading-relaxed text-mist">
-                <span className="mono mr-2 text-gold/90">Learned</span>
-                {p.learned.join(" · ")}
-              </p>
-            )}
-          </Arrive>
-        )}
-        {p.after && (
-          <Arrive at={0.74} reveal={reveal} className="sm:col-span-2">
-            <Label>What came after</Label>
-            <p className="text-sm leading-relaxed text-ivory/85">{p.after}</p>
-          </Arrive>
-        )}
-        <Arrive at={0.8} reveal={reveal} className="flex flex-wrap gap-x-6 gap-y-2 sm:col-span-2">
-          {p.github && (
-            <a href={p.github} target="_blank" rel="noreferrer" className="thread-link mono text-gold" data-cursor="external">
-              Source on GitHub <span aria-hidden>↗</span>
-            </a>
-          )}
-          {p.signals?.map((s) => (
-            <button key={s} type="button" onClick={() => read(s)} className="thread-link text-sm" data-cursor="link">
-              <span className="mono text-gold">LI</span> {getNode(s)?.label}
-            </button>
-          ))}
-        </Arrive>
-      </div>
+            ),
+          },
+          p.difficult && {
+            at: 0.34, key: "hard",
+            node: (<><Label>The hard part</Label><p className="text-sm leading-relaxed text-mist">{p.difficult}</p></>),
+          },
+          {
+            at: 0.46, key: "tech", className: "sm:col-span-2",
+            node: (<><Label>Technologies</Label><p className="mono leading-relaxed text-ivory/70">{p.stack.join(" · ")}</p></>),
+          },
+          {
+            at: 0.56, key: "skills",
+            node: (
+              <>
+                <Label>Skills it strengthened</Label>
+                <p className="flex flex-wrap gap-x-3 gap-y-1">
+                  {skills.map((s) => (
+                    <button key={s.id} type="button" onClick={() => select(s.id)} className="mono text-mist hover:text-gold" data-cursor="link">{s.name}</button>
+                  ))}
+                </p>
+              </>
+            ),
+          },
+          (p.experience || p.learned) && {
+            at: 0.64, key: "origin",
+            node: (
+              <>
+                {p.experience && (
+                  <>
+                    <Label>Born in</Label>
+                    <button type="button" onClick={() => select(p.experience!)} className="text-sm text-ivory/85 underline decoration-gold/40 underline-offset-4 hover:text-gold" data-cursor="link">
+                      {getNode(p.experience)?.label}
+                    </button>
+                    {inferred && <span className="mono ml-2 text-faint">inferred from dates</span>}
+                  </>
+                )}
+                {p.learned && (
+                  <p className="mt-3 text-sm leading-relaxed text-mist">
+                    <span className="mono mr-2 text-gold/90">Learned</span>
+                    {p.learned.join(" · ")}
+                  </p>
+                )}
+              </>
+            ),
+          },
+          p.after && {
+            at: 0.74, key: "after", className: "sm:col-span-2",
+            node: (<><Label>What came after</Label><p className="text-sm leading-relaxed text-ivory/85">{p.after}</p></>),
+          },
+          {
+            at: 0.82, key: "links", className: "sm:col-span-2",
+            node: (
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                {p.github && (
+                  <a href={p.github} target="_blank" rel="noreferrer" className="thread-link mono text-gold" data-cursor="external">
+                    Source on GitHub <span aria-hidden>↗</span>
+                  </a>
+                )}
+                {p.signals?.map((s) => (
+                  <button key={s} type="button" onClick={() => read(s)} className="thread-link text-sm" data-cursor="link">
+                    <span className="mono text-gold">LI</span> {getNode(s)?.label}
+                  </button>
+                ))}
+                {!p.github && !p.signals?.length && <p className="text-sm text-mist">No public source or post for this one yet.</p>}
+              </div>
+            ),
+          },
+        ].filter(Boolean) as Section[]}
+      />
     </article>
   );
 }

@@ -27,11 +27,17 @@ export function ConnectChapter() {
             She names <span className="italic text-gold">people.</span>
           </h2>
           <p className="mt-5 text-[15px] leading-relaxed text-mist">
-            Nearly every post she writes ends with a list of names — mentors, co-interns, teammates, organisers. Here are the{" "}
+            Nearly every post she writes ends with a list of names<span className="hidden sm:inline"> — mentors, co-interns, teammates, organisers</span>. Here are the{" "}
             <span className="text-ivory">{stats.people} people</span> she has named across{" "}
-            <span className="text-ivory">{stats.postsNamingPeople} posts</span>, held in place by the stories they share with her.
+            <span className="text-ivory">{stats.postsNamingPeople} posts</span>
+            <span className="hidden sm:inline">, held in place by the stories they share with her</span>.
           </p>
-          {!flow && <p className="mono mt-5 text-faint">Hover a name · click to follow its threads · drag to turn the network</p>}
+          {!flow && (
+            <>
+              <p className="mono mt-5 text-faint [@media(pointer:coarse)]:hidden">Hover a name · click to follow its threads · drag to turn the network</p>
+              <p className="mono mt-4 hidden text-faint [@media(pointer:coarse)]:block">Tap a name to follow its threads</p>
+            </>
+          )}
         </div>
 
         {bridges.length > 0 && (

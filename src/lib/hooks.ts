@@ -39,6 +39,19 @@ export function useIsChapter(chapter: number) {
   return useUI((s) => s.chapter === chapter);
 }
 
+/** Phone-width layout: one idea on screen at a time. */
+export function useCompact() {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const on = () => setCompact(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return compact;
+}
+
 export function useIsCinematic() {
   return useUI((s) => s.tier !== null && s.tier !== "static");
 }

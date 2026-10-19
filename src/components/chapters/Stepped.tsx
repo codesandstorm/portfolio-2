@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { chapterIndex, type ChapterId } from "@/lib/chapters";
-import { useIsChapter, useTicker } from "@/lib/hooks";
+import { useCompact, useIsChapter, useTicker } from "@/lib/hooks";
 import { useUI } from "@/lib/store";
 import { chapterProgress } from "@/lib/world";
 import { useFlow } from "./Chapter";
@@ -83,6 +83,52 @@ export function Arrive({ at, reveal, children, className = "" }: { at: number; r
     >
       {children}
     </motion.div>
+  );
+}
+
+export type Section = { at: number; key: string; node: ReactNode; className?: string };
+
+/**
+ * The parts of a stepped item. On wide screens they accumulate in a grid; on
+ * phones only the newest part is shown, with ticks for where you are.
+ */
+export function Sections({ reveal, items }: { reveal: number; items: Section[] }) {
+  const compact = useCompact();
+  const flow = useFlow();
+  if (flow || !compact) {
+    return (
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 sm:gap-x-8">
+        {items.map((s) => (
+          <Arrive key={s.key} at={flow ? 0 : s.at} reveal={reveal} className={s.className}>
+            {s.node}
+          </Arrive>
+        ))}
+      </div>
+    );
+  }
+  const shown = items.filter((s) => reveal >= s.at);
+  const current = shown[shown.length - 1] ?? items[0];
+  return (
+    <div className="mt-4">
+      <div className="mb-3 flex gap-1.5" aria-hidden>
+        {items.map((s) => (
+          <span key={s.key} className={`h-px flex-1 transition-colors duration-500 ${reveal >= s.at ? "bg-gold" : "bg-hair"}`} />
+        ))}
+      </div>
+      <div className="min-h-[10rem]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current.key}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {current.node}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
   );
 }
 

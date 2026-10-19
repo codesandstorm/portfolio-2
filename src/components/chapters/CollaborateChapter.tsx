@@ -6,7 +6,7 @@ import type { Experience } from "@/content/types";
 import { useUI } from "@/lib/store";
 import { experienceOrder } from "@/world/layout";
 import { Chapter, Kicker, useFlow } from "./Chapter";
-import { Arrive, Label, Stepped } from "./Stepped";
+import { Arrive, Label, Sections, Stepped, type Section } from "./Stepped";
 
 const ordered = experienceOrder.map((id) => experiences.find((e) => e.id === id)!);
 const KIND: Record<Experience["kind"], string> = {
@@ -36,72 +36,88 @@ function Memory({ e, i, reveal }: { e: Experience; i: number; reveal: number }) 
       <p className="mt-2 text-[15px] text-gold/90">{e.role}</p>
       {e.place && <p className="mono mt-1 text-faint">{e.place}</p>}
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 sm:gap-x-8">
-        {e.opportunity && (
-          <Arrive at={0.12} reveal={reveal} className="sm:col-span-2">
-            <Label>The opportunity</Label>
-            <p className="text-[15px] leading-relaxed text-mist">{e.opportunity}</p>
-          </Arrive>
-        )}
-        <Arrive at={0.2} reveal={reveal} className="sm:col-span-2">
-          <Label>The work</Label>
-          <ul className="space-y-1 text-sm leading-snug text-ivory/85">
-            {e.work.map((w) => <li key={w} className="flex gap-3"><span className="mt-[0.6em] h-px w-3 shrink-0 bg-gold/60" aria-hidden />{w}</li>)}
-          </ul>
-        </Arrive>
-        {people.length > 0 && (
-          <Arrive at={0.38} reveal={reveal} className="hidden sm:block">
-            <Label>The people</Label>
-            <p className="text-sm leading-relaxed text-mist">
-              She named {people.length}: {people.slice(0, 4).map((p) => getNode(p)?.label).join(", ")}
-              {people.length > 4 ? ` and ${people.length - 4} more` : ""}.
-            </p>
-          </Arrive>
-        )}
-        {e.learning && (
-          <Arrive at={0.48} reveal={reveal}>
-            <Label>The learning</Label>
-            <ul className="text-sm leading-relaxed text-ivory/85">{e.learning.map((l) => <li key={l}>{l}</li>)}</ul>
-          </Arrive>
-        )}
-        <Arrive at={0.56} reveal={reveal} className={e.learning ? "" : "sm:col-span-2"}>
-          <Label>Skills it grew</Label>
-          <p className="flex flex-wrap gap-x-3 gap-y-1">
-            {skills.map((s) => (
-              <button key={s.id} type="button" onClick={() => select(s.id)} className="mono text-mist hover:text-gold" data-cursor="link">
-                {s.name}
-              </button>
-            ))}
-          </p>
-        </Arrive>
-        {(e.enabled || ach.length > 0) && (
-          <Arrive at={0.68} reveal={reveal} className="sm:col-span-2">
-            <Label>What it enabled</Label>
-            {e.enabled && <p className="text-sm leading-relaxed text-mist">{e.enabled}</p>}
-            {ach.length > 0 && (
-              <p className="mt-1 text-sm text-ivory/85">
-                {ach.map((a) => (
-                  <button key={a.id} type="button" onClick={() => select(a.id)} className="mr-4 underline decoration-gold/40 underline-offset-4 hover:text-gold" data-cursor="link">
-                    {a.title} — {a.result}
-                  </button>
-                ))}
-              </p>
-            )}
-          </Arrive>
-        )}
-        {posts.length > 0 && (
-          <Arrive at={0.78} reveal={reveal} className="sm:col-span-2">
-            <Label>Evidence</Label>
-            <div className="flex flex-wrap gap-x-6 gap-y-1">
-              {posts.map((s) => (
-                <button key={s.id} type="button" onClick={() => read(s.id)} className="thread-link text-sm" data-cursor="link">
-                  <span className="mono text-gold">LI</span> {s.title}
-                </button>
-              ))}
-            </div>
-          </Arrive>
-        )}
-      </div>
+      <Sections
+        reveal={reveal}
+        items={[
+          e.opportunity && {
+            at: 0.08, key: "opportunity", className: "sm:col-span-2",
+            node: (<><Label>The opportunity</Label><p className="text-[15px] leading-relaxed text-mist">{e.opportunity}</p></>),
+          },
+          {
+            at: 0.18, key: "work", className: "sm:col-span-2",
+            node: (
+              <>
+                <Label>The work</Label>
+                <ul className="space-y-1 text-sm leading-snug text-ivory/85">
+                  {e.work.map((w) => <li key={w} className="flex gap-3"><span className="mt-[0.6em] h-px w-3 shrink-0 bg-gold/60" aria-hidden />{w}</li>)}
+                </ul>
+              </>
+            ),
+          },
+          people.length > 0 && {
+            at: 0.36, key: "people",
+            node: (
+              <>
+                <Label>The people</Label>
+                <p className="text-sm leading-relaxed text-mist">
+                  She named {people.length}: {people.slice(0, 4).map((p) => getNode(p)?.label).join(", ")}
+                  {people.length > 4 ? ` and ${people.length - 4} more` : ""}.
+                </p>
+              </>
+            ),
+          },
+          e.learning && {
+            at: 0.46, key: "learning",
+            node: (<><Label>The learning</Label><ul className="text-sm leading-relaxed text-ivory/85">{e.learning.map((l) => <li key={l}>{l}</li>)}</ul></>),
+          },
+          {
+            at: 0.56, key: "skills", className: e.learning && people.length ? "sm:col-span-2" : "",
+            node: (
+              <>
+                <Label>Skills it grew</Label>
+                <p className="flex flex-wrap gap-x-3 gap-y-1">
+                  {skills.map((s) => (
+                    <button key={s.id} type="button" onClick={() => select(s.id)} className="mono text-mist hover:text-gold" data-cursor="link">{s.name}</button>
+                  ))}
+                </p>
+              </>
+            ),
+          },
+          (e.enabled || ach.length > 0) && {
+            at: 0.68, key: "enabled", className: "sm:col-span-2",
+            node: (
+              <>
+                <Label>What it enabled</Label>
+                {e.enabled && <p className="text-sm leading-relaxed text-mist">{e.enabled}</p>}
+                {ach.length > 0 && (
+                  <p className="mt-1 text-sm text-ivory/85">
+                    {ach.map((a) => (
+                      <button key={a.id} type="button" onClick={() => select(a.id)} className="mr-4 underline decoration-gold/40 underline-offset-4 hover:text-gold" data-cursor="link">
+                        {a.title} — {a.result}
+                      </button>
+                    ))}
+                  </p>
+                )}
+              </>
+            ),
+          },
+          posts.length > 0 && {
+            at: 0.8, key: "evidence", className: "sm:col-span-2",
+            node: (
+              <>
+                <Label>Evidence</Label>
+                <div className="flex flex-wrap gap-x-6 gap-y-1">
+                  {posts.map((s) => (
+                    <button key={s.id} type="button" onClick={() => read(s.id)} className="thread-link text-sm" data-cursor="link">
+                      <span className="mono text-gold">LI</span> {s.title}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ),
+          },
+        ].filter(Boolean) as Section[]}
+      />
       {next && (
         <Arrive at={0.9} reveal={reveal}>
           <p className="mono mt-6 text-faint">
