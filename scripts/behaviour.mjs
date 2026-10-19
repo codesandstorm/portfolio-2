@@ -144,6 +144,41 @@ const scrollTo = (page, y) => page.evaluate((y) => (window.__lenis ? window.__le
   check("last thread: no errors", errors.length === 0, errors[0]);
   await ctx.close();
 }
+{
+  // Guided tour: disclosure first, then narrated stops that move the page; the visitor can always take over.
+  const { ctx, page, errors } = await fresh();
+  await sleep(1500);
+  await page.evaluate(() => [...document.querySelectorAll("button")].find((b) => b.textContent.startsWith("or take the guided tour"))?.click());
+  await sleep(800);
+  const disclosed = await page.evaluate(() => document.querySelector('[aria-label="Guided tour"]')?.textContent?.includes("AI voice"));
+  check("tour: AI-voice disclosure shown before it starts", !!disclosed);
+  const shots = process.env.SHOTS;
+  if (shots) await page.screenshot({ path: shots + "/tour-disclosure.jpg", type: "jpeg", quality: 72 });
+  await page.click("button::-p-text(Begin)");
+  await sleep(6000);
+  if (shots) await page.screenshot({ path: shots + "/tour-stop1.jpg", type: "jpeg", quality: 72 });
+  const y0 = await page.evaluate(() => scrollY);
+  await page.click('button[aria-label="Next stop"]');
+  await sleep(5000);
+  const state = await page.evaluate(() => ({ y: scrollY, counter: document.querySelector('[aria-label="Guided tour"]')?.textContent?.match(/\d\d \/ \d\d/)?.[0] }));
+  if (shots) await page.screenshot({ path: shots + "/tour-stop2.jpg", type: "jpeg", quality: 72 });
+  check("tour: next stop travels through the story", state.y > y0 + 200 && state.counter === "02 / 11", `y ${Math.round(y0)} → ${Math.round(state.y)}, ${state.counter}`);
+  await page.mouse.move(700, 400);
+  await page.mouse.wheel({ deltaY: 300 });
+  await sleep(500);
+  const paused = await page.evaluate(() => !!document.querySelector('button[aria-label="Resume tour"]'));
+  check("tour: scrolling hands control back (pauses)", paused);
+  await page.click('button[aria-label="Resume tour"]');
+  await sleep(1500);
+  const resumed = await page.evaluate(() => !!document.querySelector('button[aria-label="Pause tour"]'));
+  check("tour: resume continues", resumed);
+  await page.click('button[aria-label="End tour"]');
+  await sleep(700);
+  const gone = await page.evaluate(() => !document.querySelector('[aria-label="Guided tour"]'));
+  check("tour: can be ended at any time", gone);
+  check("tour: no errors", errors.length === 0, errors[0]);
+  await ctx.close();
+}
 await browser.close();
 console.log(results.join("\n"));
 process.exit(results.some((r) => r.startsWith("FAIL")) ? 1 : 0);

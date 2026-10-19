@@ -7,6 +7,7 @@ import { useSound } from "@/audio/useSound";
 import { chapters } from "@/lib/chapters";
 import { scrollToChapter } from "@/lib/scroll";
 import { useUI } from "@/lib/store";
+import { useTour } from "@/lib/tour";
 
 function SoundToggle() {
   const enabled = useSound((s) => s.enabled);
@@ -113,6 +114,15 @@ export function TopBar() {
           >
             Connect<span aria-hidden> ↗</span>
           </a>
+          <button
+            type="button"
+            onClick={() => useTour.getState().open()}
+            className={`mono text-mist transition-[opacity,visibility,color] duration-1000 hover:text-gold ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}
+            aria-label="Start the narrated guided tour"
+            data-cursor="link"
+          >
+            Tour ▸
+          </button>
           <SoundToggle />
           <button
             type="button"

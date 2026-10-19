@@ -9,6 +9,7 @@ import { AT, INTRO_SECONDS, introAmounts, introPhase } from "@/lib/intro";
 import { useTicker } from "@/lib/hooks";
 import { scrollToChapter } from "@/lib/scroll";
 import { useUI } from "@/lib/store";
+import { useTour } from "@/lib/tour";
 import { smooth, world } from "@/lib/world";
 import { Chapter, useFlow } from "../chapters/Chapter";
 
@@ -216,7 +217,7 @@ export function CinematicLanding() {
           })}
         </div>
 
-        <div ref={invite} className={flow ? "mt-12" : "absolute bottom-[5%] left-1/2 -translate-x-1/2"} style={hidden}>
+        <div ref={invite} className={`flex flex-col items-center gap-5 ${flow ? "mt-12" : "absolute bottom-[4%] left-1/2 -translate-x-1/2"}`} style={hidden}>
           <button
             type="button"
             onClick={() => { skip(); sfx.swell(); scrollToChapter("start"); }}
@@ -228,6 +229,14 @@ export function CinematicLanding() {
               <span className="text-sm text-gold transition-transform duration-500 group-hover:translate-y-0.5">↓</span>
             </span>
             <span className="mono text-[0.65rem] tracking-[0.4em] text-ivory/70">{landing.enter}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => { skip(); useTour.getState().open(); }}
+            className="mono whitespace-nowrap text-[0.65rem] tracking-[0.3em] text-gold/85 transition-colors hover:text-ivory"
+            data-cursor="link"
+          >
+            or take the guided tour ▸ <span className="text-faint">2½ min · narrated</span>
           </button>
         </div>
       </div>
