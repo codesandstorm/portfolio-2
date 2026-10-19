@@ -40,4 +40,9 @@ export const sfx = {
   shimmer: (step?: number) => audio.shimmer(step),
   tick: () => audio.tick(),
   swell: (bright?: boolean) => audio.swell(bright),
+  fireWake: () => audio.fireWake(),
+  iceWake: () => audio.iceWake(),
+  riser: (seconds: number) => audio.riser(seconds),
+  impact: () => audio.impact(),
+  resolve: () => audio.resolve(),
 };
