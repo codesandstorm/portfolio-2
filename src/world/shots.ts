@@ -54,7 +54,7 @@ export function shotAt(t: number, aspect: number): Shot {
     case chapterIndex.build: {
       const { index, local } = stepOf(p, projectOrder.length);
       const n = posOf(projectOrder[index]);
-      return { pos: add(n, [0.5 - local, 0.7, portrait ? 8.5 : 6.2]), look: add(n, frame), fov };
+      return { pos: add(n, [0.5 - local, 0.7, portrait ? 8.5 : 6.2]), look: add(n, portrait ? [0, -3, 0] : frame), fov }; // phones: artifact high, words and demo below
     }
     case chapterIndex.learn: {
       const a = 0.25 - p * 0.5;

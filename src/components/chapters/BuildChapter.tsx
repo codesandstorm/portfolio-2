@@ -3,7 +3,11 @@
 import { projects } from "@/content/data";
 import { getEdgeConfidence, getNode, getSkillsForProject } from "@/content/graph";
 import type { Project } from "@/content/types";
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
+import { useCompact } from "@/lib/hooks";
 import { useUI } from "@/lib/store";
+import { ProjectDemo } from "../demos/ProjectDemo";
 import { Chapter, Kicker, useFlow } from "./Chapter";
 import { Label, Sections, Stepped, type Section } from "./Stepped";
 
@@ -14,10 +18,12 @@ const STATUS: Record<Project["status"], string> = {
   hackathon: "Hackathon",
 };
 
-function Artifact({ p, i, reveal }: { p: Project; i: number; reveal: number }) {
+function Artifact({ p, i, reveal, flow }: { p: Project; i: number; reveal: number; flow: boolean }) {
   const select = useUI((s) => s.select);
   const read = useUI((s) => s.read);
   const skills = getSkillsForProject(p.id);
+  // On phones (and without WebGL) the demo is one more step; on wide screens it sits beside the artifact.
+  const inline = useCompact() || flow;
   const inferred = p.experience && getEdgeConfidence(p.id, p.experience) === "inferred";
 
   return (
@@ -49,6 +55,10 @@ function Artifact({ p, i, reveal }: { p: Project; i: number; reveal: number }) {
                 <ul className="text-sm leading-snug text-mist">{p.built.map((b) => <li key={b}>{b}</li>)}</ul>
               </>
             ),
+          },
+          inline && {
+            at: 0.27, key: "demo", className: "sm:col-span-2",
+            node: <ProjectDemo id={p.id} />,
           },
           p.difficult && {
             at: 0.34, key: "hard",
@@ -124,13 +134,40 @@ function Artifact({ p, i, reveal }: { p: Project; i: number; reveal: number }) {
 /** 05 — Build. Idea → form: each project grows from a seed into its artifact. */
 export function BuildChapter() {
   const flow = useFlow();
+  const compact = useCompact();
+  const [demo, setDemo] = useState<{ index: number; open: boolean }>({ index: 0, open: false });
   return (
     <Chapter id="build" scrim="right">
+      {!flow && !compact && (
+        <div className="absolute bottom-[6svh] left-[var(--gutter)] z-10 w-[min(25rem,32vw)]">
+          <AnimatePresence mode="wait">
+            {demo.open && (
+              <motion.div
+                key={projects[demo.index].id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <ProjectDemo id={projects[demo.index].id} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
       <div className={flow ? "mx-auto max-w-3xl" : "flex h-full flex-col justify-end pb-[7svh] pt-[38svh] md:items-end md:justify-center md:pb-0 md:pt-20"}>
         <div className="w-full md:w-[min(36rem,44vw)] md:mr-[7.5rem]">
           <Kicker id="build" className="mb-6" />
           <h2 id="build-title" className="sr-only">Build — her projects</h2>
-          <Stepped chapter="build" items={projects} render={(p, i, r) => <Artifact p={p} i={i} reveal={r} />} />
+          <Stepped
+            chapter="build"
+            items={projects}
+            render={(p, i, r) => <Artifact p={p} i={i} reveal={r} flow={flow} />}
+            onStep={(index, local) => {
+              const open = local > 0.12;
+              if (index !== demo.index || open !== demo.open) setDemo({ index, open });
+            }}
+          />
         </div>
       </div>
     </Chapter>
