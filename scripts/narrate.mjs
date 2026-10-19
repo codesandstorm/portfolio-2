@@ -32,8 +32,9 @@ if (!key) {
   console.error("ELEVENLABS_API_KEY is not set. Add it to .env.local (that file is git-ignored).");
   process.exit(1);
 }
-// Default: "George", a warm, neutral premade narrator voice. Override with ELEVENLABS_VOICE_ID.
-const voice = process.env.ELEVENLABS_VOICE_ID || "JBFqnCBsd6RMkjVDRZzb";
+// Default: "Matilda", a warm female premade narrator voice (a narrator, not a clone of Akshita).
+// Override with ELEVENLABS_VOICE_ID — e.g. a female Indian-English voice from your Voice Library.
+const voice = process.env.ELEVENLABS_VOICE_ID || "XrExE9yKIg1WjnnlVkGX";
 const model = process.env.ELEVENLABS_MODEL_ID || "eleven_multilingual_v2";
 const headers = { "xi-api-key": key, "Content-Type": "application/json" };
 

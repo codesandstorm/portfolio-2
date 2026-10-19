@@ -44,7 +44,7 @@ Edit `src/content/data.ts`; every claim carries a source id. Add `sourceUrl` to 
 The tour (`src/content/tour.ts`) plays in captions-only mode until narration is generated. To add the voice:
 
 1. Put your key in `.env.local` (git-ignored): `ELEVENLABS_API_KEY=...`
-   Optional: `ELEVENLABS_VOICE_ID=...` (default: George, a neutral premade narrator) and `ELEVENLABS_MODEL_ID=...`.
+   Optional: `ELEVENLABS_VOICE_ID=...` (default: Matilda, a warm female premade narrator — never a clone of Akshita) and `ELEVENLABS_MODEL_ID=...`.
 2. `npm run narrate` — writes `public/tour/<stop>.mp3` + word timings and `manifest.json`. Unchanged stops are skipped; `--force` regenerates all; `node scripts/narrate.mjs --voices` lists voices on your account.
 3. Commit the generated files in `public/tour/`. The site never calls ElevenLabs at runtime and never sees the key.
 
