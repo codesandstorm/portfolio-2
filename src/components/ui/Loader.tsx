@@ -21,7 +21,7 @@ export function Loader() {
       {!ready && (
         <motion.div
           key="loader"
-          className="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-6 bg-void"
+          className="pointer-events-none fixed inset-0 z-[60] flex flex-col items-center justify-center gap-6 bg-void"
           exit={{ opacity: 0, transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] } }}
           role="status"
           aria-live="polite"

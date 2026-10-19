@@ -1,0 +1,103 @@
+/**
+ * Behaviour checks for the opening and its fallbacks.
+ *   node scripts/behaviour.mjs [baseUrl]
+ */
+import puppeteer from "puppeteer-core";
+
+const base = process.argv[2] ?? "http://localhost:3000";
+const browser = await puppeteer.launch({
+  executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  headless: "new",
+  args: ["--use-angle=d3d11", "--enable-gpu", "--ignore-gpu-blocklist", "--autoplay-policy=no-user-gesture-required"],
+});
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const results = [];
+const check = (name, ok, detail = "") => results.push(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? ` — ${detail}` : ""}`);
+
+async function fresh(opts = {}) {
+  const ctx = await browser.createBrowserContext();
+  const page = await ctx.newPage();
+  await page.setViewport({ width: 1440, height: 900 });
+  if (opts.reduced) await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(String(e)));
+  page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+  await page.goto(base + (opts.query ?? ""), { waitUntil: "domcontentloaded" });
+  return { ctx, page, errors };
+}
+const nameOpacity = (page) => page.$eval("#signal-title", (el) => Number(getComputedStyle(el).opacity));
+const navVisible = (page) => page.$eval('a[aria-label^="Akshita Mahajan"]', (el) => getComputedStyle(el).visibility === "visible");
+const scrollTo = (page, y) => page.evaluate((y) => (window.__lenis ? window.__lenis.scrollTo(y, { immediate: true }) : window.scrollTo(0, y)), y);
+
+{
+  const { ctx, page, errors } = await fresh();
+  await sleep(1500);
+  await page.click('button[aria-label="Turn sound on"]');
+  await sleep(11000);
+  check("sound on: full intro without errors", errors.length === 0, errors[0]);
+  check("intro resolves the name", (await nameOpacity(page)) > 0.95);
+  check("navigation revealed after intro", await navVisible(page));
+  await ctx.close();
+}
+{
+  const { ctx, page, errors } = await fresh();
+  await sleep(1800);
+  check("nav hidden during intro", !(await navVisible(page)));
+  const covered = await page.evaluate(() => { const b = [...document.querySelectorAll("button")].find((x) => x.textContent === "Skip intro"); const r = b.getBoundingClientRect(); const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); b.click(); return !b.contains(top) && top ? top.tagName : ""; });
+  if (covered) console.log("note: skip button covered by", covered, "(dev overlay)");
+  await sleep(1800);
+  check("skip intro: name present", (await nameOpacity(page)) > 0.95);
+  check("skip intro: nav revealed", await navVisible(page));
+  check("skip intro: no errors", errors.length === 0, errors[0]);
+  await ctx.close();
+}
+{
+  const { ctx, page } = await fresh();
+  await sleep(2000);
+  await scrollTo(page, 400);
+  await sleep(1500);
+  const done = await page.evaluate(() => document.querySelector('a[aria-label^="Akshita Mahajan"]') && getComputedStyle(document.querySelector('a[aria-label^="Akshita Mahajan"]')).visibility === "visible");
+  check("scroll during intro completes it (never traps)", done);
+  await scrollTo(page, 2600);
+  await sleep(1500);
+  const away = await nameOpacity(page);
+  await scrollTo(page, 0);
+  await sleep(2500);
+  const back = await nameOpacity(page);
+  check("scroll forward fades the name, back restores it", away < 0.1 && back > 0.95, `away ${away.toFixed(2)} back ${back.toFixed(2)}`);
+  // Repeat visit in the same context: shorter intro.
+  const t0 = Date.now();
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('a[aria-label^="Akshita Mahajan"]')).visibility === "visible", { timeout: 20000 });
+  const secs = (Date.now() - t0) / 1000;
+  check("repeat visit plays a shorter intro", secs < 8, `${secs.toFixed(1)}s to settle`);
+  await ctx.close();
+}
+{
+  const { ctx, page, errors } = await fresh({ reduced: true });
+  await sleep(2500);
+  const tier = await page.evaluate(() => document.documentElement.dataset.tier);
+  const canvas = await page.$("canvas");
+  check("reduced motion → static tier without canvas", tier === "static" && !canvas, `tier ${tier}`);
+  check("reduced motion: name immediately visible", (await nameOpacity(page)) > 0.95);
+  const sections = await page.$$eval("section[data-chapter]", (s) => s.length);
+  check("reduced motion: all chapters present", sections === 10);
+  check("reduced motion: no errors", errors.length === 0, errors[0]);
+  // Keyboard: tab through the first stops and make sure each is visible and named.
+  const stops = [];
+  for (let i = 0; i < 14; i++) {
+    await page.keyboard.press("Tab");
+    stops.push(
+      await page.evaluate(() => {
+        const el = document.activeElement;
+        const r = el.getBoundingClientRect();
+        return { name: (el.getAttribute("aria-label") || el.textContent || "").trim().slice(0, 40), visible: r.width > 0 && getComputedStyle(el).visibility !== "hidden" };
+      }),
+    );
+  }
+  check("keyboard: first 14 tab stops visible and named", stops.every((s) => s.visible && s.name), stops.map((s) => s.name).join(" | "));
+  await ctx.close();
+}
+await browser.close();
+console.log(results.join("\n"));
+process.exit(results.some((r) => r.startsWith("FAIL")) ? 1 : 0);

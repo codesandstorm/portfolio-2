@@ -3,6 +3,7 @@ import { achievements, experiences, people, profile, projects, signals, skills }
 import {
   edges,
   getAchievementsForExperience,
+  getAchievementsForSkill,
   getBridgePeople,
   getNeighbors,
   getNode,
@@ -80,6 +81,12 @@ describe("relationship queries", () => {
     expect(getPostsForExperience("x-iit").map((s) => s.id)).toContain("sig-p8");
     expect(getAchievementsForExperience("x-iit").map((a) => a.id)).toContain("a-offers");
     expect(getRelatedNodes("x-iit").has("p-breastcare")).toBe(true);
+  });
+
+  it("answers: what did teamwork help make happen? (without overclaiming via experiences)", () => {
+    const ids = getAchievementsForSkill("s-teamwork").map((a) => a.id).sort();
+    expect(ids).toEqual(["a-prakriti", "a-techkutumb"]);
+    expect(getAchievementsForSkill("s-react").map((a) => a.id)).toEqual([]);
   });
 
   it("finds people who bridge more than one story", () => {

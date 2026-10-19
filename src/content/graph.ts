@@ -139,6 +139,17 @@ export function getAchievementsForExperience(expId: string): Achievement[] {
   return byKind<Achievement>([...ids]);
 }
 
+/**
+ * Results a skill fed into: achievements linked to the skill itself, or to a
+ * project that used it. Achievements reached only through a shared
+ * experience are excluded — that would overclaim what one skill did.
+ */
+export function getAchievementsForSkill(skillId: string): Achievement[] {
+  const ids = new Set(getNeighbors(skillId, "achievement"));
+  for (const p of getNeighbors(skillId, "project")) getNeighbors(p, "achievement").forEach((a) => ids.add(a));
+  return byKind<Achievement>([...ids]);
+}
+
 /** Skills that share a project or experience with this skill. */
 export function getRelatedSkills(skillId: string, limit = 6): Skill[] {
   const counts = new Map<string, number>();

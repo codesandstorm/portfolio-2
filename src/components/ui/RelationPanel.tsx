@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef } from "react";
 import {
   getAchievementsForExperience,
+  getAchievementsForSkill,
   getEdgeConfidence,
   getEntity,
   getExperiencesForSkill,
@@ -69,8 +70,9 @@ function Body({ id }: { id: string }) {
         <>
           {s.note && <p className="mt-3 text-mist">{s.note}</p>}
           {isHeadlineSkill(id) && <p className="mono mt-3 text-gold/80">She leads with this on her profile</p>}
-          <Group title="Where she used it" ids={getExperiencesForSkill(id).map((e) => e.id)} />
-          <Group title="What she built with it" ids={getProjectsForSkill(id).map((p) => p.id)} />
+          <Group title="Where she learned and practised it" ids={getExperiencesForSkill(id).map((e) => e.id)} />
+          <Group title="Where she applied it" ids={getProjectsForSkill(id).map((p) => p.id)} />
+          <Group title="What it helped make happen" ids={getAchievementsForSkill(id).map((a) => a.id)} />
           <Group title="Where she wrote about it" ids={getSignalsForSkill(id).map((p) => p.id)} />
           <Group title="Travels with" ids={getRelatedSkills(id).map((r) => r.id)} />
         </>
