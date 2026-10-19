@@ -25,6 +25,8 @@ export const threadFragment = /* glsl */ `
   uniform float uOpacity;
   uniform float uFocus;
   uniform vec3 uGold;
+  uniform vec3 uIce;
+  uniform float uIceMix;
   uniform vec3 uDim;
   varying float vT;
   varying float vHi;
@@ -44,7 +46,9 @@ export const threadFragment = /* glsl */ `
     float ambient = smoothstep(0.94, 1.0, fract(vT - uTime * 0.08 + vSeed * 3.0)) * 0.25;
     float a = mix(idle + ambient * (1.0 - uFocus), 0.38 + pulse, vHi);
     a *= smoothstep(160.0, 8.0, vDepth) * uOpacity;
-    vec3 col = mix(uDim, uGold * (1.0 + pulse), vHi);
+    // Fire's DNA is warm connection energy; ice's is a minority of precise, cold structural light.
+    vec3 lit = vSeed > 1.0 - uIceMix ? uIce : uGold;
+    vec3 col = mix(uDim, lit * (1.0 + pulse), vHi);
     gl_FragColor = vec4(col, a);
   }
 `;

@@ -3,14 +3,15 @@
 import { useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { CORE_ID, edges, getRelatedNodes, nodes } from "@/content/graph";
+import { CORE_ID, edges, getNeighbors, getRelatedNodes, nodes } from "@/content/graph";
 import { skills } from "@/content/data";
 import type { NodeKind } from "@/content/types";
 import { chapterIndex } from "@/lib/chapters";
+import { introAmounts } from "@/lib/intro";
 import { focusOf, useUI } from "@/lib/store";
 import { chapterProgress, smooth, world } from "@/lib/world";
 import { nodeFragment, nodeVertex, threadFragment, threadVertex } from "@/shaders/constellation";
-import { experienceOrder, posOf } from "@/world/layout";
+import { posOf } from "@/world/layout";
 import { labelElements, nodeBrightness, screenPos } from "@/world/labels";
 
 const SEGMENTS = 14;
@@ -64,6 +65,19 @@ function labelMask(chapter: number, w: number, h: number) {
     return false;
   };
 }
+
+/** Hops from Akshita to each node — the order in which the opening lights the network. */
+const depth = (() => {
+  const d = new Map<string, number>([[CORE_ID, 0]]);
+  let frontier = [CORE_ID];
+  while (frontier.length) {
+    const next: string[] = [];
+    for (const id of frontier) for (const nb of getNeighbors(id)) if (!d.has(nb)) { d.set(nb, d.get(id)! + 1); next.push(nb); }
+    frontier = next;
+  }
+  return d;
+})();
+const DEPTH_STEP = 0.22;
 
 export function Constellation() {
   const { camera, size, gl } = useThree();
@@ -153,6 +167,8 @@ export function Constellation() {
           uOpacity: { value: 1 },
           uFocus: { value: 0 },
           uGold: { value: new THREE.Color("#ffb347") },
+          uIce: { value: new THREE.Color("#6fb6ff") },
+          uIceMix: { value: 0.15 },
           uDim: { value: new THREE.Color("#8d94d6") },
         },
         transparent: true,
@@ -172,7 +188,7 @@ export function Constellation() {
     }
     const related = relatedRef.current;
     const emph = EMPHASIS[chapter];
-    const intro = world.intro;
+    const net = introAmounts(world.intro).network;
     const k = 1 - Math.exp(-dt * 5);
 
     const st = state.current;
@@ -180,13 +196,8 @@ export function Constellation() {
     nodes.forEach((n, i) => {
       let target: number;
       if (chapter === 0) {
-        const ei = experienceOrder.indexOf(n.id);
         target =
-          n.id === CORE_ID
-            ? smooth(0, 0.12, intro)
-            : ei >= 0
-              ? smooth(0.16 + ei * 0.07, 0.22 + ei * 0.07, intro) * 0.9
-              : smooth(0.86, 1, intro) * 0.16;
+          n.id === CORE_ID ? net : smooth(DEPTH_STEP * (depth.get(n.id) ?? 3), DEPTH_STEP * (depth.get(n.id) ?? 3) + 0.3, net) * ((depth.get(n.id) ?? 3) > 2 ? 0.12 : 0.45);
       } else {
         const base = emph[n.kind] ?? emph.rest;
         target = related ? (n.id === focus ? 1 : related.has(n.id) ? 0.82 : Math.max(0.03, base * 0.22)) : base;
@@ -207,10 +218,12 @@ export function Constellation() {
       let h = 0;
       let d = 1;
       if (chapter === 0) {
-        const other = e.a === CORE_ID ? e.b : e.b === CORE_ID ? e.a : null;
-        const ei = other ? experienceOrder.indexOf(other) : -1;
-        if (ei >= 0) h = smooth(0.2 + ei * 0.07, 0.3 + ei * 0.07, intro);
-        d = e.a === CORE_ID ? 1 : 0;
+        // The collision draws the network: energy runs outward from her name, ring by ring.
+        const da = depth.get(e.a) ?? 3, db = depth.get(e.b) ?? 3;
+        const near = Math.min(da, db);
+        // Only the first two rings: enough to show the network being born, calm enough to keep the name clear.
+        h = near > 1 ? 0 : smooth(DEPTH_STEP * near, DEPTH_STEP * near + 0.28, net) * (near === 0 ? 0.5 : 0.22);
+        d = da <= db ? 1 : 0;
       } else if (chapter === chapterIndex.continue) {
         // Finale: every thread visited lights at once.
         h = smooth(0.1, 0.55, chapterProgress(chapter)) * 0.38;
@@ -231,8 +244,9 @@ export function Constellation() {
     nodeMat.uniforms.uTime.value = time;
     nodeMat.uniforms.uPixelRatio.value = gl.getPixelRatio();
     threadMat.uniforms.uTime.value = time;
+    threadMat.uniforms.uIceMix.value += ((chapter === 0 ? 0.45 : chapter === chapterIndex.continue ? 0.4 : 0.15) - threadMat.uniforms.uIceMix.value) * k;
     threadMat.uniforms.uFocus.value += ((focus || chapter === 0 ? 1 : 0) - threadMat.uniforms.uFocus.value) * k;
-    const threadOpacity = chapter === 0 ? 1 : chapter === 2 ? 0.25 : chapter === 1 ? 0.5 : 1;
+    const threadOpacity = chapter === 0 ? 0.65 : chapter === 2 ? 0.25 : chapter === 1 ? 0.5 : 1;
     threadMat.uniforms.uOpacity.value += (threadOpacity - threadMat.uniforms.uOpacity.value) * k;
 
     // Project every node onto the screen; move the DOM labels that exist.
