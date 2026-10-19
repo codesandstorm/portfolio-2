@@ -301,7 +301,7 @@ export function GuidedTour() {
                   {captionsOnly && " · captions only"}
                 </span>
                 <span className="relative h-px flex-1 bg-hair">
-                  <span ref={bar} className="absolute inset-0 origin-left scale-x-0 bg-gold" />
+                  <span ref={bar} className="absolute inset-0 origin-left bg-gold" style={{ transform: "scaleX(0)" }} />
                 </span>
                 <button type="button" onClick={() => go(index - 1)} disabled={index === 0} className="mono text-mist hover:text-ivory disabled:opacity-30" aria-label="Previous stop" data-cursor="link">◂</button>
                 {status === "paused" ? (
