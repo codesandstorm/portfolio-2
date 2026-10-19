@@ -117,11 +117,21 @@ export function TopBar() {
           <button
             type="button"
             onClick={() => useTour.getState().open()}
-            className={`mono text-mist transition-[opacity,visibility,color] duration-1000 hover:text-gold ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}
+            className={`mono hidden text-mist transition-[opacity,visibility,color] duration-1000 hover:text-gold sm:inline ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}
             aria-label="Start the narrated guided tour"
             data-cursor="link"
           >
             Tour ▸
+          </button>
+          <button
+            type="button"
+            onClick={() => useUI.getState().setAskOpen(!useUI.getState().askOpen)}
+            className={`mono flex items-center gap-1.5 text-mist transition-[opacity,visibility,color] duration-1000 hover:text-gold ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}
+            aria-label="Ask the constellation a question"
+            data-cursor="link"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_8px_#ffb347]" aria-hidden />
+            Ask
           </button>
           <SoundToggle />
           <button

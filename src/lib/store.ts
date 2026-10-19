@@ -19,6 +19,8 @@ type UIState = {
   /** LinkedIn signal opened in the reader. */
   reading: string | null;
   indexOpen: boolean;
+  askOpen: boolean;
+  setAskOpen: (v: boolean) => void;
   introPhase: IntroPhase;
   setIntroPhase: (p: IntroPhase) => void;
   setTier: (t: Tier) => void;
@@ -42,6 +44,8 @@ export const useUI = create<UIState>((set) => ({
   scrollFocus: null,
   reading: null,
   indexOpen: false,
+  askOpen: false,
+  setAskOpen: (askOpen) => set({ askOpen }),
   introPhase: "void",
   setIntroPhase: (introPhase) => set((s) => (s.introPhase === introPhase ? s : { introPhase })),
   setTier: (tier) => set({ tier }),

@@ -24,6 +24,7 @@ import { NodeLabels } from "./ui/NodeLabels";
 import { RelationPanel } from "./ui/RelationPanel";
 import { SignalReader } from "./ui/SignalReader";
 import { GuidedTour } from "./tour/GuidedTour";
+import { AskConstellation } from "./ask/AskConstellation";
 import { TopBar } from "./ui/TopBar";
 
 const WorldCanvas = dynamic(() => import("./webgl/WorldCanvas"), { ssr: false });
@@ -117,6 +118,7 @@ export function Experience() {
       <RelationPanel />
       <SignalReader />
       <GuidedTour />
+      <AskConstellation />
     </>
   );
 }
