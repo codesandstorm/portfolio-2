@@ -4,11 +4,14 @@ export const particlesVertex = /* glsl */ `
   uniform float uSize;
   uniform float uPixelRatio;
   attribute float aSeed;
+  attribute float aAlpha;
   attribute vec3 aColor;
   varying vec3 vColor;
   varying float vTwinkle;
+  varying float vAlpha;
 
   void main() {
+    vAlpha = aAlpha;
     vec3 p = position;
     float s = aSeed * 6.2831;
     p += vec3(sin(uTime * 0.7 + s), cos(uTime * 0.5 + s * 1.3), sin(uTime * 0.6 + s * 0.7)) * 0.025;
@@ -25,11 +28,12 @@ export const particlesFragment = /* glsl */ `
   uniform float uOpacity;
   varying vec3 vColor;
   varying float vTwinkle;
+  varying float vAlpha;
 
   void main() {
     float d = length(gl_PointCoord - 0.5);
     float a = smoothstep(0.5, 0.0, d);
-    a = pow(a, 1.8) * vTwinkle * uOpacity;
+    a = pow(a, 1.8) * vTwinkle * uOpacity * vAlpha;
     if (a < 0.01) discard;
     gl_FragColor = vec4(vColor * (1.0 + a * 0.6), a);
   }
