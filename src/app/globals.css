@@ -137,3 +137,8 @@ html[data-cursor="on"], html[data-cursor="on"] * { cursor: none !important; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
+
+/* Printing (the one-page summary): plain paper, no backdrop. */
+@media print {
+  html, body { background: #fff !important; color: #111; }
+}

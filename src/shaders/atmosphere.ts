@@ -21,6 +21,7 @@ export const atmosphereFragment = /* glsl */ `
   uniform float uFlash;
   uniform float uHaze;
   uniform float uTall;
+  uniform vec3 uSky;
   uniform float uSeam;
   varying vec2 vUv;
 
@@ -47,7 +48,8 @@ export const atmosphereFragment = /* glsl */ `
 
     // Values are linear: the output pass lifts them, so the void stays very low.
     vec3 col = vec3(0.0016, 0.0016, 0.0042);
-    col += vec3(0.0035, 0.004, 0.012) * smoothstep(1.1, 0.1, length((uv - 0.5) * vec2(uAspect, 1.0))) * uHaze;
+    // The haze takes the colour of the sky over Indore right now.
+    col += uSky * smoothstep(1.1, 0.1, length((uv - 0.5) * vec2(uAspect, 1.0))) * uHaze;
 
     float warm = field(uv, uFirePos, 0.34) * uFire * (0.25 + 1.1 * n * n);
     float cold = field(uv, uIcePos, 0.34) * uIce * (0.25 + 1.1 * wisps * wisps);

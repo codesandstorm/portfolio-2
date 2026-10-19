@@ -286,6 +286,9 @@ export function GuidedTour() {
           <div className="flex flex-wrap items-center gap-4">
             <span className="h-3 w-3 rounded-full bg-gold shadow-[0_0_14px_#ffb347]" aria-hidden />
             <p className="display flex-1 text-lg text-ivory">That&rsquo;s her story. Explore freely — or draw the last thread.</p>
+            {variant === "recruiter" && (
+              <a href="/one-page" className="mono text-gold hover:text-ivory" data-cursor="link">One-page summary</a>
+            )}
             <button type="button" onClick={() => go(0)} className="mono text-mist hover:text-gold" data-cursor="link">↺ Again</button>
             <button type="button" onClick={exit} className="mono text-mist hover:text-ivory" data-cursor="link">Close</button>
           </div>

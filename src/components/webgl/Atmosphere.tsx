@@ -8,6 +8,7 @@ import { introAmounts } from "@/lib/intro";
 import { smooth, world } from "@/lib/world";
 import { atmosphereFragment, atmosphereVertex } from "@/shaders/atmosphere";
 import { heroFrame } from "@/world/hero";
+import { indoreSky } from "@/lib/indore";
 
 /** The environment reacting to fire and ice: warm left, cold right, combined at impact. */
 export function Atmosphere() {
@@ -29,6 +30,7 @@ export function Atmosphere() {
           uFlash: { value: 0 },
           uHaze: { value: 0 },
           uTall: { value: 0 },
+          uSky: { value: new THREE.Color(0.0035, 0.004, 0.012) },
           uSeam: { value: 0 },
         },
         depthTest: false,
@@ -87,6 +89,7 @@ export function Atmosphere() {
     u.uHaze.value = Math.min(1, amt.spark + (t > 0.5 ? 1 : 0));
     u.uAspect.value = size.width / size.height;
     u.uTall.value = f.tall ? 1 : 0;
+    (u.uSky.value as THREE.Color).setRGB(...indoreSky(), THREE.LinearSRGBColorSpace);
     // The seam marks the duality; once they have met, it is gone.
     u.uSeam.value = smooth(0.3, 0.45, world.intro) * (1 - amt.glyph);
     u.uTime.value = world.time;

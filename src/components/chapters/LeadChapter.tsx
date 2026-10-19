@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { signals, voiceMoments } from "@/content/data";
-import { formatDate, getNode } from "@/content/graph";
+import { formatDate, getNode, latestSignals } from "@/content/graph";
 import { statements } from "@/content/story";
 import { sfx } from "@/audio/useSound";
 import { chapterIndex } from "@/lib/chapters";
@@ -12,6 +12,7 @@ import { useIsChapter, useTicker } from "@/lib/hooks";
 import { focusOf, useUI } from "@/lib/store";
 import { chapterProgress, smooth } from "@/lib/world";
 import { screenPos } from "@/world/labels";
+import { HerVoice } from "../ui/HerVoice";
 import { Chapter, Kicker, useFlow } from "./Chapter";
 
 /** Where each statement's words fly when the sentence completes. */
@@ -46,13 +47,14 @@ function SignalRail() {
                 onFocus={() => hover(s.id)}
                 onBlur={() => hover(null)}
                 className="flex h-full w-full items-end justify-center"
-                aria-label={`${s.title}, ${formatDate(s.date)}`}
+                aria-label={`${s.title}, ${formatDate(s.date)}${latestSignals.has(s.id) ? " — latest" : ""}`}
                 data-cursor="link"
               >
                 <span
                   className={`w-px transition-all duration-500 ${on ? "bg-gold shadow-[0_0_8px_#ffb347]" : s.featured ? "bg-ivory/70 group-hover:bg-gold" : "bg-ivory/30 group-hover:bg-gold"}`}
                   style={{ height: on ? "100%" : s.featured ? "62%" : "30%" }}
                 />
+                {latestSignals.has(s.id) && <span className="absolute -top-1 h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_8px_#ffb347]" aria-hidden />}
               </button>
               <span className="mono pointer-events-none absolute bottom-full mb-2 hidden whitespace-nowrap text-ivory opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 sm:block">
                 {s.title}
@@ -167,6 +169,7 @@ export function LeadChapter() {
                     </p>
                     {"tail" in s && <p className="display mt-3 text-2xl italic text-gold/90">{s.tail}</p>}
                     <footer className="mono mt-4 text-faint">{s.source}</footer>
+                    {stmt === 0 && <HerVoice clip="signoff" />}
                   </motion.blockquote>
                 ) : (
                   <motion.div

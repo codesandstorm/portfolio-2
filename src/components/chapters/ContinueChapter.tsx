@@ -7,9 +7,11 @@ import { finale } from "@/content/story";
 import { chapterIndex } from "@/lib/chapters";
 import { sfx } from "@/audio/useSound";
 import { useTicker } from "@/lib/hooks";
+import { indoreLine } from "@/lib/indore";
 import { scrollToChapter } from "@/lib/scroll";
 import { chapterProgress, smooth } from "@/lib/world";
 import { LastThread, THREAD_KEY } from "../finale/LastThread";
+import { HerVoice } from "../ui/HerVoice";
 import { Chapter, Kicker, useFlow } from "./Chapter";
 
 /** 09 — Continue. The whole structure at once; the next connection is the visitor's. */
@@ -21,6 +23,7 @@ export function ContinueChapter() {
   const [threadOn, setThreadOn] = useState(false);
 
   const recalled = useRef(false);
+  const clockLine = useRef<HTMLParagraphElement>(null);
 
   const connect = useCallback(() => {
     setConnected(true);
@@ -42,6 +45,11 @@ export function ContinueChapter() {
       } catch {
         /* storage unavailable: the thread simply isn't remembered */
       }
+    }
+    // The time where she is, written straight into the DOM (no re-renders).
+    if (clockLine.current) {
+      const line = indoreLine();
+      if (clockLine.current.textContent !== line) clockLine.current.textContent = line;
     }
     if (flow) return;
     const p = chapterProgress(chapterIndex.continue);
@@ -102,9 +110,14 @@ export function ContinueChapter() {
             <a href={profile.links.linkedinActivity} target="_blank" rel="noreferrer" className="thread-link mono" data-cursor="external">
               Follow her signals <span aria-hidden>↗</span>
             </a>
+            <a href="/one-page" className="thread-link mono" data-cursor="link">
+              One-page summary
+            </a>
           </div>
           <p className="display mt-8 text-2xl italic text-gold">{finale.advice}</p>
           <p className="mono mt-2 text-faint">{finale.adviceSource}</p>
+          <HerVoice clip="justStart" />
+          <p ref={clockLine} className="mono mt-4 text-faint" suppressHydrationWarning />
           <button type="button" onClick={() => scrollToChapter("signal")} className="mono mt-6 text-faint hover:text-ivory" data-cursor="link">
             ↺ Return to the first signal
           </button>

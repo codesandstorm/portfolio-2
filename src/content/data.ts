@@ -28,6 +28,11 @@ export const profile = {
     linkedinActivity: "https://www.linkedin.com/in/akshita-mahajan-73ba56370/recent-activity/all/",
     github: "https://github.com/akshita-mahajan",
   },
+  /**
+   * Short clips Akshita records herself (e.g. "/akshita/voice/signoff.mp3").
+   * Leave null until she supplies them; her voice is never synthesised.
+   */
+  voice: { signoff: null as string | null, justStart: null as string | null },
   /** Her photograph (supplied 19 Oct 2026). Set to null to fall back to the abstract silhouette. */
   portrait: "/akshita/portrait.jpg" as string | null,
 } as const;

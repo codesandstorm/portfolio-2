@@ -3,7 +3,7 @@
 import { useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { CORE_ID, edges, getNeighbors, getRelatedNodes, nodes } from "@/content/graph";
+import { CORE_ID, edges, getNeighbors, getRelatedNodes, latestSignals, nodes } from "@/content/graph";
 import { skills } from "@/content/data";
 import type { NodeKind } from "@/content/types";
 import { chapterIndex } from "@/lib/chapters";
@@ -99,7 +99,8 @@ export function Constellation() {
       p.set(posOf(n.id), i * 3);
       const col = n.kind === "skill" && humanSkills.has(n.id) ? COLOR.person : COLOR[n.kind];
       c.set(col, i * 3);
-      s[i] = SIZE[n.kind];
+      // Her newest posts are new stars: a little larger, so they catch the eye.
+      s[i] = SIZE[n.kind] * (latestSignals.has(n.id) ? 1.7 : 1);
       seed[i] = Math.random();
     });
     g.setAttribute("position", new THREE.BufferAttribute(p, 3));

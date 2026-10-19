@@ -204,6 +204,12 @@ export function joinWords(words: string[]) {
   return words.length < 2 ? words.join("") : `${words.slice(0, -1).join(", ")} and ${words[words.length - 1]}`;
 }
 
+/** Her latest posts: within two weeks of her newest one. They shine as new stars. */
+export const latestSignals: ReadonlySet<string> = (() => {
+  const newest = Math.max(...signals.map((s) => Date.parse(s.date)));
+  return new Set(signals.filter((s) => newest - Date.parse(s.date) <= 14 * 86400000).map((s) => s.id));
+})();
+
 export function signalUrl(s: LinkedInSignal): { href: string; exact: boolean } {
   return s.sourceUrl ? { href: s.sourceUrl, exact: true } : { href: profile.links.linkedinActivity, exact: false };
 }

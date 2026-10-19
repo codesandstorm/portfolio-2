@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef } from "react";
-import { getEntity, getNode, signalUrl, formatDate, summarizePeople } from "@/content/graph";
+import { getEntity, getNode, latestSignals, signalUrl, formatDate, summarizePeople } from "@/content/graph";
 import type { LinkedInSignal } from "@/content/types";
 import { useUI } from "@/lib/store";
 
@@ -56,6 +56,7 @@ export function SignalReader() {
             <div className="absolute left-0 top-10 hidden h-[calc(100%-5rem)] w-px bg-gradient-to-b from-gold via-gold/30 to-transparent sm:block" aria-hidden />
             <p className="mono text-gold">
               Signal {String(s.post).padStart(2, "0")} · {formatDate(s.date)}
+              {latestSignals.has(s.id) && <span className="ml-3 rounded-full border border-gold/50 px-2 py-0.5 text-[9px]">Latest</span>}
             </p>
             <h2 id="signal-title" className="display mt-4 text-4xl leading-[1.05] text-ivory sm:text-5xl">
               {s.title}
