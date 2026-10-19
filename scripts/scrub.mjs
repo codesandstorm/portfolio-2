@@ -33,7 +33,8 @@ for (const [id, f] of shots) {
   await page.evaluate((id, f) => {
     const el = document.getElementById(id);
     const top = el.getBoundingClientRect().top + scrollY + Math.max(0, el.offsetHeight - innerHeight) * Number(f);
-    window.__lenis ? window.__lenis.scrollTo(top, { immediate: true }) : window.scrollTo(0, top);
+    if (window.__lenis) window.__lenis.scrollTo(top, { immediate: true });
+    else window.scrollTo(0, top);
   }, id, f);
   await new Promise((r) => setTimeout(r, 1600));
   await page.screenshot({ path: `${out}/scrub-${width}-${id}-${f}.jpg`, type: "jpeg", quality: 72 });

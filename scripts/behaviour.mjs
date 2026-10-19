@@ -106,7 +106,8 @@ const scrollTo = (page, y) => page.evaluate((y) => (window.__lenis ? window.__le
   await page.evaluate(() => {
     const el = document.getElementById("continue");
     const top = el.getBoundingClientRect().top + scrollY + (el.offsetHeight - innerHeight) * 0.6;
-    window.__lenis ? window.__lenis.scrollTo(top, { immediate: true }) : window.scrollTo(0, top);
+    if (window.__lenis) window.__lenis.scrollTo(top, { immediate: true });
+    else window.scrollTo(0, top);
   });
   await sleep(2500);
   const shots = process.env.SHOTS;
