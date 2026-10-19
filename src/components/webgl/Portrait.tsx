@@ -8,6 +8,7 @@ import { chapterIndex } from "@/lib/chapters";
 import { chapterProgress, smooth, world } from "@/lib/world";
 import { holoFragment, holoVertex } from "@/shaders/holo";
 import { getPortraitCanvas } from "@/world/portrait";
+import { SHATTER } from "./Particles";
 
 /** The holographic plane behind the point-cloud portrait in "Akshita". */
 export function Portrait() {
@@ -26,6 +27,7 @@ export function Portrait() {
           uGold: { value: new THREE.Color("#ffb347") },
           uElectric: { value: new THREE.Color("#6fb6ff") },
           uPhoto: { value: profile.portrait ? 1 : 0 },
+          uShatter: { value: 0 },
         },
         transparent: true,
         depthWrite: false,
@@ -52,10 +54,11 @@ export function Portrait() {
     if (!g) return;
     const i = chapterIndex.akshita;
     const p = chapterProgress(i);
-    const inChapter = world.t > i - 0.15 && world.t < i + 1.05;
+    const inChapter = world.t > i - 0.15 && world.t < SHATTER[1];
     g.visible = inChapter && !!material.uniforms.uTex.value;
     if (!g.visible) return;
-    const presence = smooth(i - 0.12, i + 0.05, world.t) * (1 - smooth(i + 0.9, i + 1.02, world.t));
+    const presence = smooth(i - 0.12, i + 0.05, world.t) * (1 - smooth(SHATTER[1] - 0.15, SHATTER[1], world.t));
+    material.uniforms.uShatter.value = smooth(SHATTER[0], SHATTER[1] - 0.12, world.t);
     material.uniforms.uOpacity.value = presence * 0.9;
     material.uniforms.uReveal.value = smooth(0, 0.3, p) * 1.02;
     material.uniforms.uTime.value = performance.now() / 1000;

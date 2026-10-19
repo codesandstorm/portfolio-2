@@ -18,13 +18,14 @@ import { glyphTarget, nameTarget, splitByX, portraitTarget, seedTarget, tunnelTa
  * collide and become her name; afterwards it becomes the tunnel, the portrait,
  * the threads of the constellation and the finale.
  */
-type Mode = "proc" | "glyph" | "tunnel" | "portrait" | "web" | "finale";
+type Mode = "proc" | "glyph" | "tunnel" | "portrait" | "shatter" | "web" | "finale";
 
 const LOOK: Record<Mode, { opacity: number; size: number }> = {
   proc: { opacity: 1, size: 2.5 },
   glyph: { opacity: 1, size: 1.6 },
   tunnel: { opacity: 0.75, size: 1.5 },
   portrait: { opacity: 1, size: 0.75 },
+  shatter: { opacity: 0.9, size: 0.9 },
   web: { opacity: 0.4, size: 0.7 },
   finale: { opacity: 1, size: 2.6 },
 };
@@ -34,13 +35,16 @@ const ICE: [number, number, number][] = [[0.3, 0.42, 1], [0.38, 0.72, 1], [0.66,
 const MERGED: [number, number, number] = [1, 0.86, 0.66];
 const GOLD: [number, number, number] = [1, 0.72, 0.36];
 const SHARDS = 11;
+/** Story time over which her portrait breaks apart and becomes the network (end of chapter 02 into 03). */
+export const SHATTER: [number, number] = [2.7, 3.2];
 const HEX = Array.from({ length: 6 }, (_, i) => [Math.cos((i * Math.PI) / 3), Math.sin((i * Math.PI) / 3)]);
 
 function modeAt(t: number, intro: number): Mode {
   if (t < 1) return intro < AT.collision ? "proc" : "glyph";
   if (t < 1.12) return "glyph";
   if (t < 1.86) return "tunnel";
-  if (t < 2.92) return "portrait";
+  if (t < SHATTER[0]) return "portrait";
+  if (t < SHATTER[1]) return "shatter";
   if (t < 9) return "web";
   return "finale";
 }
@@ -66,6 +70,10 @@ export function Particles({ count }: { count: number }) {
   const look = useRef({ opacity: 0, size: 1 });
   const lastIntro = useRef(0);
   const portraitColor = useRef<Float32Array | null>(null);
+  /** Each portrait point's distance from her face, 0…1 — cracks spread outward from there. */
+  const portraitDist = useRef<Float32Array | null>(null);
+  /** Per-particle progress through the shatter, 0…1. */
+  const shatterK = useMemo(() => new Float32Array(count), [count]);
 
   const { geometry, baseColor } = useMemo(() => {
     const g = new THREE.BufferGeometry();
@@ -137,6 +145,9 @@ export function Particles({ count }: { count: number }) {
     void getPortraitCanvas(profile.portrait).then((c) => {
       const p = portraitTarget(count, c, 6.6, [0, 0.2, 0.6]);
       targets.current.portrait = p.pos;
+      const d = new Float32Array(count);
+      for (let i = 0; i < count; i++) d[i] = Math.min(1, Math.hypot(p.pos[i * 3], p.pos[i * 3 + 1] - 1.2) / 4.2);
+      portraitDist.current = d;
       // A real photograph lends its own colours to the point cloud.
       if (profile.portrait) portraitColor.current = p.col;
     });
@@ -232,6 +243,31 @@ export function Particles({ count }: { count: number }) {
     return proc;
   }
 
+  /**
+   * Her portrait breaks apart from the face outward: each fragment is thrown
+   * toward the viewer, then pulled onto a thread of the network. Driven by
+   * scroll, so scrolling back reassembles her.
+   */
+  function shatter(t: number) {
+    const P = targets.current.portrait, W = targets.current.web;
+    const D = portraitDist.current;
+    if (!P || !W) return P ?? W ?? proc;
+    const kg = smooth(SHATTER[0], SHATTER[1] - 0.04, t);
+    for (let i = 0; i < count; i++) {
+      const d = D ? D[i] : seeds[i * 3];
+      const raw = Math.min(1, Math.max(0, kg * 1.7 - d * 0.7));
+      const k = raw * raw * (3 - 2 * raw);
+      shatterK[i] = k;
+      const px = P[i * 3], py = P[i * 3 + 1] - 0.2, pz = P[i * 3 + 2];
+      const len = Math.hypot(px, py) || 1;
+      const burst = Math.sin(Math.PI * k) * (1.4 + 3.2 * seeds[i * 3]);
+      proc[i * 3] = P[i * 3] + (W[i * 3] - P[i * 3]) * k + (px / len) * burst;
+      proc[i * 3 + 1] = P[i * 3 + 1] + (W[i * 3 + 1] - P[i * 3 + 1]) * k + (py / len) * burst * 0.8;
+      proc[i * 3 + 2] = pz + (W[i * 3 + 2] - pz) * k + burst * (0.8 + seeds[i * 3 + 1]);
+    }
+    return proc;
+  }
+
   useFrame((_, rawDt) => {
     const dt = Math.min(rawDt, 1 / 30);
     const t = world.t;
@@ -257,8 +293,10 @@ export function Particles({ count }: { count: number }) {
     }
     lastIntro.current = intro;
 
-    const target =
-      mode === "proc" ? procedural(world.time, amt) : (targets.current[mode] ?? targets.current.glyph ?? targets.current.seed ?? proc);
+    let target: Float32Array;
+    if (mode === "proc") target = procedural(world.time, amt);
+    else if (mode === "shatter") target = shatter(t);
+    else target = targets.current[mode] ?? targets.current.glyph ?? targets.current.seed ?? proc;
 
     // As the camera pushes into the name its letters loosen toward the viewer — reversible with scroll.
     const loosen = mode === "glyph" ? smooth(0.9, 1.12, t) : 0;
@@ -269,7 +307,8 @@ export function Particles({ count }: { count: number }) {
     const rem = [0, 0, 0];
     const damp = Math.exp(-dt * 4.2);
     for (let i = 0; i < count; i++) {
-      const s = stiffness[i] * dt;
+      // Scroll-scrubbed moments track the scroll tightly so they reverse cleanly.
+      const s = stiffness[i] * dt * (mode === "shatter" ? 2.5 : 1);
       const spread = 1 + loosen * (0.6 + seeds[i * 3] * 1.6);
       const r1 = seeds[i * 3], r2 = seeds[i * 3 + 1];
       const isRem = remnants && seeds[i * 3 + 2] > 0.9;
@@ -302,7 +341,7 @@ export function Particles({ count }: { count: number }) {
     // Fire and ice keep their identity in the name, then lean warm as the story goes on.
     const merge = t < 1.5 ? amt.crisp * 0.45 : t < 9 ? 0.6 : 0.3;
     const toward = t < 1.5 ? MERGED : GOLD;
-    const photo = mode === "portrait" ? portraitColor.current : null;
+    const photo = mode === "portrait" || mode === "shatter" ? portraitColor.current : null;
     const ck = 1 - Math.exp(-dt * 2.5);
     for (let i = 0; i < count; i++) {
       const fire = i < half;
@@ -321,7 +360,10 @@ export function Particles({ count }: { count: number }) {
       for (let j = 0; j < 3; j++) {
         const k = i * 3 + j;
         // Her photo, lifted and warmed a touch so it reads as light, not a print.
-        const want = photo ? Math.min(1, photo[k] * 1.35 + 0.06) * 0.8 + GOLD[j] * 0.2 : baseColor[k] + (toward[j] - baseColor[k]) * m;
+        const web = baseColor[k] + (toward[j] - baseColor[k]) * m;
+        const her = photo ? Math.min(1, photo[k] * 1.35 + 0.06) * 0.8 + GOLD[j] * 0.2 : web;
+        // While shattering, each fragment cools from her colours into the network's.
+        const want = mode === "shatter" ? her + (web - her) * shatterK[i] : photo ? her : web;
         cl[k] += (want - cl[k]) * (photo || mode === "portrait" || t >= 1.5 ? ck : 1);
       }
     }

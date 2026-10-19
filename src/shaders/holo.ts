@@ -28,7 +28,26 @@ export const holoFragment = /* glsl */ `
   uniform vec3 uGold;
   uniform vec3 uElectric;
   uniform float uPhoto;
+  uniform float uShatter;
   varying vec2 vUv;
+
+  vec2 hash2(vec2 p) {
+    p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
+    return fract(sin(p) * 43758.5453);
+  }
+  // Voronoi: distance to the nearest cell edge, and that cell's random id.
+  vec2 voronoi(vec2 x) {
+    vec2 n = floor(x), f = fract(x);
+    float d1 = 8.0, d2 = 8.0, id = 0.0;
+    for (int j = -1; j <= 1; j++)
+      for (int i = -1; i <= 1; i++) {
+        vec2 g = vec2(float(i), float(j));
+        vec2 o = hash2(n + g);
+        float d = length(g + o - f);
+        if (d < d1) { d2 = d1; d1 = d; id = o.x; } else if (d < d2) { d2 = d; }
+      }
+    return vec2(d2 - d1, id);
+  }
 
   void main() {
     vec2 px = vec2(1.0 / 512.0);
@@ -67,6 +86,17 @@ export const holoFragment = /* glsl */ `
       col = mix(duo, tex, 0.45) * scan * (0.9 + sweep * 0.6) + rim * edge * 0.5;
       col += uGold * frontGlow * 1.5 * a;
       alpha = (a * 0.72 * (0.85 + 0.15 * scan) + edge * 0.25) * front * uOpacity + frontGlow * a * uOpacity;
+    }
+    // Shatter: cracks open outward from her face; each shard drops out in turn,
+    // its edges glowing as it goes. Reversed by scrolling back.
+    if (uShatter > 0.0) {
+      vec2 v = voronoi(vUv * vec2(9.0, 11.0));
+      float fromFace = length((vUv - vec2(0.55, 0.62)) * vec2(1.0, 1.2));
+      float t = uShatter * 1.8 - fromFace * 0.9 - v.y * 0.35;
+      float gone = step(0.0, t);
+      float crack = (1.0 - smoothstep(0.0, 0.05, v.x)) * smoothstep(-0.35, 0.0, t);
+      col += mix(uGold, uElectric, v.y) * crack * 2.2;
+      alpha = alpha * (1.0 - gone) + crack * max(a, 0.2) * 0.9 * (1.0 - gone) * uOpacity;
     }
     if (alpha < 0.01) discard;
     gl_FragColor = vec4(col, alpha);

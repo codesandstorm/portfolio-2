@@ -7,7 +7,7 @@ import { facets } from "@/content/story";
 import { chapterIndex } from "@/lib/chapters";
 import { useTicker } from "@/lib/hooks";
 import { useUI } from "@/lib/store";
-import { chapterProgress, smooth } from "@/lib/world";
+import { chapterProgress, smooth, world } from "@/lib/world";
 import { Chapter, Kicker, useFlow } from "./Chapter";
 
 const facts = [
@@ -24,14 +24,21 @@ export function AkshitaChapter() {
   const select = useUI((s) => s.select);
   const [active, setActive] = useState(0);
   const intro = useRef<HTMLDivElement>(null);
+  const handoff = useRef<HTMLParagraphElement>(null);
 
   useTicker(() => {
     if (flow) return;
     const p = chapterProgress(chapterIndex.akshita);
-    const i = Math.min(facets.length - 1, Math.floor(Math.max(0, (p - 0.28) / 0.72) * facets.length));
+    const i = Math.min(facets.length - 1, Math.floor(Math.min(0.999, Math.max(0, (p - 0.24) / 0.52)) * facets.length));
     if (i !== active) setActive(i);
+    if (handoff.current) {
+      const h = smooth(0.84, 0.92, p) * (1 - smooth(3.0, 3.12, world.t));
+      handoff.current.style.opacity = h.toFixed(3);
+      handoff.current.style.transform = `translateY(${((1 - h) * 16).toFixed(1)}px)`;
+    }
     if (intro.current) {
-      const r = smooth(0.04, 0.18, p);
+      // The words step aside just before her portrait breaks into the network.
+      const r = smooth(0.04, 0.18, p) * (1 - smooth(0.8, 0.88, p));
       intro.current.style.opacity = r.toFixed(3);
       intro.current.style.transform = `translateY(${((1 - r) * 24).toFixed(1)}px)`;
     }
@@ -99,6 +106,12 @@ export function AkshitaChapter() {
           </div>
         </div>
       </div>
+      {!flow && (
+        <p ref={handoff} className="pointer-events-none absolute inset-x-0 bottom-[12svh] px-6 text-center" style={{ opacity: 0 }} aria-hidden>
+          <span className="display block text-[clamp(1.6rem,3.2vw,2.6rem)] italic text-ivory">Then every point of her becomes a connection.</span>
+          <span className="mono mt-3 block text-gold/80">She is the centre of everything that follows</span>
+        </p>
+      )}
       {!profile.portrait && !flow && (
         <p className="mono absolute bottom-5 left-[var(--gutter)] hidden text-faint/70 md:block">Portrait · abstract placeholder until her photograph is supplied</p>
       )}

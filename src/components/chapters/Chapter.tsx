@@ -39,7 +39,7 @@ export function Chapter({
       className={flow ? "relative z-10 py-[18vh]" : "relative z-10 h-[var(--h-m)] md:h-[var(--h-d)]"}
     >
       <div className={flow ? `px-[var(--gutter)] ${className}` : `sticky top-0 h-svh overflow-hidden px-[var(--gutter)] ${className}`}>
-        {scrim && !flow && <div aria-hidden className={`pointer-events-none absolute inset-0 -z-10 ${SCRIM[scrim]}`} />}
+        {scrim && !flow && <div aria-hidden className={`pointer-events-none absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,transparent,black_14%)] ${SCRIM[scrim]}`} />}
         {children}
       </div>
     </section>
