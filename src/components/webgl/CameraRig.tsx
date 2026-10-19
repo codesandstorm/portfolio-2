@@ -52,6 +52,12 @@ export function CameraRig() {
     pos.lerp(wantPos, k);
     look.lerp(wantLook, k);
     camera.position.copy(pos);
+    // Collision impulse: a tiny, quickly-damped tremor.
+    if (world.shake > 0) {
+      const s = world.shake * world.shake * 0.35;
+      camera.position.x += (Math.random() - 0.5) * s;
+      camera.position.y += (Math.random() - 0.5) * s;
+    }
     camera.lookAt(look);
     const cam = camera as THREE.PerspectiveCamera;
     if (Math.abs(cam.fov - shot.fov) > 0.01) {

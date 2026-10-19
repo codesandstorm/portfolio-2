@@ -3,6 +3,7 @@
  * jump between chapters becomes a flight rather than a cut.
  */
 import { chapterIndex } from "@/lib/chapters";
+import { introAmounts } from "@/lib/intro";
 import { STICKY, smooth, world } from "@/lib/world";
 import { achievementOrder, centroid, experienceOrder, posOf, projectOrder, type Vec3 } from "./layout";
 
@@ -28,8 +29,11 @@ export function shotAt(t: number, aspect: number): Shot {
   const frame: Vec3 = portrait ? [0, -1.4, 0] : [1.9, 0, 0];
 
   switch (i) {
-    case chapterIndex.signal:
-      return { pos: [0, 0, 46 - world.intro * 2], look: [0, 0, 0], fov };
+    case chapterIndex.signal: {
+      // Almost still; a slow push during the attraction, eased back as the name settles.
+      const a = introAmounts(world.intro);
+      return { pos: [0, 0, 46 - a.attract * 3 + a.network * 2.2], look: [0, 0, 0], fov };
+    }
     case chapterIndex.start: {
       const e = smooth(0, 1, p);
       const z = 44 - e * 34;
