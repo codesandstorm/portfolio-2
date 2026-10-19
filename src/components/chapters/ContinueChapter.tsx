@@ -37,6 +37,7 @@ export function ContinueChapter() {
           <p className="mono mt-4 text-faint">
             {stats.people} people · {stats.projects} builds · {stats.skills} skills · {stats.signals} signals · {stats.edges} threads
           </p>
+          <p className="display mt-3 text-base italic text-mist">{finale.thesis}</p>
           <h2 id="continue-title" className="display mt-4 text-[clamp(1.8rem,4vw,3.4rem)] italic leading-[1.02] text-ivory">
             {finale.line}
           </h2>

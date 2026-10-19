@@ -4,10 +4,25 @@
  */
 import { people } from "./data";
 
-export const awakening = {
-  line: "Every connection begins with a signal.",
-  enter: "Enter the constellation",
-};
+/**
+ * Fire × Ice opening. Fire is the side of her that speaks and acts; ice the
+ * side that reasons and builds. Both are evidenced in her headline, which
+ * names her a MERN-stack developer and closes on "Public Speaker".
+ */
+export const landing = {
+  fire: { name: "Fire", qualities: ["voice", "confidence", "action"] },
+  ice: { name: "Ice", qualities: ["intellect", "clarity", "structure"] },
+  /** Her own sign-off, SLC 2026 (LI-P4). */
+  signoff: ["Connect", "Collaborate", "Learn", "Lead"],
+  thought: "A voice for the room. A mind for the system.",
+  enter: "Scroll to enter",
+  marks: [
+    { n: "01", title: "People", note: `${people.length} she has named, by name`, to: "connect" },
+    { n: "02", title: "Experiences", note: "IIT Indore · i-SOFTZONE · ACM-W · IEEE", to: "collaborate" },
+    { n: "03", title: "Projects", note: "Seven builds, from an HRMS to PrakritiOS", to: "build" },
+    { n: "04", title: "Voice", note: "Anchor · representative · teacher", to: "lead" },
+  ],
+} as const;
 
 /** Words in depth during the flight — each carries the fact behind it. */
 export const fragments = [
@@ -46,6 +61,7 @@ export const statements = [
 ] as const;
 
 export const finale = {
+  thesis: "Two forces became one person. One person became a network.",
   line: "The next connection hasn’t been made yet.",
   advice: "Just start.",
   adviceSource: "Her advice to anyone still in the quiet seat (LI-P13)",

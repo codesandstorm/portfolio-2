@@ -36,8 +36,28 @@ function SoundToggle() {
   );
 }
 
+const NAV = [
+  { id: "collaborate", label: "Experience" },
+  { id: "build", label: "Projects" },
+  { id: "learn", label: "Constellation" },
+  { id: "lead", label: "Voice" },
+] as const;
+
+/** The brand: a minimal typographic AM. Fire and ice belong to the experience, never to the mark. */
+function Monogram() {
+  return (
+    <span aria-hidden className="display relative flex h-9 w-10 items-center justify-center text-[1.55rem] leading-none text-ivory">
+      <span className="-mr-[0.18em]">A</span>
+      <span>M</span>
+      <span className="absolute bottom-1 left-1 right-1 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent" />
+    </span>
+  );
+}
+
 export function TopBar() {
   const indexOpen = useUI((s) => s.indexOpen);
+  // The bar stays out of the opening; only sound is offered until the name settles.
+  const revealed = useUI((s) => s.introDone || s.introPhase === "settled" || s.tier === "static");
   const setIndexOpen = useUI((s) => s.setIndexOpen);
   const chapter = useUI((s) => s.chapter);
 
@@ -61,21 +81,37 @@ export function TopBar() {
         <a
           href="#signal"
           onClick={(e) => { e.preventDefault(); scrollToChapter("signal"); }}
-          className="pointer-events-auto flex items-center gap-3 text-ivory"
+          className={`pointer-events-auto flex items-center gap-4 text-ivory transition-[opacity,visibility] duration-1000 ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}
           aria-label="Akshita Mahajan — back to the beginning"
           data-cursor="link"
         >
-          <span className="relative flex h-2 w-2" aria-hidden>
-            <span className="absolute inset-0 rounded-full bg-gold shadow-[0_0_12px_#ffb347]" />
-          </span>
-          <span className="mono text-ivory/80">Akshita Mahajan</span>
+          <Monogram />
+          <span className="mono hidden tracking-[0.32em] text-ivory/80 sm:inline">Akshita Mahajan</span>
         </a>
-        <nav aria-label="Elsewhere" className="pointer-events-auto flex items-center gap-4 sm:gap-6">
-          <a href={profile.links.linkedin} target="_blank" rel="noreferrer" className="mono text-mist transition-colors hover:text-gold" data-cursor="external">
-            LinkedIn<span aria-hidden> ↗</span>
-          </a>
-          <a href={profile.links.github} target="_blank" rel="noreferrer" className="mono hidden text-mist transition-colors hover:text-gold sm:inline" data-cursor="external">
-            GitHub<span aria-hidden> ↗</span>
+        <nav aria-label="Primary" className="pointer-events-auto flex items-center gap-4 sm:gap-6">
+          <ul className={`hidden items-center gap-6 transition-[opacity,visibility] duration-1000 lg:flex ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}>
+            {NAV.map((n) => (
+              <li key={n.id}>
+                <a
+                  href={`#${n.id}`}
+                  onClick={(e) => { e.preventDefault(); scrollToChapter(n.id); }}
+                  aria-current={chapters[chapter]?.id === n.id ? "location" : undefined}
+                  className={`mono transition-colors hover:text-ivory ${chapters[chapter]?.id === n.id ? "text-gold" : "text-mist"}`}
+                  data-cursor="link"
+                >
+                  {n.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a
+            href={profile.links.linkedin}
+            target="_blank"
+            rel="noreferrer"
+            className={`mono rounded-full border border-gold/50 px-4 py-2 text-ivory transition-[opacity,visibility,border-color,color] duration-700 hover:border-gold hover:text-gold ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}
+            data-cursor="external"
+          >
+            Connect<span aria-hidden> ↗</span>
           </a>
           <SoundToggle />
           <button
@@ -83,7 +119,7 @@ export function TopBar() {
             onClick={() => setIndexOpen(!indexOpen)}
             aria-expanded={indexOpen}
             aria-controls="chapter-index"
-            className="mono flex h-9 items-center gap-2 text-mist transition-colors hover:text-ivory"
+            className={`mono flex h-9 items-center gap-2 text-mist transition-[opacity,visibility,color] duration-1000 hover:text-ivory ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}
             data-cursor="link"
           >
             <span aria-hidden className="text-gold">{chapters[chapter]?.n}</span>

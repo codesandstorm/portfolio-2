@@ -97,6 +97,32 @@ html[data-cursor="on"], html[data-cursor="on"] * { cursor: none !important; }
 .reveal-line { display: block; overflow: hidden; }
 .reveal-line > span { display: block; transform: translateY(calc((1 - var(--r, 1)) * 110%)); opacity: var(--r, 1); }
 
+/* Her name: editorial serif, fire on one side, ice on the other, meeting in ivory. */
+.hero-name {
+  background-image: linear-gradient(180deg, #ffad5e 0%, #ffd6a6 34%, #f7efe4 50%, #cfe6ff 66%, #84c2ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 22px rgba(255, 196, 140, 0.16)) drop-shadow(0 0 40px rgba(110, 170, 255, 0.1));
+}
+@media (min-width: 768px) {
+  .hero-name { background-image: linear-gradient(90deg, #ff9440 0%, #ffcf98 30%, #f7efe4 50%, #c6e2ff 70%, #6cb2ff 100%); }
+}
+
+/* Static tier: the Fire × Ice opening as two still lights. */
+.static-duality {
+  background:
+    radial-gradient(40% 55% at 12% 50%, rgba(255, 120, 40, 0.22), transparent 70%),
+    radial-gradient(40% 55% at 88% 50%, rgba(70, 140, 255, 0.22), transparent 70%);
+}
+@media (max-width: 767px) {
+  .static-duality {
+    background:
+      radial-gradient(70% 35% at 50% 8%, rgba(255, 120, 40, 0.22), transparent 70%),
+      radial-gradient(70% 35% at 50% 92%, rgba(70, 140, 255, 0.22), transparent 70%);
+  }
+}
+
 /* Static tier: a quiet constellation backdrop without WebGL. */
 .static-sky {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;

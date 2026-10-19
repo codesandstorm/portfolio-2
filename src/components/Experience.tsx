@@ -15,7 +15,7 @@ import { ContinueChapter } from "./chapters/ContinueChapter";
 import { ConvergeChapter } from "./chapters/ConvergeChapter";
 import { LeadChapter } from "./chapters/LeadChapter";
 import { LearnChapter } from "./chapters/LearnChapter";
-import { SignalChapter } from "./chapters/SignalChapter";
+import { CinematicLanding } from "./landing/CinematicLanding";
 import { StartChapter } from "./chapters/StartChapter";
 import { ChapterNav } from "./ui/ChapterNav";
 import { Cursor } from "./ui/Cursor";
@@ -102,7 +102,7 @@ export function Experience() {
       {cinematic && <NodeLabels />}
       <Cursor />
       <main id="main">
-        <SignalChapter />
+        <CinematicLanding />
         <StartChapter />
         <AkshitaChapter />
         <ConnectChapter />
