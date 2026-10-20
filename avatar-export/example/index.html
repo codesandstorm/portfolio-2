@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Avatar head-tracking + lip-sync test</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; height: 100%; background: #1d1f22; color: #e8e6e3; font: 13px/1.45 system-ui, sans-serif; }
+  canvas { display: block; }
+  #panel { position: fixed; top: 12px; left: 12px; max-width: 340px; background: #0009; padding: 10px 12px; border-radius: 8px; }
+  #panel button, #panel label { margin: 4px 4px 0 0; }
+  button { background: #333; color: #eee; border: 1px solid #555; border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+  pre { white-space: pre-wrap; margin: 8px 0 0; font-size: 11px; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="panel">
+  <b>avatar-neck-lipsync.glb</b><br />
+  Move the pointer to steer the head. Leave the window to return to neutral.<br />
+  <button id="talk">▶ Talk test (synthetic)</button>
+  <label><input type="file" id="audio" accept="audio/*" hidden /><button id="pick">🎵 Lip-sync an audio file</button></label><br />
+  <label><input type="checkbox" id="torsoFollow" /> torso follows a little</label>
+  <pre id="report">loading…</pre>
+</div>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+// ---- names come from model-manifest.json -----------------------------------
+const NECK = "Neck", HEAD = "Head", TORSO = "Spine";
+// clamps (yaw ±55°, pitch up 25° / down 20°, roll ±6°). Rotation is shared torso → neck → head.
+const D = THREE.MathUtils.degToRad;
+const LIMIT = { yaw: D(55), up: D(25), down: D(20), roll: D(6) };
+const SHARE = { torso: 0.15, neck: 0.35, head: 0.5 };   // torso share is used only when "torso follows" is on
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1d1f22);
+const camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.01, 10);
+camera.position.set(0, 0.17, 0.9);
+camera.lookAt(0, 0.165, 0);
+
+const report = document.getElementById("report");
+const state = { neck: null, head: null, torso: null, faceMeshes: [], ready: false };
+
+new GLTFLoader().load("../avatar-neck-lipsync.glb", (gltf) => {
+  const root = gltf.scene;
+  scene.add(root);
+  let skinned = 0, bones = new Set();
+  root.traverse((o) => {
+    if (o.isSkinnedMesh) {
+      skinned++;
+      o.frustumCulled = false;
+      o.skeleton.bones.forEach((b) => bones.add(b.name));
+      if (o.morphTargetDictionary) state.faceMeshes.push(o);
+    }
+  });
+  // bones are found by name, never by rotating the whole model
+  state.neck = root.getObjectByName(NECK);
+  state.head = root.getObjectByName(HEAD);
+  state.torso = root.getObjectByName(TORSO);
+  state.neutral = { neck: state.neck.quaternion.clone(), head: state.head.quaternion.clone(), torso: state.torso.quaternion.clone() };
+  root.updateMatrixWorld(true);
+  state.torsoRest = state.torso.matrixWorld.clone();
+  state.rootRest = root.matrixWorld.clone();
+  state.root = root;
+  state.ready = true;
+
+  const tex = [];
+  root.traverse((o) => o.material?.map && tex.push(o.material.map.image?.width + "x" + o.material.map.image?.height));
+  state.static = [
+    `skinned meshes: ${skinned}`,
+    `bones: ${[...bones].join(" → ")}`,
+    `neck: ${!!state.neck}  head: ${!!state.head}  torso: ${!!state.torso}`,
+    ...state.faceMeshes.map((m) => `${m.name} morphs: ${Object.keys(m.morphTargetDictionary).join(", ")}`),
+    `embedded texture: ${tex.join(", ") || "none"}`,
+    `animation clips: ${gltf.animations.length}`,
+  ].join("\n");
+  window.__avatar = state; // for automated checks
+}, undefined, (e) => { report.textContent = "FAILED to load: " + e.message; });
+
+// ---- pointer → target yaw/pitch --------------------------------------------
+const target = { yaw: 0, pitch: 0 }, cur = { yaw: 0, pitch: 0, roll: 0 };
+let active = false;
+addEventListener("pointermove", (e) => {
+  active = true;
+  const nx = (e.clientX / innerWidth) * 2 - 1, ny = (e.clientY / innerHeight) * 2 - 1;
+  target.yaw = THREE.MathUtils.clamp(nx * LIMIT.yaw, -LIMIT.yaw, LIMIT.yaw);
+  target.pitch = THREE.MathUtils.clamp(ny * LIMIT.down, -LIMIT.up, LIMIT.down); // +pitch = look down
+});
+document.addEventListener("pointerleave", () => { active = false; target.yaw = 0; target.pitch = 0; });
+addEventListener("blur", () => { target.yaw = 0; target.pitch = 0; });
+
+// ---- lip sync: writes ONLY morph influences, never bones -------------------
+const mouth = { jawOpen: 0, mouthFunnel: 0, mouthSmileLeft: 0.15, mouthSmileRight: 0.15 };
+let talkUntil = 0, analyser = null, audioData = null;
+document.getElementById("talk").onclick = () => { talkUntil = performance.now() + 6000; };
+document.getElementById("pick").onclick = () => document.getElementById("audio").click();
+document.getElementById("audio").onchange = async (e) => {
+  const file = e.target.files[0]; if (!file) return;
+  const ctx = new AudioContext();
+  const el = new Audio(URL.createObjectURL(file));
+  const src = ctx.createMediaElementSource(el);
+  analyser = ctx.createAnalyser(); analyser.fftSize = 1024;
+  audioData = new Uint8Array(analyser.fftSize);
+  src.connect(analyser); analyser.connect(ctx.destination);
+  el.play();
+};
+
+function speechLevel(t) {
+  if (analyser) {
+    analyser.getByteTimeDomainData(audioData);
+    let s = 0; for (const v of audioData) s += ((v - 128) / 128) ** 2;
+    return Math.min(1, Math.sqrt(s / audioData.length) * 6);
+  }
+  if (t < talkUntil) { // syllable-like envelope, ~5 syllables / second
+    const syl = Math.max(0, Math.sin(t * 0.016)) * (0.55 + 0.45 * Math.sin(t * 0.0037));
+    return syl;
+  }
+  return 0;
+}
+
+function setMorph(name, v) {
+  for (const m of state.faceMeshes) {
+    const i = m.morphTargetDictionary[name];
+    if (i !== undefined) m.morphTargetInfluences[i] = v;
+  }
+}
+
+// ---- frame loop: head tracking and lip sync run in the same frame ----------
+const damp = THREE.MathUtils.damp, q = new THREE.Quaternion(), eul = new THREE.Euler(0, 0, 0, "YXZ");
+let last = performance.now();
+renderer.setAnimationLoop((now) => {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (state.ready) {
+    // (if the model had an AnimationMixer, mixer.update(dt) would go HERE, before the bone override)
+    const lambda = active ? 6 : 2.5;   // frame-rate independent smoothing; slower drift back to neutral
+    cur.yaw = damp(cur.yaw, target.yaw, lambda, dt);
+    cur.pitch = damp(cur.pitch, target.pitch, lambda, dt);
+    cur.roll = THREE.MathUtils.clamp(-cur.yaw * 0.12, -LIMIT.roll, LIMIT.roll);
+
+    const torsoOn = document.getElementById("torsoFollow").checked;
+    const ts = torsoOn ? SHARE.torso : 0, ns = SHARE.neck + (torsoOn ? 0 : SHARE.torso * 0.5), hs = 1 - ts - ns;
+    state.torso.quaternion.copy(state.neutral.torso).multiply(q.setFromEuler(eul.set(0, cur.yaw * ts, 0)));
+    state.neck.quaternion.copy(state.neutral.neck).multiply(q.setFromEuler(eul.set(cur.pitch * ns, cur.yaw * ns, cur.roll * ns)));
+    state.head.quaternion.copy(state.neutral.head).multiply(q.setFromEuler(eul.set(cur.pitch * hs, cur.yaw * hs, cur.roll * hs)));
+
+    const lvl = speechLevel(now);
+    mouth.jawOpen = damp(mouth.jawOpen, lvl, 18, dt);
+    mouth.mouthFunnel = damp(mouth.mouthFunnel, lvl > 0.1 ? 0.25 * (1 + Math.sin(now * 0.005)) * lvl : 0, 12, dt);
+    if (window.__mouthOverride) Object.assign(mouth, window.__mouthOverride); // test hook: hold a mouth pose
+    for (const k in mouth) setMorph(k, mouth[k]);
+
+    state.root.updateMatrixWorld(true);
+    const torsoDrift = state.torso.matrixWorld.elements.reduce((a, v, i) => Math.max(a, Math.abs(v - state.torsoRest.elements[i])), 0);
+    if (!torsoOn) state.torsoDrift = Math.max(state.torsoDrift || 0, torsoDrift);
+    state.maxJaw = Math.max(state.maxJaw || 0, mouth.jawOpen);
+    state.maxYaw = Math.max(state.maxYaw || 0, Math.abs(cur.yaw));
+    report.textContent = state.static +
+      `\n\nyaw ${THREE.MathUtils.radToDeg(cur.yaw).toFixed(1)}°  pitch ${THREE.MathUtils.radToDeg(cur.pitch).toFixed(1)}°` +
+      `\njawOpen ${mouth.jawOpen.toFixed(2)}` +
+      `\ntorso drift (max) ${state.torsoDrift.toExponential(1)}  ${state.torsoDrift < 1e-6 ? "✔ rigid" : "✘ moving"}`;
+  }
+  renderer.render(scene, camera);
+});
+addEventListener("resize", () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

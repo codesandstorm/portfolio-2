@@ -37,11 +37,12 @@ function SoundToggle() {
   );
 }
 
+/** The landing's four words; every chapter is still one keypress away in the Index. */
 const NAV = [
-  { id: "collaborate", label: "Experience" },
+  { id: "signal", label: "Home" },
+  { id: "akshita", label: "About" },
   { id: "build", label: "Projects" },
-  { id: "learn", label: "Constellation" },
-  { id: "lead", label: "Voice" },
+  { id: "continue", label: "Contact" },
 ] as const;
 
 /** The brand: a minimal typographic AM. Fire and ice belong to the experience, never to the mark. */
@@ -97,7 +98,7 @@ export function TopBar() {
                   href={`#${n.id}`}
                   onClick={(e) => { e.preventDefault(); scrollToChapter(n.id); }}
                   aria-current={chapters[chapter]?.id === n.id ? "location" : undefined}
-                  className={`mono transition-colors hover:text-ivory ${chapters[chapter]?.id === n.id ? "text-gold" : "text-mist"}`}
+                  className={`mono relative pb-1 tracking-[0.3em] transition-colors hover:text-ivory ${chapters[chapter]?.id === n.id ? "text-gold after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:bg-gold/70" : "text-mist"}`}
                   data-cursor="link"
                 >
                   {n.label}

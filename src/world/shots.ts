@@ -30,9 +30,9 @@ export function shotAt(t: number, aspect: number): Shot {
 
   switch (i) {
     case chapterIndex.signal: {
-      // Almost still; a slow push during the attraction, eased back as the name settles.
+      // Almost still: the slowest push toward her as she emerges from the smoke.
       const a = introAmounts(world.intro);
-      return { pos: [0, 0, 46 - a.attract * 3 + a.network * 2.2], look: [0, 0, 0], fov };
+      return { pos: [0, 0, 46 - a.portrait * 1.5], look: [0, 0, 0], fov };
     }
     case chapterIndex.start: {
       const e = smooth(0, 1, p);

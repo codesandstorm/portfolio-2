@@ -33,6 +33,12 @@ export const profile = {
    * Leave null until she supplies them; her voice is never synthesised.
    */
   voice: { signoff: null as string | null, justStart: null as string | null },
+  /**
+   * Talking-portrait video made from her photo (e.g. with Hedra or HeyGen),
+   * e.g. "/akshita/avatar.mp4". Shown only when `consent` is true: set it only
+   * once Akshita has agreed to her face being animated and approved the words.
+   */
+  avatar: { video: null as string | null, consent: false },
   /** Her photograph (supplied 19 Oct 2026). Set to null to fall back to the abstract silhouette. */
   portrait: "/akshita/portrait.jpg" as string | null,
 } as const;

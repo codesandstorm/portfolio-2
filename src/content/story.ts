@@ -10,18 +10,10 @@ import { people } from "./data";
  * names her a MERN-stack developer and closes on "Public Speaker".
  */
 export const landing = {
-  fire: { name: "Fire", qualities: ["voice", "confidence", "action"] },
-  ice: { name: "Ice", qualities: ["intellect", "clarity", "structure"] },
-  /** Her own sign-off, SLC 2026 (LI-P4). */
-  signoff: ["Connect", "Collaborate", "Learn", "Lead"],
-  thought: "A voice for the room. A mind for the system.",
-  enter: "Scroll to enter",
-  marks: [
-    { n: "01", title: "People", note: `${people.length} she has named, by name`, to: "connect" },
-    { n: "02", title: "Experiences", note: "IIT Indore · i-SOFTZONE · ACM-W · IEEE", to: "collaborate" },
-    { n: "03", title: "Projects", note: "Seven builds, from an HRMS to PrakritiOS", to: "build" },
-    { n: "04", title: "Voice", note: "Anchor · representative · teacher", to: "lead" },
-  ],
+  /** The line under her name — her own choice of words (CSIT undergraduate, MERN/PERN builder). */
+  roles: ["CSIT student", "Full-stack developer", "Project builder"],
+  explore: "Explore my work",
+  tour: "or take the guided tour",
 } as const;
 
 /** Words in depth during the flight — each carries the fact behind it. */

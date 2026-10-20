@@ -1,34 +1,26 @@
 /**
- * The Fire × Ice opening as an explicit state machine. `world.intro` runs
- * 0 → 1 over the timeline; everything (particles, light, sound, DOM) reads its
- * phase and amounts from here so the systems never disagree.
+ * The opening as an explicit state machine. `world.intro` runs 0 → 1 over the
+ * timeline; smoke, portrait, title, sound and navigation all read their phase
+ * and amounts from here so they never disagree.
+ *
+ *   void → smoke (fire and ice drift in) → portrait (she emerges)
+ *        → strike (her name is struck into being) → title → settled
  */
 import { smooth } from "./world";
 
-export type IntroPhase =
-  | "void"
-  | "awakening"
-  | "duality"
-  | "attraction"
-  | "collision"
-  | "nameReveal"
-  | "settled"
-  | "transitioning"
-  | "complete";
+export type IntroPhase = "void" | "smoke" | "portrait" | "strike" | "title" | "settled" | "transitioning" | "complete";
 
 /** Full-length timeline in seconds (first visit, desktop). */
-export const INTRO_SECONDS = 9.6;
+export const INTRO_SECONDS = 8;
 
 /** Phase start points as fractions of the timeline. */
 export const AT = {
-  awakening: 0.1,
-  iceWakes: 0.26,
-  duality: 0.44,
-  attraction: 0.56,
-  collision: 0.72,
-  nameReveal: 0.735,
-  crisp: 0.82,
-  network: 0.84,
+  smoke: 0.04,
+  portrait: 0.22,
+  strike: 0.5,
+  mahajan: 0.68,
+  subtitle: 0.8,
+  cta: 0.88,
   settled: 0.97,
 } as const;
 
@@ -36,23 +28,20 @@ export function introPhase(intro: number, t: number): IntroPhase {
   if (t >= 1) return "complete";
   if (t > 0.05 && intro >= 1) return "transitioning";
   if (intro >= AT.settled) return "settled";
-  if (intro >= AT.nameReveal) return "nameReveal";
-  if (intro >= AT.collision) return "collision";
-  if (intro >= AT.attraction) return "attraction";
-  if (intro >= AT.duality) return "duality";
-  if (intro >= AT.awakening) return "awakening";
+  if (intro >= AT.mahajan) return "title";
+  if (intro >= AT.strike) return "strike";
+  if (intro >= AT.portrait) return "portrait";
+  if (intro >= AT.smoke) return "smoke";
   return "void";
 }
 
-/** How present each system is at a point in the timeline. */
+/** How present each layer is at a point in the timeline. */
 export function introAmounts(intro: number) {
   return {
-    spark: smooth(0.03, 0.09, intro),
-    fire: smooth(AT.awakening, 0.3, intro),
-    ice: smooth(AT.iceWakes, 0.44, intro),
-    attract: smooth(AT.attraction, AT.collision, intro),
-    glyph: intro >= AT.collision ? 1 : 0,
-    crisp: smooth(AT.crisp, 0.92, intro),
-    network: smooth(AT.network, 1, intro),
+    smoke: smooth(AT.smoke, 0.42, intro),
+    portrait: smooth(AT.portrait, 0.55, intro),
+    title: smooth(AT.strike, AT.mahajan, intro),
+    subtitle: smooth(AT.subtitle, 0.9, intro),
+    cta: smooth(AT.cta, 0.97, intro),
   };
 }

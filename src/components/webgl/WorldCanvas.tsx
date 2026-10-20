@@ -11,13 +11,12 @@ import { world } from "@/lib/world";
 import { Artifacts } from "./Artifacts";
 import { Atmosphere } from "./Atmosphere";
 import { CameraRig } from "./CameraRig";
-import { CollisionSystem } from "./CollisionSystem";
 import { Constellation } from "./Constellation";
 import { Convergence } from "./Convergence";
 import { Dust } from "./Dust";
-import { EnergyArcs } from "./EnergyArcs";
 import { Fragments } from "./Fragments";
-import { IceShards } from "./IceShards";
+import { CosmicSmoke } from "./CosmicSmoke";
+import { HeroPortrait } from "./HeroPortrait";
 import { Particles } from "./Particles";
 import { Portrait } from "./Portrait";
 
@@ -62,13 +61,12 @@ export default function WorldCanvas({ tier }: { tier: Exclude<Tier, "static"> })
           onIncline={() => setDpr((d) => Math.min(cfg.dpr[1], d + 0.25))}
         />
         <Atmosphere />
+        <CosmicSmoke lite={tier === "mobile"} />
+        <HeroPortrait />
         <CameraRig />
         <Dust count={cfg.dust} />
         <Constellation />
-        <EnergyArcs />
-        <IceShards count={cfg.shards} />
         <Particles count={cfg.particles} />
-        <CollisionSystem />
         <Fragments />
         <Portrait />
         <Artifacts />

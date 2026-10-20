@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Electric Title</title>
+<!--
+  Electric film-title reveal — standalone, no build, no libraries.
+  Open this file in a browser. Change FIRST / SECOND below to any name.
+
+  Sequence: each letter of the first word is struck by a lightning bolt and
+  flickers alight (ice-blue bolts from the left, fire-tinted from the right),
+  one white flash with a brief chromatic split, the letters cool into warm
+  metal, the second word is scanned in by a crackling sweep, then an
+  occasional faint arc keeps the title alive.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --bg: #04040a; --ivory: #f3ead8; --gold: #ffb347; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ivory); overflow: hidden; }
+  .stage { position: relative; height: 100%; display: grid; place-items: center; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  h1 { margin: 0; text-align: center; font-family: "Cinzel", "Trajan Pro", serif; font-weight: 500; text-transform: uppercase; line-height: 1; }
+  .line1 { display: block; font-size: clamp(2.6rem, 9vw, 9rem); letter-spacing: 0.28em; padding-left: 0.28em; }
+  .line2 { display: block; margin-top: 0.35em; font-size: clamp(1.1rem, 3.5vw, 3.3rem); letter-spacing: 0.62em; padding-left: 0.62em; }
+
+  .ttl {
+    display: inline-block;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    /* Settled: warm metal, bright at the top edge, deepening toward the base. */
+    background-image: linear-gradient(180deg, #fff8ec 0%, #ffe2b8 38%, #f1b673 62%, #b8742f 100%);
+    filter: drop-shadow(0 0 10px rgba(255, 170, 90, 0.35)) drop-shadow(0 0 28px rgba(255, 120, 40, 0.18));
+    opacity: 0;
+    transition: opacity 0.25s ease, filter 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ttl[data-s="hot"] {
+    opacity: 1;
+    background-image: linear-gradient(180deg, #ffffff, #e6f2ff);
+    filter: drop-shadow(0 0 6px #cfe6ff) drop-shadow(0 0 18px #6fb6ff) drop-shadow(0 0 42px rgba(111, 182, 255, 0.6));
+    transform: scale(1.03);
+    transition: none;
+  }
+  .ttl[data-s="flash"] {
+    opacity: 1;
+    background-image: linear-gradient(180deg, #ffffff, #ffffff);
+    filter: drop-shadow(-2px 0 0 rgba(255, 80, 60, 0.75)) drop-shadow(2px 0 0 rgba(80, 180, 255, 0.75)) drop-shadow(0 0 30px #ffffff);
+    transition: none;
+  }
+  .ttl[data-s="dim"] { opacity: 0.18; transition: none; }
+  .ttl[data-s="lit"] { opacity: 1; }
+  .line2 .ttl { background-image: linear-gradient(180deg, #f7efe4 0%, #e3cfb3 60%, #a88a68 100%); filter: drop-shadow(0 0 12px rgba(255, 200, 150, 0.18)); }
+
+  .flashwash { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(60% 50% at 50% 50%, rgba(170, 205, 255, 0.35), transparent 70%); opacity: 0; }
+
+  .controls { position: absolute; bottom: 24px; left: 0; right: 0; display: flex; gap: 18px; justify-content: center; font: 11px/1 ui-monospace, monospace; letter-spacing: 0.2em; text-transform: uppercase; }
+  .controls button, .controls label { background: none; border: 1px solid rgba(243, 234, 216, 0.25); color: var(--ivory); padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+  .controls button:hover { border-color: var(--gold); color: var(--gold); }
+  @media (prefers-reduced-motion: reduce) { .ttl { opacity: 1; } }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="flashwash" id="wash"></div>
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <h1 id="title" aria-label="Akshita Mahajan"></h1>
+  <div class="controls">
+    <button id="replay" type="button">Replay</button>
+    <label><input id="sound" type="checkbox" /> Sound</label>
+  </div>
+</div>
+
+<script>
+  // ─── Settings ──────────────────────────────────────────────
+  const FIRST = "AKSHITA";
+  const SECOND = "MAHAJAN";
+  /** Order the first word's letters are struck in: outside-in, never typewriter order. */
+  const ORDER = [0, 6, 3, 1, 5, 2, 4];
+  const GAP = 115; // ms between strikes
+  const START_DELAY = 600; // ms before the first strike
+
+  // ─── Build the letters ─────────────────────────────────────
+  const title = document.getElementById("title");
+  const sky = document.getElementById("sky");
+  const wash = document.getElementById("wash");
+  const ctx = sky.getContext("2d");
+  const line1 = document.createElement("span");
+  const line2 = document.createElement("span");
+  line1.className = "line1";
+  line2.className = "line2";
+  line1.setAttribute("aria-hidden", "true");
+  line2.setAttribute("aria-hidden", "true");
+  const mk = (ch, parent) => {
+    const s = document.createElement("span");
+    s.className = "ttl";
+    s.dataset.s = "off";
+    s.textContent = ch;
+    parent.appendChild(s);
+    return s;
+  };
+  const first = [...FIRST].map((c) => mk(c, line1));
+  const second = [...SECOND].map((c) => mk(c, line2));
+  title.append(line1, line2);
+  title.setAttribute("aria-label", `${FIRST} ${SECOND}`);
+  // Order must cover every letter of FIRST.
+  const order = ORDER.length === FIRST.length ? ORDER : [...FIRST].map((_, i) => i);
+
+  // ─── Canvas sizing ─────────────────────────────────────────
+  function fit() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    sky.width = Math.round(innerWidth * dpr);
+    sky.height = Math.round(innerHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  fit();
+  addEventListener("resize", fit);
+
+  // ─── Sound (optional, synthesised, off by default) ─────────
+  let actx = null;
+  const soundOn = () => document.getElementById("sound").checked;
+  function noise(seconds) {
+    const b = actx.createBuffer(1, Math.floor(actx.sampleRate * seconds), actx.sampleRate);
+    const d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    return b;
+  }
+  function env(g, t, peak, a, r) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + a + r);
+  }
+  function zap(k = 1) {
+    if (!soundOn()) return;
+    actx ??= new AudioContext();
+    const t = actx.currentTime;
+    const n = actx.createBufferSource();
+    n.buffer = noise(0.12);
+    const bp = actx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 3200 + Math.random() * 2400;
+    const g = actx.createGain();
+    env(g, t, 0.09 * k, 0.002, 0.09);
+    n.connect(bp).connect(g).connect(actx.destination);
+    n.start(t);
+    const o = actx.createOscillator();
+    o.type = "sawtooth";
+    o.frequency.value = 110 + Math.random() * 40;
+    const lp = actx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 900;
+    const og = actx.createGain();
+    env(og, t, 0.035 * k, 0.003, 0.12);
+    o.connect(lp).connect(og).connect(actx.destination);
+    o.start(t);
+    o.stop(t + 0.16);
+  }
+  function thunder() {
+    if (!soundOn()) return;
+    zap(1.8);
+    const t = actx.currentTime;
+    const n = actx.createBufferSource();
+    n.buffer = noise(2.4);
+    const lp = actx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.setValueAtTime(900, t);
+    lp.frequency.exponentialRampToValueAtTime(90, t + 2);
+    const g = actx.createGain();
+    env(g, t + 0.02, 0.22, 0.04, 2.1);
+    n.connect(lp).connect(g).connect(actx.destination);
+    n.start(t);
+  }
+
+  // ─── Lightning ─────────────────────────────────────────────
+  const TONE = {
+    ice: { glow: "rgba(111,182,255,0.6)", mid: "rgba(190,222,255,0.95)", core: "#ffffff" },
+    fire: { glow: "rgba(255,150,70,0.55)", mid: "rgba(255,214,170,0.95)", core: "#fffaf2" },
+    white: { glow: "rgba(200,225,255,0.65)", mid: "rgba(235,244,255,0.95)", core: "#ffffff" },
+  };
+  let bolts = [];
+
+  /** Jagged path by repeated midpoint displacement — re-rolled every frame, so it flickers. */
+  function jag(a, b, disp) {
+    let pts = [a, b];
+    let d = disp;
+    for (let it = 0; it < 6; it++) {
+      const next = [pts[0]];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const [ax, ay] = pts[i];
+        const [bx, by] = pts[i + 1];
+        next.push([(ax + bx) / 2 + (Math.random() - 0.5) * d, (ay + by) / 2 + (Math.random() - 0.5) * d], [bx, by]);
+      }
+      pts = next;
+      d *= 0.55;
+    }
+    return pts;
+  }
+  const bolt = (a, b, tone, life = 130, disp = 70, width = 1.4) => bolts.push({ a, b, tone, life, disp, width, born: performance.now() });
+
+  /** Centre of a letter, `dy` of the way down it, in page pixels. */
+  function anchor(el, dy = 0.08) {
+    const r = el.getBoundingClientRect();
+    return [r.left + r.width / 2, r.top + r.height * dy];
+  }
+
+  function stroke(pts) {
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (const [x, y] of pts) ctx.lineTo(x, y);
+    ctx.stroke();
+  }
+
+  function draw(now) {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    bolts = bolts.filter((b) => now - b.born < b.life);
+    ctx.globalCompositeOperation = "lighter";
+    ctx.lineJoin = "round";
+    for (const b of bolts) {
+      const age = (now - b.born) / b.life;
+      // Real lightning stutters: the bolt drops out for a frame here and there.
+      const alpha = (1 - age * age) * (Math.random() < 0.22 ? 0.25 : 1);
+      const pts = jag(b.a, b.b, b.disp);
+      const t = TONE[b.tone];
+      ctx.globalAlpha = alpha;
+      ctx.shadowColor = t.glow;
+      ctx.shadowBlur = 22;
+      ctx.strokeStyle = t.glow;
+      ctx.lineWidth = b.width * 6;
+      stroke(pts);
+      ctx.shadowBlur = 8;
+      ctx.strokeStyle = t.mid;
+      ctx.lineWidth = b.width * 2.2;
+      stroke(pts);
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = t.core;
+      ctx.lineWidth = b.width * 0.9;
+      stroke(pts);
+      // Branches off the main channel.
+      if (b.disp > 40) {
+        for (let n = 0; n < 2; n++) {
+          const k = Math.floor(pts.length * (0.25 + Math.random() * 0.5));
+          const [sx, sy] = pts[k];
+          const branch = jag([sx, sy], [sx + (Math.random() - 0.5) * 140, sy + 30 + Math.random() * 70], 34);
+          ctx.globalAlpha = alpha * 0.6;
+          ctx.strokeStyle = t.mid;
+          ctx.lineWidth = b.width * 0.9;
+          stroke(branch);
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ─── The sequence ──────────────────────────────────────────
+  let timers = [];
+  let done = false;
+  let nextCrackle = 0;
+  const later = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const set = (el, s) => (el.dataset.s = s);
+
+  function play() {
+    timers.forEach(clearTimeout);
+    timers = [];
+    bolts = [];
+    done = false;
+    nextCrackle = 0;
+    [...first, ...second].forEach((el) => set(el, "off"));
+
+    // 1. Each letter is struck and flickers alight like a tube catching.
+    order.forEach((i, k) => {
+      later(START_DELAY + k * GAP, () => {
+        const el = first[i];
+        const fromLeft = i < first.length / 2;
+        const [x, y] = anchor(el);
+        bolt([fromLeft ? -20 : innerWidth + 20, y - 60 - Math.random() * 140], [x, y], fromLeft ? "ice" : "fire", 160, 95, 1.7);
+        zap(0.8);
+        set(el, "hot");
+        later(45, () => set(el, "dim"));
+        later(85, () => set(el, "hot"));
+        later(120, () => set(el, "dim"));
+        later(150, () => set(el, "hot"));
+      });
+    });
+
+    // 2. One full strike: everything white, the room lights up, then it cools to metal.
+    const flashAt = START_DELAY + order.length * GAP + 200;
+    later(flashAt, () => {
+      first.forEach((el) => set(el, "flash"));
+      wash.style.transition = "none";
+      wash.style.opacity = "1";
+      requestAnimationFrame(() => {
+        wash.style.transition = "opacity 0.9s ease-out";
+        wash.style.opacity = "0";
+      });
+      thunder();
+      for (let k = 0; k < first.length - 1; k++) bolt(anchor(first[k], 0.5), anchor(first[k + 1], 0.5), "white", 180, 26, 1.2);
+      const [lx, ly] = anchor(first[0], 0.5);
+      const [rx, ry] = anchor(first[first.length - 1], 0.5);
+      bolt([-30, ly - 140], [lx, ly], "ice", 220, 120, 2);
+      bolt([innerWidth + 30, ry - 140], [rx, ry], "fire", 220, 120, 2);
+    });
+    later(flashAt + 150, () => first.forEach((el) => set(el, "lit")));
+
+    // 3. The second word is scanned in by a crackling sweep.
+    const scanAt = flashAt + 700;
+    second.forEach((el, j) => {
+      later(scanAt + j * 70, () => {
+        set(el, "hot");
+        const [x, y] = anchor(el, 0.2);
+        bolt([x - 14, y - 18], [x + 10, y + 4], "white", 90, 14, 1);
+        if (j === 0 || j === second.length - 1) zap(0.35);
+        later(140, () => set(el, "lit"));
+      });
+    });
+    later(scanAt + second.length * 70 + 200, () => (done = true));
+  }
+
+  function loop(now) {
+    // 4. Afterwards, a faint arc now and then keeps the title alive.
+    if (done && now > nextCrackle) {
+      if (nextCrackle) {
+        const i = Math.floor(Math.random() * (first.length - 1));
+        bolt(anchor(first[i], 0.3 + Math.random() * 0.4), anchor(first[i + 1], 0.3 + Math.random() * 0.4), i < first.length / 2 ? "ice" : "fire", 110, 18, 0.9);
+        zap(0.2);
+      }
+      nextCrackle = now + 3500 + Math.random() * 4500;
+    }
+    draw(now);
+    requestAnimationFrame(loop);
+  }
+
+  document.getElementById("replay").addEventListener("click", play);
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    [...first, ...second].forEach((el) => set(el, "lit"));
+  } else {
+    document.fonts.ready.then(play);
+  }
+  requestAnimationFrame(loop);
+</script>
+</body>
+</html>

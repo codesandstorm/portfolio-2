@@ -7,7 +7,6 @@ import { CORE_ID, edges, getNeighbors, getRelatedNodes, latestSignals, nodes } f
 import { skills } from "@/content/data";
 import type { NodeKind } from "@/content/types";
 import { chapterIndex } from "@/lib/chapters";
-import { introAmounts } from "@/lib/intro";
 import { focusOf, useUI } from "@/lib/store";
 import { chapterProgress, smooth, world } from "@/lib/world";
 import { nodeFragment, nodeVertex, threadFragment, threadVertex } from "@/shaders/constellation";
@@ -191,7 +190,8 @@ export function Constellation() {
     }
     const related = relatedRef.current;
     const emph = EMPHASIS[chapter];
-    const net = introAmounts(world.intro).network;
+    // The landing keeps the network hidden behind the smoke; it appears as you fly in.
+    const net = 0;
     const k = 1 - Math.exp(-dt * 5);
 
     const st = state.current;

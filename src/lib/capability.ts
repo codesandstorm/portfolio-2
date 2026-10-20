@@ -5,13 +5,12 @@ export type TierConfig = {
   dpr: [number, number];
   post: boolean;
   dust: number;
-  shards: number;
 };
 
 export const tierConfig: Record<Exclude<Tier, "static">, TierConfig> = {
-  high: { particles: 7000, dpr: [1, 2], post: true, dust: 1600, shards: 48 },
-  standard: { particles: 4500, dpr: [1, 1.5], post: true, dust: 1000, shards: 32 },
-  mobile: { particles: 2400, dpr: [1, 1.5], post: false, dust: 500, shards: 16 },
+  high: { particles: 7000, dpr: [1, 2], post: true, dust: 1600 },
+  standard: { particles: 4500, dpr: [1, 1.5], post: true, dust: 1000 },
+  mobile: { particles: 2400, dpr: [1, 1.5], post: false, dust: 500 },
 };
 
 function hasWebGL2() {

@@ -1,0 +1,29 @@
+{
+  "file": "avatar-neck-lipsync.glb",
+  "kind": "3D bust reconstructed from two renders (front + side profile) of the avatar; closed surface, texture projected from both views",
+  "sources": ["source/front.webp", "source/side.webp"],
+  "sizeBytes": 4856656,
+  "rootNode": "AvatarRoot",
+  "torsoBone": "Spine",
+  "neckBone": "Neck",
+  "headBone": "Head",
+  "jawBone": null,
+  "boneHierarchy": ["Spine", "Neck", "Head"],
+  "skinnedMeshes": ["AvatarFace", "AvatarMouth"],
+  "vertexCount": { "AvatarFace": 54253, "AvatarMouth": 240 },
+  "lipSyncType": "morph targets with ARKit blendshape names (subset); jawOpen is a hinged-jaw rotation baked into a morph; no bones are used for the mouth",
+  "morphTargets": {
+    "AvatarFace": ["jawOpen", "mouthFunnel", "mouthPucker", "mouthSmileLeft", "mouthSmileRight", "mouthClose"],
+    "AvatarMouth": ["jawOpen"]
+  },
+  "visemes": [],
+  "animationClips": [],
+  "texturesEmbedded": true,
+  "texture": "2048x1024 JPEG atlas, embedded",
+  "externalFiles": [],
+  "materials": ["AvatarSkinHair (unlit, embedded JPEG)", "AvatarMouthInterior (unlit, vertex colours)"],
+  "units": "metres, +Y up, avatar faces +Z",
+  "recommendedLimitsDegrees": { "yaw": 55, "pitchUp": 25, "pitchDown": 20, "roll": 6 },
+  "recommendedShares": { "torsoLocked": { "neck": 0.425, "head": 0.575 }, "torsoFollows": { "torso": 0.15, "neck": 0.35, "head": 0.5 } },
+  "notes": "Drive Neck and Head local rotations for tracking (optionally a small Spine yaw for torso follow). Drive jawOpen on every mesh that has it for speech. Rebuild: python avatar-export/tools/build_glb.py avatar-export/source/front.webp avatar-export/source/side.webp avatar-export/avatar-neck-lipsync.glb"
+}

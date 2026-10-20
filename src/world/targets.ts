@@ -79,44 +79,6 @@ export function nameTarget(n: number, opts: { width: number; center: [number, nu
   });
 }
 
-/**
- * Her name sampled from the exact font, size and spacing of the DOM <h1>, so
- * the particles land on the crisp type. The first half of the particles (fire)
- * takes the left of the name, the second half (ice) the right, along a jagged
- * seam rather than a clean cut between the words.
- */
-export function glyphTarget(
-  n: number,
-  rect: { w: number; h: number; fontPx: number; spacingPx: number; lines: string[] },
-  toWorld: (u: number, v: number) => [number, number],
-  z: number,
-) {
-  const family = cssFont("--font-instrument", "serif");
-  const s = Math.min(3, 1400 / rect.w);
-  const W = Math.ceil(rect.w * s);
-  const H = Math.ceil(rect.h * s);
-  const { pixels } = litPixels(
-    (ctx) => {
-      ctx.fillStyle = "#fff";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.font = `400 ${rect.fontPx * s}px ${family}`;
-      (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = `${rect.spacingPx * s}px`;
-      rect.lines.forEach((l, i) => ctx.fillText(l, W / 2 + (rect.spacingPx * s) / 2, (H / rect.lines.length) * (i + 0.5)));
-    },
-    W,
-    H,
-    2,
-  );
-  const pts = fill(n, pixels, (u, v, out, i) => {
-    const [x, y] = toWorld(u, v);
-    out[i * 3] = x;
-    out[i * 3 + 1] = y;
-    out[i * 3 + 2] = z + rand(-0.08, 0.08);
-  });
-  return splitByX(pts, n);
-}
-
 /** Order points so the first half (fire) lies left of a jagged seam and the second half (ice) right of it. */
 export function splitByX(pts: Float32Array, n: number) {
   const key = Array.from({ length: n }, (_, i) => pts[i * 3] + Math.sin(pts[i * 3 + 1] * 1.7) * 0.6 + rand(-0.45, 0.45));
