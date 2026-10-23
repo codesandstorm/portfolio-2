@@ -46,7 +46,7 @@ export function Atmosphere() {
     const t = world.t;
     const tall = size.width / size.height < 0.9;
     // Fire and ice glow only in the finale (the landing draws its own); elsewhere a faint presence.
-    const want = t >= chapterIndex.continue ? 0.6 * smooth(9, 9.5, t) : t < 1 ? 0 : 0.12;
+    const want = t >= chapterIndex.continue ? 0.6 * smooth(chapterIndex.continue, chapterIndex.continue + 0.5, t) : t < 1 ? 0 : 0.12;
     state.current.glow += (want - state.current.glow) * (1 - Math.exp(-dt * 3));
     u.uFire.value = u.uIce.value = state.current.glow;
     // Ice on the left and fire on the right, as on the landing (top and bottom on phones).

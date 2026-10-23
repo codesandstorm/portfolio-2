@@ -11,9 +11,9 @@ import { useUI } from "@/lib/store";
 /** Atmosphere behind a text column so light passing behind it never costs legibility. */
 const SCRIM = {
   right:
-    "bg-[linear-gradient(to_top,rgba(4,4,10,0.94)_0%,rgba(4,4,10,0.75)_45%,transparent_72%)] md:bg-[linear-gradient(to_left,rgba(4,4,10,0.9)_0%,rgba(4,4,10,0.72)_38%,transparent_62%)]",
+    "bg-[linear-gradient(to_top,rgba(5,6,8,0.94)_0%,rgba(5,6,8,0.75)_45%,transparent_72%)] md:bg-[linear-gradient(to_left,rgba(5,6,8,0.9)_0%,rgba(5,6,8,0.72)_38%,transparent_62%)]",
   left:
-    "bg-[linear-gradient(to_bottom,rgba(4,4,10,0.9)_0%,rgba(4,4,10,0.6)_30%,transparent_48%)] md:bg-[linear-gradient(to_right,rgba(4,4,10,0.85)_0%,rgba(4,4,10,0.55)_28%,transparent_45%)]",
+    "bg-[linear-gradient(to_bottom,rgba(5,6,8,0.9)_0%,rgba(5,6,8,0.6)_30%,transparent_48%)] md:bg-[linear-gradient(to_right,rgba(5,6,8,0.85)_0%,rgba(5,6,8,0.55)_28%,transparent_45%)]",
 };
 
 export function Chapter({
@@ -21,15 +21,26 @@ export function Chapter({
   children,
   className = "",
   scrim,
+  free = false,
 }: {
   id: ChapterId;
   children: ReactNode;
   className?: string;
   scrim?: keyof typeof SCRIM;
+  /** Content that should be read all at once (a grid, a list) rather than pinned and stepped through. */
+  free?: boolean;
 }) {
   const flow = useUI((s) => s.tier === "static");
   const c = chapters[chapterIndex[id]];
   const style = { "--h-d": `${c.vh[0]}vh`, "--h-m": `${c.vh[1]}vh` } as CSSProperties;
+  if (free && !flow) {
+    return (
+      <section id={id} data-chapter={id} aria-labelledby={`${id}-title`} className="relative z-10 min-h-svh">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,transparent,rgba(5,6,8,0.72)_14%,rgba(5,6,8,0.72)_86%,transparent)]" />
+        <div className={`px-[var(--gutter)] pb-[14svh] pt-[16svh] ${className}`}>{children}</div>
+      </section>
+    );
+  }
   return (
     <section
       id={id}
@@ -49,9 +60,9 @@ export function Chapter({
 export function Kicker({ id, className = "" }: { id: ChapterId; className?: string }) {
   const c = chapters[chapterIndex[id]];
   return (
-    <p className={`mono flex items-center gap-3 text-faint ${className}`}>
-      <span className="text-gold">{c.n}</span>
-      <span className="h-px w-8 bg-gold/50" aria-hidden />
+    <p className={`title-face flex items-center gap-4 text-[0.78rem] uppercase tracking-[0.3em] text-[#ecd6b8] ${className}`}>
+      <span className="text-[#d48b3b]">{c.n}</span>
+      <span className="h-[1.5px] w-12 bg-gradient-to-r from-[#d48b3b] to-transparent shadow-[0_0_8px_rgba(212,139,59,0.45)]" aria-hidden />
       <span>{c.title}</span>
       <span className="sr-only">— {c.plain}</span>
     </p>

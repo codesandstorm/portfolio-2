@@ -26,15 +26,6 @@ export const fragments = [
   { word: "Leadership", note: "Vice Chair · SUAS ACM-W" },
 ] as const;
 
-/** LI-P13, "4 internships in 15 days". */
-export const origin = [
-  { kicker: "July 2026, looking back a year", text: "She was the quiet student in class," },
-  { kicker: "", text: "still learning JavaScript." },
-  { kicker: "Then", text: "She built projects. Applied every day. Took the rejections." },
-  { kicker: "Then", text: "A first offer." },
-  { kicker: "Then", text: "Four offers in fifteen days — one of them, IIT Indore." },
-] as const;
-
 /** Identity facets — each only with evidence. */
 export const facets = [
   { word: "Builder", proof: "An enterprise HRMS with 33 data models, live on Vercel + Render.", focus: "p-hrms" },
@@ -43,13 +34,6 @@ export const facets = [
   { word: "Leader", proof: "Membership Development Vice Chair, SUAS ACM-W. Represented SUAS at IEEE SLC 2026.", focus: "s-leadership" },
   { word: "Teacher", proof: "Took cybersecurity, STEM and AI to rural schools with IEEE CS SUAS.", focus: "s-teaching" },
   { word: "Learner", proof: "Lost at Green Tech. Came back with PrakritiOS and placed third.", focus: "p-prakriti" },
-] as const;
-
-/** Kinetic statements for "Lead" — her words, where the dossier quotes them. */
-export const statements = [
-  { words: ["Connect.", "Collaborate.", "Learn.", "Lead."], source: "Her sign-off, SLC 2026 (LI-P4)" },
-  { words: ["We", "went", "there", "to", "teach", "technology."], tail: "We came back having learned…", source: "Rural school outreach (LI-P10)" },
-  { words: ["Just", "another", "project", "→", "Ours."], source: "Her IIT Indore journey (LI-P8)" },
 ] as const;
 
 export const finale = {

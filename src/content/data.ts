@@ -8,6 +8,7 @@ import type {
   Credential,
   Experience,
   LinkedInSignal,
+  Participation,
   Person,
   Project,
   Skill,
@@ -431,6 +432,18 @@ export const credentials: Credential[] = [
   { name: "University Hackathon 2026 — Round 1", issuer: "Adobe", date: "Aug 2026", source: "li-certifications" },
   { name: "Software Engineering & Agile", issuer: "Infosys Springboard", date: "Oct 2025", source: "li-p17" },
   { name: "Basics of Python", issuer: "Certification", date: "Aug 2025", source: "li-p21" },
+];
+
+/** Events she took part in, newest first — each from one of her posts. */
+export const participation: Participation[] = [
+  { id: "pa-slc", title: "IEEE Student Leadership Congress 2026", role: "Represented SUAS · Gwalior", date: "Oct 2026", signal: "sig-p4" },
+  { id: "pa-devengers", title: "Hack Devengers 2.0", role: "Participant · certificate of appreciation", date: "Sep 2026", signal: "sig-p5" },
+  { id: "pa-adobe", title: "Adobe University Hackathon 2026", role: "Cleared Round 1", date: "Aug 2026", signal: "sig-p7" },
+  { id: "pa-rural", title: "Rural school outreach", role: "Taught cybersecurity, STEM and AI with IEEE CS SUAS", date: "Aug 2026", signal: "sig-p10" },
+  { id: "pa-stem", title: "STEM Awareness Program", role: "With IEEE, for school students", date: "Aug 2026", signal: "sig-p9" },
+  { id: "pa-greentech", title: "Green Tech Hackathon", role: "Built PrakritiOS · ran a seedball workshop", date: "Jun 2026", signal: "sig-p15" },
+  { id: "pa-skill", title: "Symbiosis Skill Hackathon", role: "Anchor for 36 hours · organising committee", date: "Mar 2026", signal: "sig-p16" },
+  { id: "pa-sih", title: "SIH Internal Hackathon 2025", role: "Built an AI fitness app", date: "Sep 2025", signal: "sig-p18" },
 ];
 
 /** Leadership & voice moments for chapter 07, in her chronology. */

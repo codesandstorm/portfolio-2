@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect } from "react";
-import { profile } from "@/content/data";
 import { useSound } from "@/audio/useSound";
 import { chapters } from "@/lib/chapters";
 import { scrollToChapter } from "@/lib/scroll";
@@ -37,31 +36,32 @@ function SoundToggle() {
   );
 }
 
-/** The landing's four words; every chapter is still one keypress away in the Index. */
+/** The sections a visitor looks for, in the order they come; every chapter is also in the Index (M). */
 const NAV = [
-  { id: "signal", label: "Home" },
   { id: "akshita", label: "About" },
+  { id: "collaborate", label: "Experience" },
   { id: "build", label: "Projects" },
-  { id: "continue", label: "Contact" },
+  { id: "learn", label: "Skills" },
+  { id: "converge", label: "Achievements" },
+  { id: "continue", label: "Connect" },
 ] as const;
 
-/** The brand: a minimal typographic AM. Fire and ice belong to the experience, never to the mark. */
-function Monogram() {
+/** Gold hairline under the section you are in — the landing's HOME mark, carried through the site. */
+function Indicator({ on }: { on: boolean }) {
   return (
-    <span aria-hidden className="display relative flex h-9 w-10 items-center justify-center text-[1.55rem] leading-none text-ivory">
-      <span className="-mr-[0.18em]">A</span>
-      <span>M</span>
-      <span className="absolute bottom-1 left-1 right-1 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent" />
-    </span>
+    <span
+      aria-hidden
+      className={`absolute -bottom-[7px] left-1/2 h-[1.5px] w-7 -translate-x-1/2 bg-gradient-to-r from-[#d48b3b] to-[#f5be74] shadow-[0_0_8px_rgba(212,139,59,0.6)] transition-[opacity,transform] duration-500 ${on ? "scale-x-100 opacity-100" : "scale-x-0 opacity-0"}`}
+    />
   );
 }
 
 export function TopBar() {
   const indexOpen = useUI((s) => s.indexOpen);
-  // The bar stays out of the opening; only sound is offered until the name settles.
-  const revealed = useUI((s) => s.introDone || s.introPhase === "settled" || s.tier === "static");
+  const ready = useUI((s) => s.ready);
   const setIndexOpen = useUI((s) => s.setIndexOpen);
   const chapter = useUI((s) => s.chapter);
+  const here = chapters[chapter]?.id;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -74,79 +74,85 @@ export function TopBar() {
     return () => window.removeEventListener("keydown", onKey);
   }, [setIndexOpen]);
 
+  const item = "title-face relative text-[0.7rem] font-medium uppercase tracking-[0.24em] transition-[color,text-shadow] duration-300 hover:text-white hover:[text-shadow:0_0_12px_rgba(255,255,255,0.4)]";
+
   return (
     <>
       <a href="#main" className="sr-only-focusable fixed left-4 top-4 z-[70] bg-void px-3 py-2 text-ivory">
         Skip to content
       </a>
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-40 flex items-center justify-between px-[var(--gutter)] pt-4 sm:pt-6">
-        <a
-          href="#signal"
-          onClick={(e) => { e.preventDefault(); scrollToChapter("signal"); }}
-          className={`pointer-events-auto flex items-center gap-4 text-ivory transition-[opacity,visibility] duration-1000 ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}
-          aria-label="Akshita Mahajan — back to the beginning"
-          data-cursor="link"
-        >
-          <Monogram />
-          <span className="mono hidden tracking-[0.32em] text-ivory/80 sm:inline">Akshita Mahajan</span>
-        </a>
-        <nav aria-label="Primary" className="pointer-events-auto flex items-center gap-4 sm:gap-6">
-          <ul className={`hidden items-center gap-6 transition-[opacity,visibility] duration-1000 lg:flex ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}>
-            {NAV.map((n) => (
-              <li key={n.id}>
-                <a
-                  href={`#${n.id}`}
-                  onClick={(e) => { e.preventDefault(); scrollToChapter(n.id); }}
-                  aria-current={chapters[chapter]?.id === n.id ? "location" : undefined}
-                  className={`mono relative pb-1 tracking-[0.3em] transition-colors hover:text-ivory ${chapters[chapter]?.id === n.id ? "text-gold after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:bg-gold/70" : "text-mist"}`}
-                  data-cursor="link"
-                >
-                  {n.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+      <header
+        className={`pointer-events-none fixed inset-x-0 top-0 z-40 transition-opacity duration-1000 ${ready ? "opacity-100" : "opacity-0"}`}
+      >
+        {/* Past the landing the bar gets a soft floor of night so it reads over any section. */}
+        <div
+          aria-hidden
+          className={`absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#050608]/90 via-[#050608]/55 to-transparent transition-opacity duration-700 ${chapter > 0 ? "opacity-100" : "opacity-0"}`}
+        />
+        <div className="relative flex items-center justify-between px-[4.8vw] pt-[2.6vh] sm:pt-[4.2vh]">
           <a
-            href={profile.links.linkedin}
-            target="_blank"
-            rel="noreferrer"
-            className={`mono rounded-full border border-gold/50 px-4 py-2 text-ivory transition-[opacity,visibility,border-color,color] duration-700 hover:border-gold hover:text-gold ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}
-            data-cursor="external"
+            href="#signal"
+            onClick={(e) => { e.preventDefault(); scrollToChapter("signal"); }}
+            className={`pointer-events-auto ${item} ${here === "signal" ? "text-[#ecd6b8]" : "text-[#948b80]"}`}
+            aria-label="Home — Akshita Mahajan"
+            aria-current={here === "signal" ? "location" : undefined}
+            data-cursor="link"
           >
-            Connect<span aria-hidden> ↗</span>
+            Home
+            <Indicator on={here === "signal"} />
           </a>
-          <button
-            type="button"
-            onClick={() => useTour.getState().open()}
-            className={`mono hidden text-mist transition-[opacity,visibility,color] duration-1000 hover:text-gold sm:inline ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}
-            aria-label="Start the narrated guided tour"
-            data-cursor="link"
-          >
-            Tour ▸
-          </button>
-          <button
-            type="button"
-            onClick={() => useUI.getState().setAskOpen(!useUI.getState().askOpen)}
-            className={`mono flex items-center gap-1.5 text-mist transition-[opacity,visibility,color] duration-1000 hover:text-gold ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}
-            aria-label="Ask the constellation a question"
-            data-cursor="link"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_8px_#ffb347]" aria-hidden />
-            Ask
-          </button>
-          <SoundToggle />
-          <button
-            type="button"
-            onClick={() => setIndexOpen(!indexOpen)}
-            aria-expanded={indexOpen}
-            aria-controls="chapter-index"
-            className={`mono flex h-9 items-center gap-2 text-mist transition-[opacity,visibility,color] duration-1000 hover:text-ivory ${revealed ? "visible opacity-100" : "invisible opacity-0"}`}
-            data-cursor="link"
-          >
-            <span aria-hidden className="text-gold">{chapters[chapter]?.n}</span>
-            Index
-          </button>
-        </nav>
+          <nav aria-label="Primary" className="pointer-events-auto flex items-center gap-5 sm:gap-7">
+            <ul className="hidden items-center gap-[2.4rem] xl:flex">
+              {NAV.map((n) => (
+                <li key={n.id}>
+                  <a
+                    href={`#${n.id}`}
+                    onClick={(e) => { e.preventDefault(); scrollToChapter(n.id); }}
+                    aria-current={here === n.id ? "location" : undefined}
+                    className={`${item} ${here === n.id ? "text-[#ecd6b8]" : "text-[#948b80]"}`}
+                    data-cursor="link"
+                  >
+                    {n.label}
+                    <Indicator on={here === n.id} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              onClick={() => useTour.getState().open()}
+              className={`${item} text-[#dfbe88]`}
+              aria-label="Start the narrated guided tour"
+              data-cursor="link"
+            >
+              Tour ▸
+            </button>
+            <span aria-hidden className="hidden h-3 w-px bg-[#948b80]/30 sm:block" />
+            <button
+              type="button"
+              onClick={() => useUI.getState().setAskOpen(!useUI.getState().askOpen)}
+              className="mono hidden items-center gap-1.5 text-mist transition-colors hover:text-gold sm:flex"
+              aria-label="Ask the constellation a question"
+              data-cursor="link"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_8px_#ffb347]" aria-hidden />
+              Ask
+            </button>
+            <SoundToggle />
+            <button
+              type="button"
+              onClick={() => setIndexOpen(!indexOpen)}
+              aria-expanded={indexOpen}
+              aria-controls="chapter-index"
+              className="mono flex h-9 items-center gap-2 text-mist transition-colors hover:text-ivory"
+              data-cursor="link"
+            >
+              <span aria-hidden className="text-gold">{chapters[chapter]?.n}</span>
+              <span className="xl:hidden">Menu</span>
+              <span className="hidden xl:inline">Index</span>
+            </button>
+          </nav>
+        </div>
       </header>
 
       <AnimatePresence>

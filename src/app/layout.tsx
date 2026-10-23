@@ -1,17 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Cinzel, Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Bodoni_Moda, Cinzel, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 // Film-title capitals for her name on the landing (Trajan-style, open source).
-const cinzel = Cinzel({ variable: "--font-cinzel", subsets: ["latin"], weight: ["400", "500"] });
+const cinzel = Cinzel({ variable: "--font-cinzel", subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+// The landing's body face, used for all running text and labels.
+const jakarta = Plus_Jakarta_Sans({ variable: "--font-jakarta", subsets: ["latin"], weight: ["300", "400", "500", "600"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
-const instrument = Instrument_Serif({
-  variable: "--font-instrument",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-});
+// The landing's editorial serif, used for headlines across the site (with true italics).
+const bodoni = Bodoni_Moda({ variable: "--font-bodoni", subsets: ["latin"], style: ["normal", "italic"], axes: ["opsz"] });
 
 export const metadata: Metadata = {
   title: "Akshita Mahajan — Sutra",
@@ -25,14 +22,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#04040a",
+  themeColor: "#050608",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${instrument.variable} ${cinzel.variable} antialiased`}>
+    <html lang="en" className={`${geistMono.variable} ${bodoni.variable} ${cinzel.variable} ${jakarta.variable} antialiased`}>
       <body>{children}</body>
     </html>
   );

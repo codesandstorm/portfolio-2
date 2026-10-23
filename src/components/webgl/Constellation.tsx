@@ -59,10 +59,10 @@ function labelMask(chapter: number, w: number, h: number) {
     if (y < 70 || y > h - 24 || x < 8) return true;
     if (!tall && x > w - 150) return true;
     // Labels run ~150px to the right of their node, so the mask starts early.
-    // Projects: the micro-demo holds the lower left on wide screens.
-    if (chapter === chapterIndex.build && !tall && x < w * 0.42 && y > h * 0.55) return true;
+    // Projects, achievements and latest posts: the page covers the frame.
+    if (chapter === chapterIndex.build || chapter === chapterIndex.converge || chapter === chapterIndex.lead) return true;
     if (TEXT_RIGHT.has(chapter)) return tall ? y > h * 0.36 : x > w * 0.47 - 150;
-    if (TEXT_LEFT.has(chapter)) return tall ? y < h * 0.42 : x < w * 0.36;
+    if (TEXT_LEFT.has(chapter)) return tall ? y < h * 0.42 : x < w * (chapter === chapterIndex.learn ? 0.42 : 0.36);
     return false;
   };
 }

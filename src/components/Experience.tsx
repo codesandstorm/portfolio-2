@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useLive, type LivePost } from "@/content/live";
 import { detectTier } from "@/lib/capability";
 import { chapterIndex } from "@/lib/chapters";
 import { ScrollDirector } from "@/lib/scroll";
@@ -16,12 +17,12 @@ import { ConvergeChapter } from "./chapters/ConvergeChapter";
 import { LeadChapter } from "./chapters/LeadChapter";
 import { LearnChapter } from "./chapters/LearnChapter";
 import { CinematicLanding } from "./landing/CinematicLanding";
-import { StartChapter } from "./chapters/StartChapter";
 import { ChapterNav } from "./ui/ChapterNav";
 import { Cursor } from "./ui/Cursor";
 import { Loader } from "./ui/Loader";
 import { NodeLabels } from "./ui/NodeLabels";
 import { RelationPanel } from "./ui/RelationPanel";
+import { SectionBeat } from "./ui/SectionBeat";
 import { SignalReader } from "./ui/SignalReader";
 import { GuidedTour } from "./tour/GuidedTour";
 import { AskConstellation } from "./ask/AskConstellation";
@@ -71,20 +72,19 @@ function usePointer() {
   }, []);
 }
 
-export function Experience() {
+export function Experience({ posts }: { posts: LivePost[] }) {
+  // Posts published from /admin, available to every chapter from the first render.
+  useState(() => useLive.getState().set(posts));
   const tier = useUI((s) => s.tier);
   const chapter = useUI((s) => s.chapter);
   const setTier = useUI((s) => s.setTier);
-  const setReady = useUI((s) => s.setReady);
   const setScrollFocus = useUI((s) => s.setScrollFocus);
 
   useEffect(() => {
     const t = detectTier();
     setTier(t);
     document.documentElement.dataset.tier = t;
-    // Without WebGL there is nothing to prepare beyond the type.
-    if (t === "static") void document.fonts.ready.then(setReady);
-  }, [setTier, setReady]);
+  }, [setTier]);
 
   useEffect(() => {
     if (!STEPPED.has(chapter)) setScrollFocus(null);
@@ -101,18 +101,18 @@ export function Experience() {
       {cinematic ? <WorldCanvas tier={tier} /> : <div className="static-sky" aria-hidden />}
       <TopBar />
       <ChapterNav />
+      <SectionBeat />
       {cinematic && <NodeLabels />}
       <Cursor />
       <main id="main">
         <CinematicLanding />
-        <StartChapter />
         <AkshitaChapter />
-        <ConnectChapter />
         <CollaborateChapter />
         <BuildChapter />
         <LearnChapter />
-        <LeadChapter />
         <ConvergeChapter />
+        <LeadChapter />
+        <ConnectChapter />
         <ContinueChapter />
       </main>
       <RelationPanel />

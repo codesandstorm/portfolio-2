@@ -9,13 +9,16 @@ import { AT, INTRO_SECONDS, introAmounts, introPhase } from "@/lib/intro";
 import { useTicker } from "@/lib/hooks";
 import { scrollToChapter } from "@/lib/scroll";
 import { useUI } from "@/lib/store";
-import { useTour } from "@/lib/tour";
 import { smooth, world } from "@/lib/world";
-import { Chapter, useFlow } from "../chapters/Chapter";
+import { useFlow } from "../chapters/Chapter";
 import { AvatarPlayer } from "./AvatarPlayer";
 import { ElectricTitle } from "./ElectricTitle";
+import HeroParticles from "./HeroParticles";
+import SmokeCanvas from "./SmokeCanvas";
+import "./landing.css";
 
 const SEEN_KEY = "sutra-intro-seen";
+const HERO_IMAGE = "/landing/images/hero-clean.png";
 
 function readSeen() {
   try {
@@ -26,10 +29,10 @@ function readSeen() {
 }
 
 /**
- * 00 — The landing. Fire and ice drift in as slow cosmic smoke, she emerges
- * from it, and her name is struck into being like a film title. The WebGL
- * layers (smoke, her photograph) live in the world canvas; this is the type,
- * the controls and the timeline that drives them all.
+ * 00 — The landing. Her photograph breathes under live smoke, a bolt out of the
+ * sky strikes her name into being, and as you scroll the whole frame dissolves
+ * into the night the rest of the site lives in. This component owns the
+ * timeline (`world.intro`) that the title, sound and navigation all read.
  */
 export function CinematicLanding() {
   const ready = useUI((s) => s.ready);
@@ -39,8 +42,17 @@ export function CinematicLanding() {
   const flow = useFlow();
   const tween = useRef<gsap.core.Tween | null>(null);
   const silent = useRef(false);
+  const stage = useRef<HTMLDivElement>(null);
   const sub = useRef<HTMLParagraphElement>(null);
   const cta = useRef<HTMLDivElement>(null);
+
+  // The loader holds until the type and her photograph are both in hand.
+  useEffect(() => {
+    const img = new Image();
+    img.src = HERO_IMAGE;
+    const photo = img.decode().catch(() => undefined);
+    void Promise.all([document.fonts.ready, photo]).then(() => useUI.getState().setReady());
+  }, []);
 
   useEffect(() => {
     if (!ready || tween.current) return;
@@ -51,8 +63,7 @@ export function CinematicLanding() {
       return;
     }
     const seen = readSeen();
-    const tall = window.innerWidth / window.innerHeight < 0.9;
-    const seconds = INTRO_SECONDS / ((seen ? 1.8 : 1) * (tall ? 1.2 : 1));
+    const seconds = INTRO_SECONDS / (seen ? 1.6 : 1);
     // The ambience under the smoke; the title brings its own electricity.
     const cues: [number, () => void][] = [
       [AT.smoke, sfx.iceWake],
@@ -91,98 +102,73 @@ export function CinematicLanding() {
   };
 
   useTicker(() => {
+    if (!flow && !introDone && world.t > 0.05 && tween.current) skip();
+    if (!flow) setIntroPhase(introPhase(world.intro, world.t));
+    // Scrolling away: the frame dissolves into the constellation behind it.
+    const away = 1 - smooth(0.08, 0.7, world.t);
+    if (stage.current) stage.current.style.opacity = away.toFixed(3);
     if (flow) return;
-    if (!introDone && world.t > 0.05 && tween.current) skip();
-    setIntroPhase(introPhase(world.intro, world.t));
     const amt = introAmounts(world.intro);
-    const away = 1 - smooth(0.04, 0.55, world.t);
-    const set = (el: HTMLElement | null, v: number, lift = 10) => {
+    const set = (el: HTMLElement | null, v: number) => {
       if (!el) return;
       el.style.opacity = v.toFixed(3);
-      el.style.transform = `translate3d(0, ${((1 - v) * lift).toFixed(1)}px, 0)`;
+      el.style.transform = `translate3d(0, ${((1 - v) * 6).toFixed(1)}px, 0)`;
       el.style.visibility = v < 0.01 ? "hidden" : "visible";
     };
-    const title = document.getElementById("signal-title");
-    if (title) title.style.opacity = away.toFixed(3);
-    set(sub.current, amt.subtitle * away);
-    set(cta.current, amt.cta * away);
-    // As the subtitle settles its tracking closes a touch — the last move of a title card.
-    if (sub.current) sub.current.style.letterSpacing = `${(0.55 - amt.subtitle * 0.17).toFixed(3)}em`;
+    set(sub.current, amt.subtitle * 0.95);
+    set(cta.current, amt.cta);
   });
 
   const hidden = flow ? undefined : { opacity: 0, visibility: "hidden" as const };
 
   return (
-    <Chapter id="signal">
-      {flow && (
-        // Without WebGL: her photograph and two still lights.
-        <div aria-hidden className="static-duality absolute inset-0 -z-10 overflow-hidden">
-          {profile.portrait && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={profile.portrait}
-              alt=""
-              className="absolute left-1/2 top-[4%] h-[62%] -translate-x-1/2 object-cover opacity-90 saturate-[0.75] [mask-image:radial-gradient(ellipse_at_58%_38%,black_35%,transparent_68%)]"
-            />
-          )}
+    <section id="signal" data-chapter="signal" aria-labelledby="signal-title" className="relative z-10 h-svh">
+      <div ref={stage} className="cinematic-experience">
+        <div className="cinematic-backdrop" aria-hidden="true">
+          {/* Mounted with the loader's exit so the fade from black is seen, not spent behind it. */}
+          {ready && <SmokeCanvas reducedMotion={flow} />}
         </div>
-      )}
-      <div className={`relative h-full ${flow ? "min-h-[86svh]" : ""}`}>
-        <ElectricTitle flow={flow} />
+        {ready && <HeroParticles reducedMotion={flow} />}
 
-        <p
-          ref={sub}
-          className="title-face absolute inset-x-4 top-[68%] text-center text-[0.62rem] uppercase text-ivory/80 sm:text-[0.72rem] md:top-[79%]"
-          style={hidden ?? { letterSpacing: "0.38em" }}
-        >
-          {landing.roles.map((r, k) => (
-            <span key={r}>
-              {k > 0 && <span className="mx-[0.9em] text-gold" aria-hidden>·</span>}
-              {r}
-            </span>
-          ))}
-        </p>
+        <ElectricTitle flow={flow}>
+          <p ref={sub} className="hero-sub-descriptor" style={hidden}>
+            {landing.roles.map((r, k) => (
+              <span key={r}>
+                {k > 0 && <span className="descriptor-separator" aria-hidden>·</span>}
+                {r}
+              </span>
+            ))}
+          </p>
+          <div ref={cta} className="hero-explore-cta" style={hidden}>
+            <button
+              type="button"
+              className="explore-link"
+              onClick={() => {
+                skip();
+                sfx.swell();
+                scrollToChapter("build");
+              }}
+              data-cursor="link"
+            >
+              <span>{landing.explore.toUpperCase()}</span>
+              <span className="explore-arrow" aria-hidden="true">→</span>
+            </button>
+          </div>
+        </ElectricTitle>
 
-        <div ref={cta} className="absolute inset-x-0 bottom-[5%] flex flex-col items-center gap-4" style={hidden}>
-          <button
-            type="button"
-            onClick={() => {
-              skip();
-              sfx.swell();
-              scrollToChapter("start");
-            }}
-            className="group flex items-center gap-4 text-gold"
-            data-cursor="link"
-          >
-            <span className="title-face text-[0.72rem] uppercase tracking-[0.42em]">{landing.explore}</span>
-            <span aria-hidden className="relative block h-px w-10 bg-gold/70 transition-all duration-500 group-hover:w-14">
-              <span className="absolute -right-0.5 -top-[3px] h-[7px] w-[7px] rotate-45 border-r border-t border-gold/80" />
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              skip();
-              useTour.getState().open();
-            }}
-            className="mono text-[0.62rem] tracking-[0.3em] text-faint transition-colors hover:text-ivory"
-            data-cursor="link"
-          >
-            {landing.tour} ▸
-          </button>
-        </div>
-
-        <AvatarPlayer visible={introDone || flow} />
+        <div className="hero-floor" aria-hidden />
       </div>
 
+      <AvatarPlayer visible={introDone || flow} />
+
       {!flow && !introDone && ready && (
-        <button type="button" onClick={skip} className="mono absolute bottom-6 left-[var(--gutter)] z-10 text-faint hover:text-ivory" data-cursor="link">
+        <button type="button" onClick={skip} className="mono absolute bottom-6 left-[var(--gutter)] z-30 text-faint hover:text-ivory" data-cursor="link">
           Skip intro
         </button>
       )}
       <p className="sr-only">
         {profile.name}: {landing.roles.join(", ")}, from {profile.location}.
       </p>
-    </Chapter>
+    </section>
   );
 }

@@ -14,7 +14,7 @@ function wordTexture(word: string, note: string) {
   const ctx = c.getContext("2d")!;
   const style = getComputedStyle(document.documentElement);
   const mono = style.getPropertyValue("--font-geist-mono").trim() || "monospace";
-  const serif = style.getPropertyValue("--font-instrument").trim() || "serif";
+  const serif = style.getPropertyValue("--font-bodoni").trim() || "serif";
   ctx.fillStyle = "#f3ead8";
   ctx.font = `400 120px ${serif}`;
   ctx.textBaseline = "alphabetic";

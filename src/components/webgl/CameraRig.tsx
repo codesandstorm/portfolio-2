@@ -58,6 +58,8 @@ export function CameraRig() {
       camera.position.x += (Math.random() - 0.5) * s;
       camera.position.y += (Math.random() - 0.5) * s;
     }
+    world.shake = Math.max(0, world.shake - dt * 3);
+    world.heroFlash = Math.max(0, world.heroFlash - dt * 2.2);
     camera.lookAt(look);
     const cam = camera as THREE.PerspectiveCamera;
     if (Math.abs(cam.fov - shot.fov) > 0.01) {

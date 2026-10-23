@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef } from "react";
 import { getEntity, getNode, latestSignals, signalUrl, formatDate, summarizePeople } from "@/content/graph";
+import { asSignal, getLive, isLive } from "@/content/live";
 import type { LinkedInSignal } from "@/content/types";
 import { useUI } from "@/lib/store";
 
@@ -13,7 +14,8 @@ export function SignalReader() {
   const select = useUI((s) => s.select);
   const closeRef = useRef<HTMLButtonElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
-  const s = reading ? getEntity<LinkedInSignal>(reading) : null;
+  const live = reading && isLive(reading) ? getLive(reading) : null;
+  const s = reading ? (live ? asSignal(live) : getEntity<LinkedInSignal>(reading)) : null;
 
   useEffect(() => {
     if (!reading) {
@@ -55,7 +57,7 @@ export function SignalReader() {
           >
             <div className="absolute left-0 top-10 hidden h-[calc(100%-5rem)] w-px bg-gradient-to-b from-gold via-gold/30 to-transparent sm:block" aria-hidden />
             <p className="mono text-gold">
-              Signal {String(s.post).padStart(2, "0")} · {formatDate(s.date)}
+              {live ? "New post" : `Signal ${String(s.post).padStart(2, "0")}`} · {formatDate(s.date)}
               {latestSignals.has(s.id) && <span className="ml-3 rounded-full border border-gold/50 px-2 py-0.5 text-[9px]">Latest</span>}
             </p>
             <h2 id="signal-title" className="display mt-4 text-4xl leading-[1.05] text-ivory sm:text-5xl">

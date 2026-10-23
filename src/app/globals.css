@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --void: #04040a;
+  --void: #050608;
   --midnight: #0a0d24;
   --indigo: #1b1f4d;
-  --gold: #ffb347;
-  --molten: #ff8a1f;
-  --electric: #6fb6ff;
+  --gold: #dfbe88;
+  --molten: #e58237;
+  --electric: #8fc3f5;
   --violet: #9b8cff;
   --crimson: #ff4d6d;
-  --ivory: #f3ead8;
-  --mist: rgba(243, 234, 216, 0.62);
-  --faint: rgba(243, 234, 216, 0.38);
-  --hair: rgba(243, 234, 216, 0.14);
+  --ivory: #f4ecdf;
+  --mist: rgba(244, 236, 223, 0.64);
+  --faint: rgba(244, 236, 223, 0.4);
+  --hair: rgba(244, 236, 223, 0.12);
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --gutter: clamp(1rem, 4vw, 3.5rem);
@@ -32,9 +32,9 @@
   --color-mist: var(--mist);
   --color-faint: var(--faint);
   --color-hair: var(--hair);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-jakarta);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-instrument);
+  --font-display: var(--font-bodoni);
 }
 
 html {
@@ -48,11 +48,11 @@ html.lenis, html.lenis body { height: auto; }
 body {
   background: var(--void);
   color: var(--ivory);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-jakarta), system-ui, sans-serif;
   overflow-x: hidden;
 }
 
-::selection { background: rgba(255, 179, 71, 0.35); color: var(--ivory); }
+::selection { background: rgba(229, 130, 55, 0.3); color: var(--ivory); }
 
 /* Custom cursor replaces the native one only for fine pointers once mounted. */
 html[data-cursor="on"], html[data-cursor="on"] * { cursor: none !important; }
@@ -63,8 +63,9 @@ html[data-cursor="on"], html[data-cursor="on"] * { cursor: none !important; }
   border-radius: 2px;
 }
 
-.display { font-family: var(--font-instrument), serif; font-weight: 400; letter-spacing: -0.01em; }
-.mono { font-family: var(--font-geist-mono), ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.6875rem; }
+.display { font-family: var(--font-bodoni), serif; font-weight: 400; letter-spacing: -0.005em; }
+/* Small labels in the landing's tagline voice: tracked capitals, not code type. */
+.mono { font-family: var(--font-jakarta), system-ui, sans-serif; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; font-size: 0.66rem; }
 
 /* Gold hairline used for links and rules instead of boxes. */
 .thread-link {
@@ -143,35 +144,5 @@ html[data-cursor="on"], html[data-cursor="on"] * { cursor: none !important; }
   html, body { background: #fff !important; color: #111; }
 }
 
-/* ── Landing title: film-style capitals struck into being by electricity ── */
+/* Film-title capitals (Trajan-style): her name, section titles, navigation. */
 .title-face { font-family: var(--font-cinzel), "Trajan Pro", serif; font-weight: 500; }
-.ttl {
-  display: inline-block;
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  /* Settled: warm metal, bright at the top edge, deepening toward the base. */
-  background-image: linear-gradient(180deg, #fff8ec 0%, #ffe2b8 38%, #f1b673 62%, #b8742f 100%);
-  filter: drop-shadow(0 0 10px rgba(255, 170, 90, 0.35)) drop-shadow(0 0 28px rgba(255, 120, 40, 0.18));
-  opacity: 0;
-  transition: opacity 0.25s ease, filter 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.ttl[data-s="hot"] {
-  opacity: 1;
-  background-image: linear-gradient(180deg, #ffffff, #e6f2ff);
-  filter: drop-shadow(0 0 6px #cfe6ff) drop-shadow(0 0 18px #6fb6ff) drop-shadow(0 0 42px rgba(111, 182, 255, 0.6));
-  transform: scale(1.03);
-  transition: none;
-}
-.ttl[data-s="flash"] {
-  opacity: 1;
-  background-image: linear-gradient(180deg, #ffffff, #ffffff);
-  filter: drop-shadow(-2px 0 0 rgba(255, 80, 60, 0.75)) drop-shadow(2px 0 0 rgba(80, 180, 255, 0.75)) drop-shadow(0 0 30px #ffffff);
-  transition: none;
-}
-.ttl[data-s="dim"] { opacity: 0.18; transition: none; }
-.ttl[data-s="lit"] { opacity: 1; }
-.ttl-line2 { background-image: linear-gradient(180deg, #f7efe4 0%, #e3cfb3 60%, #a88a68 100%); filter: drop-shadow(0 0 12px rgba(255, 200, 150, 0.18)); }
-@media (prefers-reduced-motion: reduce) {
-  .ttl { opacity: 1; }
-}

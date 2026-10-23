@@ -24,7 +24,7 @@ export function ChapterNav() {
     <>
       <nav
         aria-label="Chapters"
-        className={`fixed right-[calc(var(--gutter)*0.6)] top-1/2 z-30 hidden -translate-y-1/2 transition-opacity duration-700 md:block ${introDone ? "opacity-100" : "opacity-0"}`}
+        className={`fixed right-[calc(var(--gutter)*0.6)] top-1/2 z-30 hidden -translate-y-1/2 transition-opacity duration-700 md:block ${introDone && chapter > 0 ? "opacity-100" : "pointer-events-none opacity-0"}`}
       >
         <div className="relative flex flex-col gap-[3.2vh] py-1">
           <span className="absolute left-[3.5px] top-0 h-full w-px bg-hair" aria-hidden />

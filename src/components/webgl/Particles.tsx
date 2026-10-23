@@ -6,8 +6,9 @@ import * as THREE from "three";
 import { profile } from "@/content/data";
 import { smooth, world } from "@/lib/world";
 import { particlesFragment, particlesVertex } from "@/shaders/particles";
+import { chapterIndex } from "@/lib/chapters";
 import { getPortraitCanvas } from "@/world/portrait";
-import { nameTarget, portraitTarget, seedTarget, splitByX, tunnelTarget, webTarget } from "@/world/targets";
+import { nameTarget, portraitTarget, seedTarget, splitByX, webTarget } from "@/world/targets";
 
 /**
  * One body of light for the story after the opening: it waits unseen behind
@@ -15,11 +16,10 @@ import { nameTarget, portraitTarget, seedTarget, splitByX, tunnelTarget, webTarg
  * shatters into the threads of the constellation and finally writes her name.
  * Warm and cool particles keep the landing's fire-and-ice DNA throughout.
  */
-type Mode = "hidden" | "tunnel" | "portrait" | "shatter" | "web" | "finale";
+type Mode = "hidden" | "portrait" | "shatter" | "web" | "finale";
 
 const LOOK: Record<Mode, { opacity: number; size: number }> = {
   hidden: { opacity: 0, size: 1 },
-  tunnel: { opacity: 0.75, size: 1.5 },
   portrait: { opacity: 1, size: 0.75 },
   shatter: { opacity: 0.9, size: 0.9 },
   web: { opacity: 0.4, size: 0.7 },
@@ -29,15 +29,14 @@ const LOOK: Record<Mode, { opacity: number; size: number }> = {
 const FIRE: [number, number, number][] = [[1, 0.32, 0.08], [1, 0.5, 0.12], [1, 0.68, 0.28], [1, 0.86, 0.6]];
 const ICE: [number, number, number][] = [[0.3, 0.42, 1], [0.38, 0.72, 1], [0.66, 0.9, 1], [0.92, 0.97, 1]];
 const GOLD: [number, number, number] = [1, 0.72, 0.36];
-/** Story time over which her portrait breaks apart and becomes the network (end of chapter 02 into 03). */
-export const SHATTER: [number, number] = [2.7, 3.2];
+/** Story time over which her portrait breaks apart and becomes the network (end of About into Experience). */
+export const SHATTER: [number, number] = [chapterIndex.akshita + 0.7, chapterIndex.akshita + 1.2];
 
 function modeAt(t: number): Mode {
-  if (t < 1) return "hidden";
-  if (t < 1.86) return "tunnel";
+  if (t < chapterIndex.akshita - 0.14) return "hidden";
   if (t < SHATTER[0]) return "portrait";
   if (t < SHATTER[1]) return "shatter";
-  if (t < 9) return "web";
+  if (t < chapterIndex.continue) return "web";
   return "finale";
 }
 
@@ -110,7 +109,6 @@ export function Particles({ count }: { count: number }) {
   }, [count, size.width, size.height]);
 
   useEffect(() => {
-    targets.current.tunnel = tunnelTarget(count);
     targets.current.web = webTarget(count);
     void getPortraitCanvas(profile.portrait).then((c) => {
       const p = portraitTarget(count, c, 6.6, [0, 0.2, 0.6]);

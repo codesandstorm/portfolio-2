@@ -1,6 +1,6 @@
 /**
  * Morph targets for the energy particles. Every function returns N×3 floats.
- * The same particles become her name, the tunnel, her portrait, the threads
+ * The same particles become her name, her portrait, the threads
  * of the constellation and the finale — one body of light, many forms.
  */
 import { CORE_ID, edges } from "@/content/graph";
@@ -50,7 +50,7 @@ function fill(n: number, pixels: number[], map: (u: number, v: number, out: Floa
 
 /** Her name, set in the display face, centred at `center`, `width` world units wide. */
 export function nameTarget(n: number, opts: { width: number; center: [number, number, number]; stacked: boolean }) {
-  const family = cssFont("--font-instrument", "serif");
+  const family = cssFont("--font-bodoni", "serif");
   const lines = opts.stacked ? ["AKSHITA", "MAHAJAN"] : ["AKSHITA MAHAJAN"];
   const W = 1400;
   const H = opts.stacked ? 520 : 240;
@@ -105,20 +105,6 @@ export function seedTarget(n: number) {
     out[i * 3] = r * Math.sin(b) * Math.cos(a);
     out[i * 3 + 1] = r * Math.sin(b) * Math.sin(a);
     out[i * 3 + 2] = r * Math.cos(b) + 20;
-  }
-  return out;
-}
-
-/** A corridor of light the camera flies through (z from 44 down to 6). */
-export function tunnelTarget(n: number) {
-  const out = new Float32Array(n * 3);
-  for (let i = 0; i < n; i++) {
-    const z = rand(4, 46);
-    const a = Math.random() * Math.PI * 2;
-    const r = rand(2.2, 13) * (0.6 + (z / 46) * 0.6);
-    out[i * 3] = Math.cos(a) * r;
-    out[i * 3 + 1] = Math.sin(a) * r * 0.7;
-    out[i * 3 + 2] = z;
   }
   return out;
 }

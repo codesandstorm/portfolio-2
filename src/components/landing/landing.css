@@ -1,0 +1,334 @@
+/* ==========================================================================
+   CINEMATIC HERO — ported from the landing build (portfolio/src/App.css).
+   Every rule is scoped under .cinematic-experience so nothing leaks into the
+   chapters, and nothing global reaches in.
+   ========================================================================== */
+
+.cinematic-experience {
+  --hero-font-body: var(--font-jakarta), "Plus Jakarta Sans", system-ui, sans-serif;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background-color: #050608;
+  color: #f7f3ee;
+  font-family: var(--hero-font-body);
+  user-select: none;
+}
+
+.cinematic-experience *,
+.cinematic-experience *::before,
+.cinematic-experience *::after {
+  box-sizing: border-box;
+}
+
+/* Base atmosphere fallback layer (shows before the smoke shader's first frame). */
+.cinematic-experience::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/landing/images/hero-clean.png");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  opacity: 0.35;
+}
+
+/* ── WebGL live smoke over her image ───────────────────────────────────── */
+.cinematic-experience .cinematic-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.cinematic-experience .webgl-smoke-canvas {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Floating particles ────────────────────────────────────────────────── */
+.cinematic-experience .hero-particles-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 15;
+}
+
+/* ── Title stage: lightning canvas across the whole frame, type stacked below her ── */
+.cinematic-experience .electric-title {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.cinematic-experience .electric-title-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.cinematic-experience .hero-title-wrapper {
+  position: absolute;
+  top: 58vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90vw;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 1;
+}
+
+.cinematic-experience .hero-name-stack {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+/* AKSHITA — wide inscriptional capitals, as set in the reference frame. */
+.cinematic-experience .hero-first {
+  display: block;
+  white-space: nowrap;
+  font-size: clamp(2.5rem, 6.6vw, 8rem);
+  letter-spacing: 0.4em;
+  margin-right: -0.4em;
+  font-weight: 400;
+}
+
+/* MAHAJAN — smaller, champagne, tracked wider. */
+.cinematic-experience .hero-second {
+  display: block;
+  white-space: nowrap;
+  margin-top: 0.42em;
+  font-size: clamp(1.15rem, 2.75vw, 3.2rem);
+  letter-spacing: 0.7em;
+  margin-right: -0.7em;
+  font-weight: 400;
+}
+
+/* ── Letters: struck by lightning, then cooled into ivory ─────────────── */
+.cinematic-experience .ttl {
+  position: relative;
+  display: inline-block;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  /* Settled: luminous ivory, bright at the top edge, warming toward the base. */
+  background-image: linear-gradient(180deg, #ffffff 0%, #f6ece0 48%, #e5ceb0 100%);
+  opacity: 0;
+  transition: opacity 0.25s ease, filter 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cinematic-experience .ttl.rim-cool {
+  filter: drop-shadow(-0.8px 0 1.2px rgba(160, 215, 255, 0.65)) drop-shadow(0 0 7px rgba(100, 180, 245, 0.3));
+}
+.cinematic-experience .ttl.rim-centre {
+  filter: drop-shadow(0 0 1.2px rgba(255, 250, 240, 0.85)) drop-shadow(0 0 7px rgba(245, 205, 140, 0.3));
+}
+.cinematic-experience .ttl.rim-warm {
+  filter: drop-shadow(0 0 1.2px rgba(255, 245, 220, 0.85)) drop-shadow(0 0 9px rgba(255, 175, 55, 0.45));
+}
+
+.cinematic-experience .ttl[data-s="hot"] {
+  opacity: 1;
+  background-image: linear-gradient(180deg, #ffffff, #e6f2ff);
+  filter: drop-shadow(0 0 6px #cfe6ff) drop-shadow(0 0 18px #6fb6ff) drop-shadow(0 0 42px rgba(111, 182, 255, 0.6));
+  transform: scale(1.03);
+  transition: none;
+}
+.cinematic-experience .ttl[data-s="flash"] {
+  opacity: 1;
+  background-image: linear-gradient(180deg, #ffffff, #ffffff);
+  filter: drop-shadow(-2px 0 0 rgba(255, 80, 60, 0.75)) drop-shadow(2px 0 0 rgba(80, 180, 255, 0.75)) drop-shadow(0 0 30px #ffffff);
+  transition: none;
+}
+.cinematic-experience .ttl[data-s="dim"] { opacity: 0.18; transition: none; }
+.cinematic-experience .ttl[data-s="lit"] { opacity: 1; }
+
+.cinematic-experience .ttl-line2 {
+  background-image: linear-gradient(180deg, #fff7e6 0%, #dfbe88 52%, #c29653 100%);
+  filter: drop-shadow(0 0 1px rgba(245, 220, 175, 0.8)) drop-shadow(0 0 4px rgba(215, 150, 60, 0.28));
+}
+
+/* The small star-flares on the outer A's: a hot point with a thin horizontal streak. */
+.cinematic-experience .ttl-flare {
+  position: absolute;
+  top: 62%;
+  width: 0.5em;
+  height: 0.5em;
+  margin: -0.25em 0 0 -0.25em;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-text-fill-color: initial;
+}
+.cinematic-experience .ttl-flare::before,
+.cinematic-experience .ttl-flare::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+.cinematic-experience .ttl-flare::before {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, #ffffff 0%, var(--flare) 22%, transparent 62%);
+}
+.cinematic-experience .ttl-flare::after {
+  width: 260%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--flare), #ffffff, var(--flare), transparent);
+}
+.cinematic-experience .ttl-flare-cool { left: 8%; --flare: rgba(170, 215, 255, 0.85); }
+.cinematic-experience .ttl-flare-warm { left: 92%; --flare: rgba(255, 170, 70, 0.9); }
+.cinematic-experience [data-flared] .ttl-flare {
+  opacity: 1;
+  transform: scale(1);
+  animation: hero-flare-breathe 4.8s ease-in-out 1.2s infinite;
+}
+
+@keyframes hero-flare-breathe {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.72; transform: scale(0.86); }
+}
+
+/* ── Tagline — centred beneath MAHAJAN ─────────────────────────────────── */
+.cinematic-experience .hero-sub-descriptor {
+  font-family: var(--hero-font-body);
+  font-size: clamp(0.78rem, 1.05vw, 0.92rem);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  color: #c4bbb0;
+  margin: clamp(1.3rem, 2.6vh, 2.2rem) 0 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.cinematic-experience .descriptor-separator {
+  color: #d48b3b;
+  margin: 0 0.65rem;
+}
+
+/* ── CTA — centred below the tagline ───────────────────────────────────── */
+.cinematic-experience .hero-explore-cta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: clamp(2.4rem, 7vh, 5.2rem) 0 0;
+  pointer-events: auto;
+}
+
+.cinematic-experience .explore-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: #dfbe88;
+  font-family: var(--hero-font-body);
+  font-size: clamp(0.72rem, 0.9vw, 0.82rem);
+  letter-spacing: 0.28em;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1.2rem;
+  border-bottom: 1px solid rgba(223, 190, 136, 0.35);
+}
+
+.cinematic-experience .explore-arrow {
+  font-size: 0.95rem;
+  transition: transform 0.3s ease;
+}
+
+.cinematic-experience .explore-link:hover {
+  color: #ffffff;
+  border-bottom-color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 0 12px rgba(255, 215, 150, 0.5);
+}
+
+.cinematic-experience .explore-link:hover .explore-arrow {
+  transform: translateX(6px);
+}
+
+/* The frame dissolves into the night the rest of the site lives in. */
+.cinematic-experience .hero-floor {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 14%;
+  z-index: 18;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, rgba(5, 6, 8, 0.85));
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 992px) {
+  .cinematic-experience .hero-title-wrapper {
+    top: 60vh;
+    width: 94vw;
+  }
+
+  .cinematic-experience .hero-sub-descriptor {
+    font-size: 0.64rem;
+    letter-spacing: 0.22em;
+    margin-top: 1.6vh;
+  }
+}
+
+@media (max-width: 640px) {
+  .cinematic-experience .hero-title-wrapper {
+    top: 60vh;
+  }
+
+  .cinematic-experience .hero-first {
+    font-size: clamp(1.9rem, 9.6vw, 3rem);
+    letter-spacing: 0.2em;
+    margin-right: -0.2em;
+  }
+
+  .cinematic-experience .hero-second {
+    font-size: clamp(0.9rem, 4.2vw, 1.3rem);
+    letter-spacing: 0.42em;
+    margin-right: -0.42em;
+  }
+
+  .cinematic-experience .hero-sub-descriptor {
+    font-size: 0.56rem;
+    letter-spacing: 0.15em;
+    line-height: 2;
+  }
+
+  .cinematic-experience .descriptor-separator {
+    margin: 0 0.35rem;
+  }
+
+  .cinematic-experience .explore-link {
+    font-size: 0.64rem;
+    letter-spacing: 0.18em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-experience .ttl { opacity: 1; }
+  .cinematic-experience .ttl-flare { opacity: 1; transform: none; animation: none; }
+}

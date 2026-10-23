@@ -15,8 +15,6 @@ import { Constellation } from "./Constellation";
 import { Convergence } from "./Convergence";
 import { Dust } from "./Dust";
 import { Fragments } from "./Fragments";
-import { CosmicSmoke } from "./CosmicSmoke";
-import { HeroPortrait } from "./HeroPortrait";
 import { Particles } from "./Particles";
 import { Portrait } from "./Portrait";
 
@@ -55,14 +53,12 @@ export default function WorldCanvas({ tier }: { tier: Exclude<Tier, "static"> })
         gl={{ antialias: false, powerPreference: "high-performance", alpha: false, stencil: false }}
         camera={{ fov: 50, near: 0.1, far: 400, position: [0, 0, 46] }}
       >
-        <color attach="background" args={["#04040a"]} />
+        <color attach="background" args={["#050608"]} />
         <PerformanceMonitor
           onDecline={() => setDpr((d) => Math.max(cfg.dpr[0], d - 0.25))}
           onIncline={() => setDpr((d) => Math.min(cfg.dpr[1], d + 0.25))}
         />
         <Atmosphere />
-        <CosmicSmoke lite={tier === "mobile"} />
-        <HeroPortrait />
         <CameraRig />
         <Dust count={cfg.dust} />
         <Constellation />

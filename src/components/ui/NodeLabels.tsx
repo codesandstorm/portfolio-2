@@ -60,7 +60,8 @@ export function NodeLabels() {
     return [...set];
   }, [chapter, hovered, selected, scrollFocus]);
 
-  if (chapter < chapterIndex.connect || chapter === chapterIndex.continue) return null;
+  // Not over her portrait, the full-width pages (projects, achievements), or the finale.
+  if (chapter <= chapterIndex.akshita || chapter === chapterIndex.build || chapter === chapterIndex.converge || chapter === chapterIndex.lead || chapter === chapterIndex.continue) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden" role="group" aria-label="Nodes in view">

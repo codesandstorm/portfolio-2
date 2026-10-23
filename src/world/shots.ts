@@ -18,9 +18,11 @@ export function stepOf(progress: number, count: number) {
 }
 
 const voiceCentre = centroid(["x-ieee", "x-acm", "x-suas"]);
+const projectsCentre = centroid(projectOrder);
+const achievementsCentre = centroid(achievementOrder);
 
 export function shotAt(t: number, aspect: number): Shot {
-  const i = Math.min(9, Math.floor(t));
+  const i = Math.min(chapterIndex.continue, Math.floor(t));
   const p = Math.min(1, (t - i) / STICKY);
   const portrait = aspect < 0.9;
   const fov = portrait ? 62 : 50;
@@ -33,11 +35,6 @@ export function shotAt(t: number, aspect: number): Shot {
       // Almost still: the slowest push toward her as she emerges from the smoke.
       const a = introAmounts(world.intro);
       return { pos: [0, 0, 46 - a.portrait * 1.5], look: [0, 0, 0], fov };
-    }
-    case chapterIndex.start: {
-      const e = smooth(0, 1, p);
-      const z = 44 - e * 34;
-      return { pos: [Math.sin(p * Math.PI) * 1.6, Math.sin(p * Math.PI * 2) * 0.5, z], look: [0, 0, Math.max(0, z - 24)], fov };
     }
     case chapterIndex.akshita:
       return { pos: [0, 0.2, portrait ? 12 : 9.5], look: portrait ? [0, -1.2, 0] : [1.5, 0.1, 0], fov };
@@ -52,9 +49,8 @@ export function shotAt(t: number, aspect: number): Shot {
       return { pos: add(n, [0.6 - local * 1.2, 0.8, portrait ? 10 : 7.5]), look: add(n, frame), fov };
     }
     case chapterIndex.build: {
-      const { index, local } = stepOf(p, projectOrder.length);
-      const n = posOf(projectOrder[index]);
-      return { pos: add(n, [0.5 - local, 0.7, portrait ? 8.5 : 6.2]), look: add(n, portrait ? [0, -3, 0] : frame), fov }; // phones: artifact high, words and demo below
+      // The whole cluster of projects at once, drifting slowly while the grid is read.
+      return { pos: add(projectsCentre, [-2 + p * 4, 3, portrait ? 30 : 22]), look: projectsCentre, fov };
     }
     case chapterIndex.learn: {
       const a = 0.25 - p * 0.5;
@@ -62,11 +58,9 @@ export function shotAt(t: number, aspect: number): Shot {
     }
     case chapterIndex.lead:
       return { pos: add(voiceCentre, [-1 + p * 2, 2.5, portrait ? 20 : 15]), look: add(voiceCentre, portrait ? [0, -2.5, 0] : [3.5, 0, 0]), fov };
-    case chapterIndex.converge: {
-      const { index, local } = stepOf(p, achievementOrder.length);
-      const n = posOf(achievementOrder[index]);
-      return { pos: add(n, [0, 0.6, (portrait ? 10 : 8) - local * 1.5]), look: add(n, frame), fov };
-    }
+    case chapterIndex.converge:
+      // Where her paths met, all at once.
+      return { pos: add(achievementsCentre, [2 - p * 4, 4, portrait ? 30 : 24]), look: achievementsCentre, fov };
     default: {
       // Pull back until everything visited is in frame at once.
       const e = smooth(0, 0.7, p);

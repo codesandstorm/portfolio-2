@@ -10,18 +10,18 @@ import { smooth } from "./world";
 
 export type IntroPhase = "void" | "smoke" | "portrait" | "strike" | "title" | "settled" | "transitioning" | "complete";
 
-/** Full-length timeline in seconds (first visit, desktop). */
-export const INTRO_SECONDS = 8;
+/** Full-length timeline in seconds (first visit). */
+export const INTRO_SECONDS = 7;
 
 /** Phase start points as fractions of the timeline. */
 export const AT = {
-  smoke: 0.04,
-  portrait: 0.22,
-  strike: 0.5,
-  mahajan: 0.68,
-  subtitle: 0.8,
-  cta: 0.88,
-  settled: 0.97,
+  smoke: 0.02,
+  portrait: 0.02,
+  strike: 0.27,
+  mahajan: 0.5,
+  subtitle: 0.62,
+  cta: 0.72,
+  settled: 0.86,
 } as const;
 
 export function introPhase(intro: number, t: number): IntroPhase {
@@ -41,7 +41,7 @@ export function introAmounts(intro: number) {
     smoke: smooth(AT.smoke, 0.42, intro),
     portrait: smooth(AT.portrait, 0.55, intro),
     title: smooth(AT.strike, AT.mahajan, intro),
-    subtitle: smooth(AT.subtitle, 0.9, intro),
-    cta: smooth(AT.cta, 0.97, intro),
+    subtitle: smooth(AT.subtitle, 0.74, intro),
+    cta: smooth(AT.cta, 0.84, intro),
   };
 }

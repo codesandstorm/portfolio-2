@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { sfx } from "@/audio/useSound";
 import { AT } from "@/lib/intro";
 import { useTicker } from "@/lib/hooks";
@@ -14,6 +14,8 @@ const SECOND = "MAHAJAN";
 /** The order letters are struck in: outside-in, never left-to-right like a typewriter. */
 const ORDER = [0, 6, 3, 1, 5, 2, 4];
 const GAP = 115;
+/** Cool rim on the ice side, warm on the fire side, neutral at the centre — as in the reference frame. */
+const RIM = ["rim-cool", "rim-cool", "rim-cool", "rim-centre", "rim-warm", "rim-warm", "rim-warm"];
 
 /** A jagged path between two points by repeated midpoint displacement — re-rolled every frame, so it flickers. */
 function jag(a: Pt, b: Pt, disp: number): Pt[] {
@@ -39,12 +41,13 @@ const TONE = {
 };
 
 /**
- * Her name, struck into being like a film title: each letter of AKSHITA is hit
+ * Her name, struck into being like a film title: a bolt from the sky hits the
+ * centre of the name, then each letter of AKSHITA is hit
  * by a bolt and flickers alight, a single white flash lights the whole scene,
  * the letters cool into warm metal, and MAHAJAN is scanned in by a crackling
  * sweep. Afterwards an occasional faint arc keeps the title alive.
  */
-export function ElectricTitle({ flow }: { flow: boolean }) {
+export function ElectricTitle({ flow, children }: { flow: boolean; children?: ReactNode }) {
   const first = useRef<(HTMLSpanElement | null)[]>([]);
   const second = useRef<(HTMLSpanElement | null)[]>([]);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -71,6 +74,7 @@ export function ElectricTitle({ flow }: { flow: boolean }) {
     timers.current.forEach(clearTimeout);
     timers.current = [];
     [...first.current, ...second.current].forEach((el) => set(el, "lit"));
+    wrap.current?.setAttribute("data-flared", "");
     stage.current = "done";
   };
 
@@ -78,8 +82,13 @@ export function ElectricTitle({ flow }: { flow: boolean }) {
     stage.current = "strike";
     const c = canvas.current?.getBoundingClientRect();
     const w = c?.width ?? 1000;
+    // The first strike comes straight down out of the smoke onto the centre of her name.
+    const [hx, hy] = anchor(first.current[3], 0.1);
+    bolt([hx + (Math.random() - 0.5) * 160, -30], [hx, hy], "white", 260, 170, 2.4);
+    world.heroFlash = Math.max(world.heroFlash, 0.45);
+    sfx.zap(1.2);
     ORDER.forEach((i, k) => {
-      later(k * GAP, () => {
+      later(220 + k * GAP, () => {
         const el = first.current[i];
         const left = i < 3 || (i === 3 && k % 2 === 0);
         const [x, y] = anchor(el);
@@ -94,7 +103,7 @@ export function ElectricTitle({ flow }: { flow: boolean }) {
         later(150, () => set(el, "hot"));
       });
     });
-    const flashAt = ORDER.length * GAP + 200;
+    const flashAt = 220 + ORDER.length * GAP + 200;
     later(flashAt, () => {
       // One full strike: the whole name goes white, the scene is lit, then it cools.
       first.current.forEach((el) => set(el, "flash"));
@@ -104,8 +113,10 @@ export function ElectricTitle({ flow }: { flow: boolean }) {
       for (let k = 0; k < FIRST.length - 1; k++) bolt(anchor(first.current[k], 0.5), anchor(first.current[k + 1], 0.5), "white", 180, 26, 1.2);
       const [lx, ly] = anchor(first.current[0], 0.5);
       const [rx, ry] = anchor(first.current[FIRST.length - 1], 0.5);
-      bolt([-30, ly - 140], [lx, ly], "ice", 220, 120, 2);
-      bolt([w + 30, ry - 140], [rx, ry], "fire", 220, 120, 2);
+      // Two more out of the sky, one on each side, landing on the outer A's.
+      bolt([lx - 60 - Math.random() * 80, -30], [lx, ly], "ice", 240, 150, 2.2);
+      bolt([rx + 60 + Math.random() * 80, -30], [rx, ry], "fire", 240, 150, 2.2);
+      wrap.current?.setAttribute("data-flared", "");
     });
     later(flashAt + 150, () => first.current.forEach((el) => set(el, "lit")));
   };
@@ -228,24 +239,28 @@ export function ElectricTitle({ flow }: { flow: boolean }) {
   });
 
   return (
-    <div ref={wrap} className="pointer-events-none absolute inset-0">
-      <canvas ref={canvas} aria-hidden className="absolute inset-0 h-full w-full" />
-      <h1 id="signal-title" aria-label="Akshita Mahajan" className="title-face absolute inset-x-0 top-[49%] text-center uppercase md:top-[57%]">
-        <span aria-hidden className="block pl-[0.28em] text-[clamp(2.6rem,12vw,4.6rem)] leading-none tracking-[0.28em] md:text-[clamp(3.4rem,8.4vw,9rem)]">
-          {FIRST.split("").map((ch, i) => (
-            <span key={i} ref={(el) => { first.current[i] = el; }} className="ttl" data-s={flow ? "lit" : "off"}>
-              {ch}
-            </span>
-          ))}
-        </span>
-        <span aria-hidden className="mt-[0.35em] block pl-[0.62em] text-[clamp(1.1rem,5vw,1.8rem)] leading-none tracking-[0.62em] md:text-[clamp(1.5rem,3.3vw,3.3rem)]">
-          {SECOND.split("").map((ch, i) => (
-            <span key={i} ref={(el) => { second.current[i] = el; }} className="ttl ttl-line2" data-s={flow ? "lit" : "off"}>
-              {ch}
-            </span>
-          ))}
-        </span>
-      </h1>
+    <div ref={wrap} className="electric-title" data-flared={flow ? "" : undefined}>
+      <canvas ref={canvas} aria-hidden className="electric-title-canvas" />
+      <div className="hero-title-wrapper">
+        <h1 id="signal-title" aria-label="Akshita Mahajan" className="title-face hero-name-stack uppercase">
+          <span aria-hidden className="hero-first">
+            {FIRST.split("").map((ch, i) => (
+              <span key={i} ref={(el) => { first.current[i] = el; }} className={`ttl ${RIM[i]}`} data-s={flow ? "lit" : "off"}>
+                {ch}
+                {(i === 0 || i === FIRST.length - 1) && <span aria-hidden className={`ttl-flare ${i === 0 ? "ttl-flare-cool" : "ttl-flare-warm"}`} />}
+              </span>
+            ))}
+          </span>
+          <span aria-hidden className="hero-second">
+            {SECOND.split("").map((ch, i) => (
+              <span key={i} ref={(el) => { second.current[i] = el; }} className="ttl ttl-line2" data-s={flow ? "lit" : "off"}>
+                {ch}
+              </span>
+            ))}
+          </span>
+        </h1>
+        {children}
+      </div>
     </div>
   );
 }

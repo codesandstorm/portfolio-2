@@ -140,6 +140,16 @@ export type Achievement = {
   signals: string[];
 };
 
+/** An event she took part in without a placing — hackathons, congresses, outreach, stage work. */
+export type Participation = {
+  id: string;
+  title: string;
+  /** What she did there, in a few words. */
+  role: string;
+  date: string;
+  signal: string;
+};
+
 export type Credential = {
   name: string;
   issuer: string;

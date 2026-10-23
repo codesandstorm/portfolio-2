@@ -24,22 +24,10 @@ export const tour: TourStop[] = [
     text: "This is Akshita Mahajan. Two forces meet in her. Fire — her voice, her confidence, her will to act. And ice — the clarity and structure of an engineer. Where they collide, she begins.",
   },
   {
-    id: "02-start",
-    from: ["start", 0],
-    to: ["start", 1],
-    text: "About a year before IIT Indore, she was the quiet student in class, still learning JavaScript. She built projects, applied every day, and took the rejections. Then four internship offers arrived in fifteen days.",
-  },
-  {
     id: "03-akshita",
     from: ["akshita", 0.15],
     to: ["akshita", 1.12],
     text: "She studies computer science at Symbiosis University of Applied Sciences in Indore — a full-stack engineer whose headline closes with two words: public speaker. And every point of her becomes a connection.",
-  },
-  {
-    id: "04-connect",
-    from: ["connect", 0],
-    to: ["connect", 1],
-    text: "Nearly every post she writes ends by naming the people who helped her — mentors, co-interns, teammates, organisers. Twenty-two of them hold this network together.",
   },
   {
     id: "05-collaborate",
@@ -69,6 +57,13 @@ export const tour: TourStop[] = [
     text: "There are no skill bars here. Every skill is a point of light with a thread to the places she used it. Choose one, and the energy shows you where.",
   },
   {
+    id: "10-converge",
+    from: ["converge", 0],
+    to: ["converge", 1],
+    text: "Here, achievements are the moments where paths meet: four offers in fifteen days, third place for PrakritiOS, third prize at Tech Kutumb, and the first ISRO exhibition in her state.",
+    say: "Here, achievements are the moments where paths meet: four offers in fifteen days, third place for Prakriti O S, third prize at Tech Kutumb, and the first ISRO exhibition in her state.",
+  },
+  {
     id: "09-lead",
     from: ["lead", 0.42],
     to: ["lead", 1],
@@ -76,11 +71,10 @@ export const tour: TourStop[] = [
     say: "She coordinated the first ISRO exhibition in Madhya Pradesh, anchored a thirty-six-hour hackathon, taught technology in rural schools, and represented her university at the I triple E Student Leadership Congress. Her sign-off: connect, collaborate, learn, lead.",
   },
   {
-    id: "10-converge",
-    from: ["converge", 0],
-    to: ["converge", 1],
-    text: "Here, achievements are the moments where paths meet: four offers in fifteen days, third place for PrakritiOS, third prize at Tech Kutumb, and the first ISRO exhibition in her state.",
-    say: "Here, achievements are the moments where paths meet: four offers in fifteen days, third place for Prakriti O S, third prize at Tech Kutumb, and the first ISRO exhibition in her state.",
+    id: "04-connect",
+    from: ["connect", 0],
+    to: ["connect", 1],
+    text: "Nearly every post she writes ends by naming the people who helped her — mentors, co-interns, teammates, organisers. Twenty-two of them hold this network together.",
   },
   {
     id: "11-continue",

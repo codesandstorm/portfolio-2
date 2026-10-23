@@ -21,6 +21,7 @@ import {
   isHeadlineSkill,
 } from "@/content/graph";
 import type { Achievement, Experience, LinkedInSignal, Person, Project, Skill } from "@/content/types";
+import { useLive } from "@/content/live";
 import { sfx } from "@/audio/useSound";
 import { useUI } from "@/lib/store";
 
@@ -45,6 +46,28 @@ function Chip({ id, note }: { id: string; note?: string }) {
         {note && <span className="mono ml-auto shrink-0 text-faint">{note}</span>}
       </button>
     </li>
+  );
+}
+
+/** Posts published from /admin that show this skill — they are not in the graph, so they get their own list. */
+function LivePosts({ skill }: { skill: string }) {
+  const read = useUI((s) => s.read);
+  const posts = useLive((s) => s.posts).filter((p) => p.skills.includes(skill));
+  if (!posts.length) return null;
+  return (
+    <section className="mt-6">
+      <h3 className="mono mb-1 text-gold/90">In her latest posts</h3>
+      <ul>
+        {posts.map((p) => (
+          <li key={p.id}>
+            <button type="button" onClick={() => read(p.id)} className="group flex w-full items-baseline gap-3 py-1.5 text-left" data-cursor="link">
+              <span className="h-px w-3 shrink-0 translate-y-[-3px] bg-[#e58237]/70 transition-all group-hover:w-6" aria-hidden />
+              <span className="text-[15px] text-ivory/90 transition-colors group-hover:text-gold">{p.title}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -73,6 +96,7 @@ function Body({ id }: { id: string }) {
           <Group title="Where she learned and practised it" ids={getExperiencesForSkill(id).map((e) => e.id)} />
           <Group title="Where she applied it" ids={getProjectsForSkill(id).map((p) => p.id)} />
           <Group title="What it helped make happen" ids={getAchievementsForSkill(id).map((a) => a.id)} />
+          <LivePosts skill={id} />
           <Group title="Where she wrote about it" ids={getSignalsForSkill(id).map((p) => p.id)} />
           <Group title="Travels with" ids={getRelatedSkills(id).map((r) => r.id)} />
         </>

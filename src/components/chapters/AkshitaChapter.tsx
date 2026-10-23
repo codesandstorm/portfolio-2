@@ -32,7 +32,7 @@ export function AkshitaChapter() {
     const i = Math.min(facets.length - 1, Math.floor(Math.min(0.999, Math.max(0, (p - 0.24) / 0.52)) * facets.length));
     if (i !== active) setActive(i);
     if (handoff.current) {
-      const h = smooth(0.84, 0.92, p) * (1 - smooth(3.0, 3.12, world.t));
+      const h = smooth(0.84, 0.92, p) * (1 - smooth(chapterIndex.akshita + 1, chapterIndex.akshita + 1.12, world.t));
       handoff.current.style.opacity = h.toFixed(3);
       handoff.current.style.transform = `translateY(${((1 - h) * 16).toFixed(1)}px)`;
     }
