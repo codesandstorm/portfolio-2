@@ -1,54 +1,54 @@
 {
-  "voice": "XrExE9yKIg1WjnnlVkGX",
+  "voice": "hpp4J3VqNfWAUOO0d1Us",
   "model": "eleven_multilingual_v2",
   "stops": {
     "01-forces": {
-      "duration": 14.257
+      "duration": 13.7
     },
     "03-akshita": {
-      "duration": 14.907
-    },
-    "04-connect": {
-      "duration": 11.006
-    },
-    "05-collaborate": {
-      "duration": 21.037
-    },
-    "06-build": {
-      "duration": 13.235
-    },
-    "07-hackathons": {
-      "duration": 12.121
-    },
-    "08-learn": {
-      "duration": 9.381
-    },
-    "09-lead": {
-      "duration": 18.437
-    },
-    "10-converge": {
-      "duration": 13.746
-    },
-    "11-continue": {
-      "duration": 9.381
-    },
-    "r1-who": {
-      "duration": 10.495
-    },
-    "r2-work": {
       "duration": 14.629
     },
+    "05-collaborate": {
+      "duration": 19.876
+    },
+    "06-build": {
+      "duration": 14.536
+    },
+    "07-hackathons": {
+      "duration": 10.635
+    },
+    "08-learn": {
+      "duration": 11.842
+    },
+    "10-converge": {
+      "duration": 18.158
+    },
+    "09-lead": {
+      "duration": 12.91
+    },
+    "04-connect": {
+      "duration": 10.124
+    },
+    "11-continue": {
+      "duration": 8.87
+    },
+    "r1-who": {
+      "duration": 9.845
+    },
+    "r2-work": {
+      "duration": 13.189
+    },
     "r3-build": {
-      "duration": 9.102
+      "duration": 7.012
     },
     "r4-lead": {
-      "duration": 13.05
+      "duration": 11.331
     },
     "r5-results": {
-      "duration": 5.433
+      "duration": 4.83
     },
     "r6-next": {
-      "duration": 7.523
+      "duration": 6.873
     }
   }
 }

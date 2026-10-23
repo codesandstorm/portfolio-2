@@ -32,9 +32,9 @@ if (!key) {
   console.error("ELEVENLABS_API_KEY is not set. Add it to .env.local (that file is git-ignored).");
   process.exit(1);
 }
-// Default: "Matilda", a warm female premade narrator voice (a narrator, not a clone of Akshita).
-// Override with ELEVENLABS_VOICE_ID — e.g. a female Indian-English voice from your Voice Library.
-const voice = process.env.ELEVENLABS_VOICE_ID || "XrExE9yKIg1WjnnlVkGX";
+// Default: "Bella", a bold, bright female premade voice (a narrator, not a clone of Akshita).
+// Premade voices work on every ElevenLabs plan; Voice Library voices need a paid one.
+const voice = process.env.ELEVENLABS_VOICE_ID || "hpp4J3VqNfWAUOO0d1Us";
 const model = process.env.ELEVENLABS_MODEL_ID || "eleven_multilingual_v2";
 const headers = { "xi-api-key": key, "Content-Type": "application/json" };
 
@@ -87,8 +87,8 @@ for (const tour of Object.values(tours)) for (let i = 0; i < tour.length; i++) {
   const body = {
     text: spoken,
     model_id: model,
-    // Steady and unhurried: a narrator, not a performance.
-    voice_settings: { stability: 0.55, similarity_boost: 0.75, style: 0.15, use_speaker_boost: true, speed: 0.95 },
+    // Bold and clear: expressive enough to hold attention, steady enough to stay crisp.
+    voice_settings: { stability: 0.42, similarity_boost: 0.8, style: 0.38, use_speaker_boost: true, speed: 1.0 },
     previous_text: tour[i - 1] ? (tour[i - 1].say ?? tour[i - 1].text) : undefined,
     next_text: tour[i + 1] ? (tour[i + 1].say ?? tour[i + 1].text) : undefined,
   };

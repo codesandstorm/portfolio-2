@@ -11,7 +11,7 @@ import { answer } from "@/content/ask";
  */
 export const runtime = "nodejs";
 
-const VOICE = process.env.ELEVENLABS_VOICE_ID || "XrExE9yKIg1WjnnlVkGX";
+const VOICE = process.env.ELEVENLABS_VOICE_ID || "hpp4J3VqNfWAUOO0d1Us";
 const MODEL = process.env.ELEVENLABS_MODEL_ID || "eleven_multilingual_v2";
 const cache = new Map<string, ArrayBuffer>();
 const hits = new Map<string, { n: number; t: number }>();
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         text: spoken,
         model_id: MODEL,
-        voice_settings: { stability: 0.55, similarity_boost: 0.75, style: 0.15, use_speaker_boost: true, speed: 1 },
+        voice_settings: { stability: 0.42, similarity_boost: 0.8, style: 0.38, use_speaker_boost: true, speed: 1 },
       }),
     });
     if (!res.ok) return new Response("Voice is unavailable right now.", { status: 502 });
