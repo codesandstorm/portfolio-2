@@ -16,6 +16,8 @@ export const world = {
   flash: 0,
   /** Fire × Ice collision flash 0 … 1, decays after the hero collision. */
   heroFlash: 0,
+  /** How far the hero has broken into particles as you scroll away from it, 0 … 1. */
+  heroDissolve: 0,
   /** Camera micro-shake 0 … 1. */
   shake: 0,
   /** Seconds since page start, advanced by the intro clock (for procedural motion). */

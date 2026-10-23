@@ -13,6 +13,7 @@ import { smooth, world } from "@/lib/world";
 import { useFlow } from "../chapters/Chapter";
 import { AvatarPlayer } from "./AvatarPlayer";
 import { ElectricTitle } from "./ElectricTitle";
+import { HeroDissolve, PHOTO_HANDOVER } from "./HeroDissolve";
 import HeroParticles from "./HeroParticles";
 import SmokeCanvas from "./SmokeCanvas";
 import "./landing.css";
@@ -42,6 +43,7 @@ export function CinematicLanding() {
   const flow = useFlow();
   const tween = useRef<gsap.core.Tween | null>(null);
   const silent = useRef(false);
+  const section = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const sub = useRef<HTMLParagraphElement>(null);
   const cta = useRef<HTMLDivElement>(null);
@@ -102,11 +104,20 @@ export function CinematicLanding() {
   };
 
   useTicker(() => {
-    if (!flow && !introDone && world.t > 0.05 && tween.current) skip();
+    // The hero stays pinned for one screen of scroll while it breaks into grains.
+    const sec = section.current;
+    const pinned = sec ? sec.offsetHeight - window.innerHeight : 0;
+    world.heroDissolve = flow || pinned <= 0 ? 0 : Math.min(1, Math.max(0, window.scrollY / pinned));
+    if (!flow && !introDone && world.heroDissolve > 0 && tween.current) skip();
     if (!flow) setIntroPhase(introPhase(world.intro, world.t));
-    // Scrolling away: the frame dissolves into the constellation behind it.
-    const away = 1 - smooth(0.08, 0.7, world.t);
-    if (stage.current) stage.current.style.opacity = away.toFixed(3);
+    // The type hands over to its grains at once; the living photograph stays until its own grains start to move.
+    const away = flow ? 1 - smooth(0.08, 0.7, world.t) : 1 - smooth(PHOTO_HANDOVER, PHOTO_HANDOVER + 0.08, world.heroDissolve);
+    if (stage.current) {
+      stage.current.style.opacity = away.toFixed(3);
+      stage.current.style.visibility = away < 0.005 ? "hidden" : "visible";
+      const type = stage.current.querySelector<HTMLElement>(".hero-title-wrapper");
+      if (type && !flow) type.style.opacity = (1 - smooth(0, 0.025, world.heroDissolve)).toFixed(3);
+    }
     if (flow) return;
     const amt = introAmounts(world.intro);
     const set = (el: HTMLElement | null, v: number) => {
@@ -122,50 +133,54 @@ export function CinematicLanding() {
   const hidden = flow ? undefined : { opacity: 0, visibility: "hidden" as const };
 
   return (
-    <section id="signal" data-chapter="signal" aria-labelledby="signal-title" className="relative z-10 h-svh">
-      <div ref={stage} className="cinematic-experience">
-        <div className="cinematic-backdrop" aria-hidden="true">
-          {/* Mounted with the loader's exit so the fade from black is seen, not spent behind it. */}
-          {ready && <SmokeCanvas reducedMotion={flow} />}
-        </div>
-        {ready && <HeroParticles reducedMotion={flow} />}
-
-        <ElectricTitle flow={flow}>
-          <p ref={sub} className="hero-sub-descriptor" style={hidden}>
-            {landing.roles.map((r, k) => (
-              <span key={r}>
-                {k > 0 && <span className="descriptor-separator" aria-hidden>·</span>}
-                {r}
-              </span>
-            ))}
-          </p>
-          <div ref={cta} className="hero-explore-cta" style={hidden}>
-            <button
-              type="button"
-              className="explore-link"
-              onClick={() => {
-                skip();
-                sfx.swell();
-                scrollToChapter("build");
-              }}
-              data-cursor="link"
-            >
-              <span>{landing.explore.toUpperCase()}</span>
-              <span className="explore-arrow" aria-hidden="true">→</span>
-            </button>
+    <section ref={section} id="signal" data-chapter="signal" aria-labelledby="signal-title" className={`relative z-10 ${flow ? "h-svh" : "h-[200svh]"}`}>
+      {/* Pinned for one screen of scroll while the hero breaks into grains. */}
+      <div className="sticky top-0 h-svh overflow-hidden">
+        <div ref={stage} className="cinematic-experience">
+          <div className="cinematic-backdrop" aria-hidden="true">
+            {/* Mounted with the loader's exit so the fade from black is seen, not spent behind it. */}
+            {ready && <SmokeCanvas reducedMotion={flow} />}
           </div>
-        </ElectricTitle>
+          {ready && <HeroParticles reducedMotion={flow} />}
 
-        <div className="hero-floor" aria-hidden />
+          <ElectricTitle flow={flow}>
+            <p ref={sub} className="hero-sub-descriptor" style={hidden}>
+              {landing.roles.map((r, k) => (
+                <span key={r}>
+                  {k > 0 && <span className="descriptor-separator" aria-hidden>·</span>}
+                  {r}
+                </span>
+              ))}
+            </p>
+            <div ref={cta} className="hero-explore-cta" style={hidden}>
+              <button
+                type="button"
+                className="explore-link"
+                onClick={() => {
+                  skip();
+                  sfx.swell();
+                  scrollToChapter("build");
+                }}
+                data-cursor="link"
+              >
+                <span>{landing.explore.toUpperCase()}</span>
+                <span className="explore-arrow" aria-hidden="true">→</span>
+              </button>
+            </div>
+          </ElectricTitle>
+
+          <div className="hero-floor" aria-hidden />
+        </div>
+        {!flow && <HeroDissolve host={stage} image={HERO_IMAGE} />}
+
+        <AvatarPlayer visible={introDone || flow} />
+
+        {!flow && !introDone && ready && (
+          <button type="button" onClick={skip} className="mono absolute bottom-6 left-[var(--gutter)] z-30 text-faint hover:text-ivory" data-cursor="link">
+            Skip intro
+          </button>
+        )}
       </div>
-
-      <AvatarPlayer visible={introDone || flow} />
-
-      {!flow && !introDone && ready && (
-        <button type="button" onClick={skip} className="mono absolute bottom-6 left-[var(--gutter)] z-30 text-faint hover:text-ivory" data-cursor="link">
-          Skip intro
-        </button>
-      )}
       <p className="sr-only">
         {profile.name}: {landing.roles.join(", ")}, from {profile.location}.
       </p>

@@ -25,7 +25,7 @@ export type Chapter = {
  * how to reach her. Titles are plain words so nobody has to decode a metaphor.
  */
 export const chapters: Chapter[] = [
-  { id: "signal", n: "00", title: "Home", plain: "Introduction", vh: [100, 100] },
+  { id: "signal", n: "00", title: "Home", plain: "Introduction", vh: [200, 200] },
   { id: "akshita", n: "01", title: "About", plain: "About her", vh: [280, 220] },
   { id: "collaborate", n: "02", title: "Experience", plain: "Where she has worked", vh: [560, 480] },
   { id: "build", n: "03", title: "Projects", plain: "What she has built", vh: [620, 520] },

@@ -176,7 +176,7 @@ export function ElectricTitle({ flow, children }: { flow: boolean; children?: Re
 
     const now = performance.now();
     // Now and then, a faint arc between two letters — the title is still live.
-    if (stage.current === "done" && world.t < 0.3 && now > nextCrackle.current) {
+    if (stage.current === "done" && world.heroDissolve === 0 && now > nextCrackle.current) {
       if (nextCrackle.current) {
         const i = Math.floor(Math.random() * (FIRST.length - 1));
         bolt(anchor(first.current[i], 0.3 + Math.random() * 0.4), anchor(first.current[i + 1], 0.3 + Math.random() * 0.4), i < 3 ? "ice" : "fire", 110, 18, 0.9);
@@ -189,7 +189,7 @@ export function ElectricTitle({ flow, children }: { flow: boolean; children?: Re
     const ctx = c?.getContext("2d");
     if (!c || !ctx) return;
     ctx.clearRect(0, 0, c.width, c.height);
-    c.style.opacity = (1 - smooth(0.04, 0.4, world.t)).toFixed(3);
+    c.style.opacity = (1 - smooth(0, 0.05, world.heroDissolve)).toFixed(3);
     bolts.current = bolts.current.filter((b) => now - b.born < b.life);
     ctx.globalCompositeOperation = "lighter";
     for (const b of bolts.current) {

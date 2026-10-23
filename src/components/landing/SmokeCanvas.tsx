@@ -346,8 +346,8 @@ export default function SmokeCanvas({ reducedMotion = false }: SmokeCanvasProps)
 
     const render = (now: number) => {
       if (!gl || !program) return
-      // Once the hero has been scrolled away the constellation owns the GPU.
-      if (world.t > 1.2) {
+      // Once the hero has broken into particles (or scrolled away) the constellation owns the GPU.
+      if (world.heroDissolve > 0.12 || world.t > 1.2) {
         animationFrameId = requestAnimationFrame(render)
         return
       }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { world } from '@/lib/world'
 
 interface Particle {
   x: number
@@ -66,6 +67,11 @@ export default function HeroParticles({ reducedMotion = false }: HeroParticlesPr
       lastTime = now
 
       ctx.clearRect(0, 0, width, height)
+      // The hero is dissolving; its own particles take over.
+      if (world.heroDissolve > 0.12) {
+        animationFrameId = requestAnimationFrame(render)
+        return
+      }
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
