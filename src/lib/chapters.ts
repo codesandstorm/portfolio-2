@@ -1,7 +1,6 @@
 export type ChapterId =
   | "signal"
   | "akshita"
-  | "connect"
   | "collaborate"
   | "build"
   | "learn"
@@ -32,8 +31,7 @@ export const chapters: Chapter[] = [
   { id: "learn", n: "04", title: "Skills", plain: "Skills and where she used them", vh: [240, 200] },
   { id: "converge", n: "05", title: "Achievements", plain: "Achievements & participation", vh: [460, 380] },
   { id: "lead", n: "06", title: "Latest", plain: "Latest from LinkedIn", vh: [420, 340] },
-  { id: "connect", n: "07", title: "Network", plain: "The people she credits", vh: [240, 200] },
-  { id: "continue", n: "08", title: "Connect", plain: "Connect with her", vh: [220, 180] },
+  { id: "continue", n: "07", title: "Connect", plain: "Connect with her", vh: [220, 180] },
 ];
 
 export const chapterIndex = Object.fromEntries(chapters.map((c, i) => [c.id, i])) as Record<ChapterId, number>;

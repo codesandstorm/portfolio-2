@@ -14,7 +14,6 @@ import { CameraRig } from "./CameraRig";
 import { Constellation } from "./Constellation";
 import { Convergence } from "./Convergence";
 import { Dust } from "./Dust";
-import { Fragments } from "./Fragments";
 import { Particles } from "./Particles";
 import { Portrait } from "./Portrait";
 
@@ -63,7 +62,6 @@ export default function WorldCanvas({ tier }: { tier: Exclude<Tier, "static"> })
         <Dust count={cfg.dust} />
         <Constellation />
         <Particles count={cfg.particles} />
-        <Fragments />
         <Portrait />
         <Artifacts />
         <Convergence />

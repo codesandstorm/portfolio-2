@@ -9,8 +9,9 @@ import type { Project } from "@/content/types";
 import { sfx } from "@/audio/useSound";
 import { useUI } from "@/lib/store";
 import { ProjectDemo } from "../demos/ProjectDemo";
+import { BrandLogo, SkillLogo, stackBrands } from "../ui/TechLogo";
+import { ProjectArt } from "./ProjectArt";
 import { Chapter, Kicker } from "./Chapter";
-import { Label } from "./Stepped";
 
 const STATUS: Record<Project["status"], string> = {
   live: "Live",
@@ -29,6 +30,10 @@ const TONE: Record<Project["status"], string> = {
 
 type Filter = "all" | Project["status"];
 const FILTERS: Filter[] = ["all", ...(["live", "internship", "hackathon", "built"] as const).filter((s) => projects.some((p) => p.status === s))];
+
+function Label({ children }: { children: ReactNode }) {
+  return <h4 className="mono mb-2 text-gold/90">{children}</h4>;
+}
 
 function Block({ title, children, wide }: { title: string; children: ReactNode; wide?: boolean }) {
   return (
@@ -76,12 +81,23 @@ function Detail({ p }: { p: Project }) {
           <ProjectDemo id={p.id} />
         </div>
         <Block title="Technologies" wide>
+          {stackBrands(p.stack).length > 0 && (
+            <p className="mb-3 flex flex-wrap gap-3">
+              {stackBrands(p.stack).map((b) => (
+                <span key={b.slug} className="inline-flex items-center gap-2 rounded-full border border-hair bg-[#07080a] py-1.5 pl-2.5 pr-3 text-[13px] text-ivory/85">
+                  <BrandLogo icon={b} size={15} />
+                  {b.title}
+                </span>
+              ))}
+            </p>
+          )}
           <p className="mono leading-relaxed text-ivory/70">{p.stack.join(" · ")}</p>
         </Block>
         <Block title="Skills it strengthened">
           <p className="flex flex-wrap gap-x-3 gap-y-1">
             {skills.map((s) => (
-              <button key={s.id} type="button" onClick={() => select(s.id)} className="mono text-mist hover:text-gold" data-cursor="link">
+              <button key={s.id} type="button" onClick={() => select(s.id)} className="mono inline-flex items-center gap-1.5 text-mist hover:text-gold" data-cursor="link">
+                <SkillLogo id={s.id} size={13} />
                 {s.name}
               </button>
             ))}
@@ -132,7 +148,7 @@ function Card({ p, onOpen }: { p: Project; onOpen: () => void }) {
       onPointerLeave={() => hover(null)}
       onFocus={() => hover(p.id)}
       onBlur={() => hover(null)}
-      className="group relative flex h-full w-full flex-col overflow-hidden border border-hair bg-[#050608]/70 p-6 text-left backdrop-blur-[2px] transition-[border-color,background-color] duration-500 hover:border-[#dfbe88]/45 hover:bg-[#0b0c10]/80"
+      className="group relative flex h-full w-full flex-col overflow-hidden rounded-2xl border border-hair bg-[#050608]/70 p-6 text-left backdrop-blur-[2px] transition-[border-color,background-color] duration-500 hover:border-[#dfbe88]/45 hover:bg-[#0b0c10]/80"
       data-cursor="link"
     >
       {/* The landing's light sweep, passing once over the card you point at. */}
@@ -140,6 +156,7 @@ function Card({ p, onOpen }: { p: Project; onOpen: () => void }) {
         aria-hidden
         className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -translate-x-full skew-x-[-18deg] bg-[linear-gradient(95deg,transparent,rgba(130,195,255,0.05)_32%,rgba(255,245,210,0.14)_50%,rgba(255,180,70,0.06)_68%,transparent)] transition-transform duration-[900ms] ease-out group-hover:translate-x-[420%]"
       />
+      <ProjectArt p={p} />
       <span className="mono flex items-center justify-between text-faint">
         <span className={TONE[p.status]}>{STATUS[p.status]}</span>
         <span>{p.period}</span>
@@ -223,7 +240,7 @@ export function BuildChapter() {
                   href={profile.links.github}
                   target="_blank"
                   rel="noreferrer"
-                  className="group flex h-full min-h-[14rem] flex-col items-start justify-end border border-dashed border-hair p-6 text-mist transition-colors hover:border-[#dfbe88]/45 hover:text-ivory"
+                  className="group flex h-full min-h-[14rem] flex-col items-start justify-end rounded-2xl border border-dashed border-hair p-6 text-mist transition-colors hover:border-[#dfbe88]/45 hover:text-ivory"
                   data-cursor="external"
                 >
                   <span className="display text-[1.6rem] leading-tight">Everything else she has written</span>

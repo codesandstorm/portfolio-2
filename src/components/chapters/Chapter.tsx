@@ -1,12 +1,49 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { chapters, type ChapterId, chapterIndex } from "@/lib/chapters";
 import { useUI } from "@/lib/store";
 
+/** How long a section shows only its world (and its title card) before its content arrives. */
+export const ARRIVE_MS = 1300;
+
 /**
- * A chapter is a tall section with a pinned stage. In the static tier (no
- * WebGL / reduced motion) it becomes ordinary flowing content.
+ * True once you have arrived in a chapter and stayed: false the moment it is
+ * no longer the chapter in view, so two chapters' content never overlap, and
+ * true again ARRIVE_MS after you come back. Always true in the static tier.
+ */
+export function useArrived(id: ChapterId) {
+  const flow = useUI((s) => s.tier === "static");
+  const here = useUI((s) => s.chapter === chapterIndex[id]);
+  const [arrived, setArrived] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => setArrived(here), here ? ARRIVE_MS : 0);
+    return () => window.clearTimeout(t);
+  }, [here]);
+  return flow || (here && arrived);
+}
+
+const Arrived = createContext(true);
+/** Whether the chapter this component sits in has arrived (see useArrived). */
+export const useChapterArrived = () => useContext(Arrived);
+
+function Content({ id, className, children }: { id: ChapterId; className: string; children: ReactNode }) {
+  const arrived = useArrived(id);
+  return (
+    <div
+      className={`transition-[opacity,transform] duration-700 ease-out ${arrived ? "opacity-100" : "pointer-events-none translate-y-3 opacity-0 !duration-300"} ${className}`}
+      inert={!arrived}
+    >
+      <Arrived.Provider value={arrived}>{children}</Arrived.Provider>
+    </div>
+  );
+}
+
+/**
+ * A chapter is a tall section with a pinned stage. Its content waits until you
+ * have arrived (the world and the title card come first) and leaves as soon as
+ * you move on. In the static tier (no WebGL / reduced motion) it becomes
+ * ordinary flowing content.
  */
 /** Atmosphere behind a text column so light passing behind it never costs legibility. */
 const SCRIM = {
@@ -37,7 +74,7 @@ export function Chapter({
     return (
       <section id={id} data-chapter={id} aria-labelledby={`${id}-title`} className="relative z-10 min-h-svh">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,transparent,rgba(5,6,8,0.72)_14%,rgba(5,6,8,0.72)_86%,transparent)]" />
-        <div className={`px-[var(--gutter)] pb-[14svh] pt-[16svh] ${className}`}>{children}</div>
+        <Content id={id} className={`px-[var(--gutter)] pb-[14svh] pt-[16svh] ${className}`}>{children}</Content>
       </section>
     );
   }
@@ -51,7 +88,7 @@ export function Chapter({
     >
       <div className={flow ? `px-[var(--gutter)] ${className}` : `sticky top-0 h-svh overflow-hidden px-[var(--gutter)] ${className}`}>
         {scrim && !flow && <div aria-hidden className={`pointer-events-none absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,transparent,black_14%)] ${SCRIM[scrim]}`} />}
-        {children}
+        {flow ? children : <Content id={id} className="h-full">{children}</Content>}
       </div>
     </section>
   );

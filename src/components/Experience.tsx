@@ -11,7 +11,6 @@ import { world } from "@/lib/world";
 import { AkshitaChapter } from "./chapters/AkshitaChapter";
 import { BuildChapter } from "./chapters/BuildChapter";
 import { CollaborateChapter } from "./chapters/CollaborateChapter";
-import { ConnectChapter } from "./chapters/ConnectChapter";
 import { ContinueChapter } from "./chapters/ContinueChapter";
 import { ConvergeChapter } from "./chapters/ConvergeChapter";
 import { LeadChapter } from "./chapters/LeadChapter";
@@ -31,7 +30,7 @@ import { TopBar } from "./ui/TopBar";
 const WorldCanvas = dynamic(() => import("./webgl/WorldCanvas"), { ssr: false });
 
 const STEPPED = new Set([chapterIndex.collaborate, chapterIndex.build, chapterIndex.lead, chapterIndex.converge]);
-const ORBIT = new Set([chapterIndex.connect, chapterIndex.learn]);
+const ORBIT = new Set([chapterIndex.learn]);
 
 /** Pointer → world: parallax everywhere, drag-to-turn in the open network chapters. */
 function usePointer() {
@@ -112,7 +111,6 @@ export function Experience({ posts }: { posts: LivePost[] }) {
         <LearnChapter />
         <ConvergeChapter />
         <LeadChapter />
-        <ConnectChapter />
         <ContinueChapter />
       </main>
       <RelationPanel />

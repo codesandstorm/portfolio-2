@@ -3,6 +3,7 @@
 import { skills } from "@/content/data";
 import { getExperiencesForSkill, getProjectsForSkill, getSignalsForSkill } from "@/content/graph";
 import { useLive } from "@/content/live";
+import { SkillLogo } from "../ui/TechLogo";
 import { useUI } from "@/lib/store";
 import { Chapter, Kicker, useFlow } from "./Chapter";
 
@@ -28,9 +29,10 @@ function SkillChip({ id, name }: { id: string; name: string }) {
         onPointerEnter={() => hover(id)}
         onPointerLeave={() => hover(null)}
         title={evidenceCount(id)}
-        className={`rounded-full border px-3 py-1.5 text-[13px] transition-colors ${on ? "border-[#dfbe88]/80 text-[#ecd6b8]" : "border-hair text-ivory/80 hover:border-[#dfbe88]/45 hover:text-ivory"}`}
+        className={`inline-flex items-center gap-2 rounded-full border bg-[#07080a]/70 py-1.5 pl-2.5 pr-3 text-[13px] transition-colors ${on ? "border-[#dfbe88]/80 text-[#ecd6b8]" : "border-hair text-ivory/85 hover:border-[#dfbe88]/45 hover:text-ivory"}`}
         data-cursor="link"
       >
+        <SkillLogo id={id} size={15} />
         {name}
         {projectsUsed > 0 && <span className="ml-1.5 text-[11px] text-faint">{projectsUsed}</span>}
       </button>

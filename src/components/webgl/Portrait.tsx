@@ -5,7 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { profile } from "@/content/data";
 import { chapterIndex } from "@/lib/chapters";
-import { chapterProgress, smooth, world } from "@/lib/world";
+import { smooth, world } from "@/lib/world";
 import { holoFragment, holoVertex } from "@/shaders/holo";
 import { getPortraitCanvas } from "@/world/portrait";
 import { SHATTER } from "./Particles";
@@ -13,6 +13,7 @@ import { SHATTER } from "./Particles";
 /** The holographic plane behind the point-cloud portrait in "Akshita". */
 export function Portrait() {
   const group = useRef<THREE.Group>(null);
+  const reveal = useRef(0);
   const material = useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -54,15 +55,16 @@ export function Portrait() {
     const g = group.current;
     if (!g) return;
     const i = chapterIndex.akshita;
-    const p = chapterProgress(i);
     const inChapter = world.t > i - 0.15 && world.t < SHATTER[1];
     g.visible = inChapter && !!material.uniforms.uTex.value;
+    // She resolves over a moment once you arrive, however you got here (scroll or a jump from the nav).
+    reveal.current = inChapter ? Math.min(1, reveal.current + dt / 1.4) : 0;
     if (!g.visible) return;
     const presence = smooth(i - 0.12, i + 0.05, world.t) * (1 - smooth(SHATTER[1] - 0.15, SHATTER[1], world.t));
     material.uniforms.uVoice.value = world.voice;
     material.uniforms.uShatter.value = smooth(SHATTER[0], SHATTER[1] - 0.12, world.t);
     material.uniforms.uOpacity.value = presence * 0.9;
-    material.uniforms.uReveal.value = smooth(0, 0.3, p) * 1.02;
+    material.uniforms.uReveal.value = reveal.current * 1.02;
     material.uniforms.uTime.value = performance.now() / 1000;
     const k = 1 - Math.exp(-dt * 3);
     const ptr = material.uniforms.uPointer.value as THREE.Vector2;

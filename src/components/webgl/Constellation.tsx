@@ -50,7 +50,7 @@ const EMPHASIS: Emphasis[] = [
 ];
 
 const TEXT_RIGHT = new Set([chapterIndex.collaborate, chapterIndex.build, chapterIndex.lead, chapterIndex.converge]);
-const TEXT_LEFT = new Set([chapterIndex.connect, chapterIndex.learn]);
+const TEXT_LEFT = new Set([chapterIndex.learn]);
 
 /** Screen regions where a chapter's text lives; node labels stay out of them. */
 function labelMask(chapter: number, w: number, h: number) {
@@ -60,7 +60,7 @@ function labelMask(chapter: number, w: number, h: number) {
     if (!tall && x > w - 150) return true;
     // Labels run ~150px to the right of their node, so the mask starts early.
     // Projects, achievements and latest posts: the page covers the frame.
-    if (chapter === chapterIndex.build || chapter === chapterIndex.converge || chapter === chapterIndex.lead) return true;
+    if (chapter === chapterIndex.collaborate || chapter === chapterIndex.build || chapter === chapterIndex.converge || chapter === chapterIndex.lead) return true;
     if (TEXT_RIGHT.has(chapter)) return tall ? y > h * 0.36 : x > w * 0.47 - 150;
     if (TEXT_LEFT.has(chapter)) return tall ? y < h * 0.42 : x < w * (chapter === chapterIndex.learn ? 0.42 : 0.36);
     return false;

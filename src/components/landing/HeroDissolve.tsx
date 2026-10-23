@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useTicker } from "@/lib/hooks";
 import { world } from "@/lib/world";
+import { drawLetters, drawText } from "./typeLayer";
 
 /** Grid spacing in CSS px for the photograph's grains, and for the denser grains of the type. */
 const IMAGE_STEP = 3;
@@ -33,19 +34,6 @@ type Grains = {
 
 const ICE = [150, 205, 255];
 const FIRE = [255, 168, 78];
-
-function drawText(ctx: CanvasRenderingContext2D, el: HTMLElement, text: string, fill: string | CanvasGradient, rect = el.getBoundingClientRect()) {
-  const cs = getComputedStyle(el);
-  ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-  ctx.letterSpacing = cs.letterSpacing === "normal" ? "0px" : cs.letterSpacing;
-  ctx.fillStyle = fill;
-  const m = ctx.measureText(text);
-  // Same baseline the browser uses for a one-line box: centre the font's ascent+descent in the line.
-  const lineH = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize);
-  const asc = m.fontBoundingBoxAscent, desc = m.fontBoundingBoxDescent;
-  const baseline = rect.top + (Math.min(rect.height, lineH) - (asc + desc)) / 2 + asc;
-  return { m, baseline };
-}
 
 /**
  * Snapshot of the hero exactly as it stands — the live smoke frame and every
@@ -78,25 +66,7 @@ function capture(host: HTMLElement, w: number, h: number, photo: HTMLImageElemen
   ctx.clearRect(0, 0, w, h);
   ctx.save();
   ctx.translate(-origin.left, -origin.top);
-  host.querySelectorAll<HTMLElement>(".ttl").forEach((el) => {
-    const r = el.getBoundingClientRect();
-    const line2 = el.classList.contains("ttl-line2");
-    const g = ctx.createLinearGradient(0, r.top, 0, r.bottom);
-    if (line2) {
-      g.addColorStop(0, "#fff7e6");
-      g.addColorStop(0.52, "#dfbe88");
-      g.addColorStop(1, "#c29653");
-    } else {
-      g.addColorStop(0, "#ffffff");
-      g.addColorStop(0.4, "#fff4e6");
-      g.addColorStop(1, "#e2b98a");
-    }
-    const ch = el.firstChild?.textContent ?? "";
-    const { baseline } = drawText(ctx, el, ch, g, r);
-    // Each letter is its own box and its tracking is space after the glyph, so the ink starts at the box's left edge.
-    ctx.letterSpacing = "0px";
-    ctx.fillText(ch, r.left, baseline);
-  });
+  drawLetters(ctx, host);
   for (const sel of [".hero-sub-descriptor", ".explore-link"]) {
     const el = host.querySelector<HTMLElement>(sel);
     if (!el || getComputedStyle(el.closest(".hero-explore-cta, .hero-sub-descriptor") ?? el).visibility === "hidden") continue;

@@ -45,6 +45,4 @@ export const sfx = {
   riser: (seconds: number) => audio.riser(seconds),
   impact: () => audio.impact(),
   resolve: () => audio.resolve(),
-  zap: (intensity?: number) => audio.zap(intensity),
-  thunder: () => audio.thunder(),
 };

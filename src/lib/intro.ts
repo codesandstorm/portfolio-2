@@ -4,7 +4,7 @@
  * and amounts from here so they never disagree.
  *
  *   void → smoke (fire and ice drift in) → portrait (she emerges)
- *        → strike (her name is struck into being) → title → settled
+ *        → strike (her name gathers out of grains) → title → settled
  */
 import { smooth } from "./world";
 

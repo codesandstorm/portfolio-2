@@ -2,7 +2,6 @@
  * Narrative copy. Each line is written from the dossier; the `source` fields
  * say where. Kept apart from data.ts so the graph stays purely factual.
  */
-import { people } from "./data";
 
 /**
  * Fire × Ice opening. Fire is the side of her that speaks and acts; ice the
@@ -16,25 +15,19 @@ export const landing = {
   tour: "or take the guided tour",
 } as const;
 
-/** Words in depth during the flight — each carries the fact behind it. */
-export const fragments = [
-  { word: "Ideas", note: "PrakritiOS · a digital identity for Nature" },
-  { word: "People", note: `${people.length} named across her posts` },
-  { word: "Technology", note: "PERN · MERN · TypeScript" },
-  { word: "Communication", note: "Anchor · a 36-hour hackathon" },
-  { word: "Curiosity", note: "Beginning research · SLC 2026" },
-  { word: "Leadership", note: "Vice Chair · SUAS ACM-W" },
-] as const;
-
-/** Identity facets — each only with evidence. */
-export const facets = [
-  { word: "Builder", proof: "An enterprise HRMS with 33 data models, live on Vercel + Render.", focus: "p-hrms" },
-  { word: "Connector", proof: "Nearly every post she writes ends by naming the people who helped.", focus: "s-networking" },
-  { word: "Communicator", proof: "On stage as anchor for a 36-hour hackathon. ‘Public Speaker’ closes her headline.", focus: "s-speaking" },
-  { word: "Leader", proof: "Membership Development Vice Chair, SUAS ACM-W. Represented SUAS at IEEE SLC 2026.", focus: "s-leadership" },
-  { word: "Teacher", proof: "Took cybersecurity, STEM and AI to rural schools with IEEE CS SUAS.", focus: "s-teaching" },
-  { word: "Learner", proof: "Lost at Green Tech. Came back with PrakritiOS and placed third.", focus: "p-prakriti" },
-] as const;
+/**
+ * About her, in prose. Every sentence is a fact from data.ts or her posts
+ * (LI-P8, P12, P13, P14, P16, P19, P20, P10) — qualities are shown through
+ * what she did, not claimed.
+ */
+export const about = {
+  line: "Full-stack developer · Public speaker · Indore",
+  paragraphs: [
+    "Akshita is a computer science (CSIT) student at Symbiosis University of Applied Sciences in Indore, and a full-stack developer who builds things people actually use. A year before her internship at IIT Indore she was the quiet student in class, still learning JavaScript. She built projects, applied every day and took the rejections — then four internship offers arrived in fifteen days.",
+    "She works across the whole stack: React and TypeScript on the front end, Node.js, Express, PostgreSQL and MongoDB behind it, with Prisma, REST APIs and JWT auth in between — and she ships. Her enterprise HRMS, with 33 data models, runs live on Vercel and Render. At IIT Indore she built the role-based dashboards of an AI platform for breast cancer detection, validated with a radiation oncologist at AIIMS Bhopal; digital healthcare is where she wants to go next.",
+    "She is as at home on a stage as in an editor. She anchored a 36-hour hackathon, coordinated the first ISRO exhibition in Madhya Pradesh, served as Membership Development Vice Chair of SUAS ACM-W and taught cybersecurity, STEM and AI in rural schools with IEEE. She credits the people she works with, by name, and she does not quit: PrakritiOS lost its first hackathon, came back refined, and placed third.",
+  ],
+} as const;
 
 export const finale = {
   thesis: "Two forces became one person. One person became a network.",

@@ -12,7 +12,7 @@ import { useUI } from "@/lib/store";
 import { smooth, world } from "@/lib/world";
 import { useFlow } from "../chapters/Chapter";
 import { AvatarPlayer } from "./AvatarPlayer";
-import { ElectricTitle } from "./ElectricTitle";
+import { HeroTitle } from "./HeroTitle";
 import { HeroDissolve, PHOTO_HANDOVER } from "./HeroDissolve";
 import HeroParticles from "./HeroParticles";
 import SmokeCanvas from "./SmokeCanvas";
@@ -30,8 +30,8 @@ function readSeen() {
 }
 
 /**
- * 00 — The landing. Her photograph breathes under live smoke, a bolt out of the
- * sky strikes her name into being, and as you scroll the whole frame dissolves
+ * 00 — The landing. Her photograph breathes under live smoke, her name gathers
+ * out of the smoke grain by grain, and as you scroll the whole frame dissolves
  * into the night the rest of the site lives in. This component owns the
  * timeline (`world.intro`) that the title, sound and navigation all read.
  */
@@ -143,7 +143,7 @@ export function CinematicLanding() {
           </div>
           {ready && <HeroParticles reducedMotion={flow} />}
 
-          <ElectricTitle flow={flow}>
+          <HeroTitle flow={flow}>
             <p ref={sub} className="hero-sub-descriptor" style={hidden}>
               {landing.roles.map((r, k) => (
                 <span key={r}>
@@ -167,7 +167,7 @@ export function CinematicLanding() {
                 <span className="explore-arrow" aria-hidden="true">→</span>
               </button>
             </div>
-          </ElectricTitle>
+          </HeroTitle>
 
           <div className="hero-floor" aria-hidden />
         </div>

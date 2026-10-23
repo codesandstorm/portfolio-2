@@ -31,7 +31,7 @@ export const tour: TourStop[] = [
   },
   {
     id: "05-collaborate",
-    from: ["collaborate", 0.6],
+    from: ["collaborate", 0],
     to: ["collaborate", 1],
     text: "At i-SOFTZONE she built and deployed an HRMS on the PERN stack. At IIT Indore she worked on an AI platform for breast cancer detection, validated with a radiation oncologist at AIIMS Bhopal. What she took away: trust my ideas, take ownership, ask better questions.",
     say: "At i SOFTZONE she built and deployed an H R M S on the PERN stack. At I I T Indore she worked on an A I platform for breast cancer detection, validated with a radiation oncologist at AIIMS Bhopal. What she took away: trust my ideas, take ownership, ask better questions.",
@@ -70,12 +70,6 @@ export const tour: TourStop[] = [
     text: "She builds in public. Her newest LinkedIn posts appear here as she shares them — what she is building, winning and learning. Her sign-off: connect, collaborate, learn, lead.",
   },
   {
-    id: "04-connect",
-    from: ["connect", 0],
-    to: ["connect", 1],
-    text: "Nearly every post she writes ends by naming the people who helped her — mentors, co-interns, teammates, organisers. Twenty-two of them hold this network together.",
-  },
-  {
     id: "11-continue",
     from: ["continue", 0.1],
     to: ["continue", 0.6],
@@ -96,7 +90,7 @@ export const recruiterTour: TourStop[] = [
   },
   {
     id: "r2-work",
-    from: ["collaborate", 0.6],
+    from: ["collaborate", 0],
     to: ["collaborate", 1],
     text: "She has interned twice as a full-stack engineer — at i-SOFTZONE, where she built and deployed an HRMS, and at IIT Indore, on an AI platform for breast cancer detection.",
     say: "She has interned twice as a full-stack engineer — at i SOFTZONE, where she built and deployed an H R M S, and at I I T Indore, on an A I platform for breast cancer detection.",

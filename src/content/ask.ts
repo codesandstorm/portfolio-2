@@ -179,7 +179,7 @@ export function answer(question: string): Answer {
     );
 
   if (has(q, "people", "mentor", "mentors", "team", "teammates", "colleagues", "who did she work with"))
-    return say(`She has credited ${people.length} people by name across her posts — ${summarizePeople(people.map((p) => p.id))}. Out of respect for them, this site shows their roles, not their names.`, { chapter: "connect" });
+    return say(`She has credited ${people.length} people by name across her posts — ${summarizePeople(people.map((p) => p.id))}. Out of respect for them, this site shows their roles, not their names.`, { chapter: "collaborate" });
 
   if (has(q, "where", "location", "based", "city", "live", "lives"))
     return say(`She's based in ${profile.location}.`, { chapter: "akshita" });

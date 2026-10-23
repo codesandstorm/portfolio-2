@@ -45,7 +45,6 @@ export function NodeLabels() {
   const ids = useMemo(() => {
     const set = new Set<string>();
     // People stay unnamed points of light; only the places and things they share with her are labelled.
-    if (chapter === chapterIndex.connect) [...byKind("experience"), ...byKind("project")].forEach((id) => set.add(id));
     if (chapter === chapterIndex.learn) byKind("skill").forEach((id) => set.add(id));
     const around = (id: string | null, limit: number) => {
       if (!id) return;
@@ -61,7 +60,7 @@ export function NodeLabels() {
   }, [chapter, hovered, selected, scrollFocus]);
 
   // Not over her portrait, the full-width pages (projects, achievements), or the finale.
-  if (chapter <= chapterIndex.akshita || chapter === chapterIndex.build || chapter === chapterIndex.converge || chapter === chapterIndex.lead || chapter === chapterIndex.continue) return null;
+  if (chapter <= chapterIndex.akshita || chapter === chapterIndex.collaborate || chapter === chapterIndex.build || chapter === chapterIndex.converge || chapter === chapterIndex.lead || chapter === chapterIndex.continue) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden" role="group" aria-label="Nodes in view">

@@ -277,61 +277,6 @@ class AudioEngine {
     });
   }
 
-  /** One electric strike: a crackle of high noise over a short mains-like buzz. */
-  zap(intensity = 1) {
-    if (!this.ok()) return;
-    const ctx = this.ctx!;
-    const t = ctx.currentTime;
-    const n = ctx.createBufferSource();
-    n.buffer = this.noiseBuffer(0.12);
-    const bp = ctx.createBiquadFilter();
-    bp.type = "bandpass";
-    bp.frequency.value = 3200 + Math.random() * 2400;
-    bp.Q.value = 0.8;
-    const ng = ctx.createGain();
-    this.env(ng, t, 0.09 * intensity, 0.002, 0.09);
-    n.connect(bp).connect(ng).connect(this.fxBus!);
-    n.start(t);
-    const o = ctx.createOscillator();
-    o.type = "sawtooth";
-    o.frequency.setValueAtTime(110 + Math.random() * 40, t);
-    const lp = ctx.createBiquadFilter();
-    lp.type = "lowpass";
-    lp.frequency.value = 900;
-    const og = ctx.createGain();
-    this.env(og, t, 0.035 * intensity, 0.003, 0.12);
-    o.connect(lp).connect(og).connect(this.fxBus!);
-    o.start(t);
-    o.stop(t + 0.16);
-  }
-
-  /** The title's full strike: a crack and a long, low roll — restrained, not a trailer boom. */
-  thunder() {
-    if (!this.ok()) return;
-    const ctx = this.ctx!;
-    const t = ctx.currentTime;
-    this.zap(1.8);
-    const n = ctx.createBufferSource();
-    n.buffer = this.noiseBuffer(2.4);
-    const lp = ctx.createBiquadFilter();
-    lp.type = "lowpass";
-    lp.frequency.setValueAtTime(900, t);
-    lp.frequency.exponentialRampToValueAtTime(90, t + 2);
-    const g = ctx.createGain();
-    this.env(g, t + 0.02, 0.22, 0.04, 2.1);
-    n.connect(lp).connect(g).connect(this.fxBus!);
-    n.start(t);
-    const o = ctx.createOscillator();
-    o.type = "sine";
-    o.frequency.setValueAtTime(58, t);
-    o.frequency.exponentialRampToValueAtTime(36, t + 1.8);
-    const og = ctx.createGain();
-    this.env(og, t, 0.2, 0.01, 1.9);
-    o.connect(og).connect(this.fxBus!);
-    o.start(t);
-    o.stop(t + 2.1);
-  }
-
   /** A low swell between chapters, or a convergence event when `bright`. */
   swell(bright = false) {
     if (!this.ok()) return;
