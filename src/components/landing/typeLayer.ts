@@ -4,12 +4,12 @@
  * dissolving. Colours match the CSS in landing.css.
  */
 
-/** AKSHITA: warm gold into orange (landing.css .ttl). */
+/** AKSHITA: a flame — white-hot at the top, light orange through the body (landing.css .ttl). */
 export const NAME_STOPS: [number, string][] = [
-  [0, "#fff1d6"],
-  [0.38, "#f7c983"],
-  [0.72, "#ec9a4c"],
-  [1, "#cf7433"],
+  [0, "#fff4df"],
+  [0.3, "#ffd59e"],
+  [0.65, "#ffb067"],
+  [1, "#ff9445"],
 ];
 /** MAHAJAN: champagne gold (landing.css .ttl-line2). */
 export const SURNAME_STOPS: [number, string][] = [

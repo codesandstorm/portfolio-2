@@ -41,11 +41,3 @@ export function indoreSky(): RGB {
   }
   return KEYS[0][1];
 }
-
-/** "It's 11:42 pm in Indore — night." */
-export function indoreLine(): string {
-  const h = indoreHour();
-  const time = new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit", hour12: true }).format(new Date());
-  const part = h < 5 || h >= 20.5 ? "night" : h < 9 ? "morning" : h < 16.5 ? "day" : "evening";
-  return `It's ${time.toLowerCase()} in Indore — ${part} where she is.`;
-}

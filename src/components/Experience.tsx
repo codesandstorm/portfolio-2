@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { useAmbientSound } from "@/audio/useSound";
 import { useLive, type LivePost } from "@/content/live";
 import { detectTier } from "@/lib/capability";
 import { chapterIndex } from "@/lib/chapters";
@@ -30,7 +31,7 @@ import { TopBar } from "./ui/TopBar";
 const WorldCanvas = dynamic(() => import("./webgl/WorldCanvas"), { ssr: false });
 
 const STEPPED = new Set([chapterIndex.collaborate, chapterIndex.build, chapterIndex.lead, chapterIndex.converge]);
-const ORBIT = new Set([chapterIndex.learn]);
+const ORBIT = new Set<number>();
 
 /** Pointer → world: parallax everywhere, drag-to-turn in the open network chapters. */
 function usePointer() {
@@ -90,6 +91,7 @@ export function Experience({ posts }: { posts: LivePost[] }) {
   }, [chapter, setScrollFocus]);
 
   usePointer();
+  useAmbientSound();
 
   const cinematic = tier !== null && tier !== "static";
 

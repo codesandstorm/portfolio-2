@@ -30,7 +30,7 @@ class AudioEngine {
     this.ambientBus.connect(this.master);
 
     this.fxBus = ctx.createGain();
-    this.fxBus.gain.value = 0.5;
+    this.fxBus.gain.value = 0.4;
     // A soft echo gives the shimmers a sense of space.
     this.delay = ctx.createDelay(1);
     this.delay.delayTime.value = 0.32;
@@ -45,34 +45,49 @@ class AudioEngine {
     return ctx;
   }
 
+  /**
+   * The bed under the whole site: a deep sub, a slow-breathing open fifth that
+   * drifts in and out of a dark filter, and a faint wind of high noise — the
+   * hum of space, quiet enough to forget it is there.
+   */
   private startAmbient() {
     const ctx = this.ctx!;
     const filter = ctx.createBiquadFilter();
     filter.type = "lowpass";
-    filter.frequency.value = 420;
-    filter.Q.value = 0.7;
+    filter.frequency.value = 360;
+    filter.Q.value = 0.9;
     filter.connect(this.ambientBus!);
+    // Some of the pad goes through the echo too, so it blooms rather than sits.
+    const send = ctx.createGain();
+    send.gain.value = 0.25;
+    filter.connect(send).connect(this.delay!);
 
-    const lfo = ctx.createOscillator();
-    lfo.frequency.value = 0.05;
-    const lfoGain = ctx.createGain();
-    lfoGain.gain.value = 160;
-    lfo.connect(lfoGain).connect(filter.frequency);
-    lfo.start();
+    const lfo = (hz: number, depth: number, target: AudioParam) => {
+      const o = ctx.createOscillator();
+      o.frequency.value = hz;
+      const g = ctx.createGain();
+      g.gain.value = depth;
+      o.connect(g).connect(target);
+      o.start();
+      return o;
+    };
+    const sweep = lfo(0.03, 140, filter.frequency);
 
-    const drone = (hz: number, gain: number, type: OscillatorType) => {
+    // Each voice breathes on its own slow cycle, so the chord never quite repeats.
+    const voice = (hz: number, gain: number, breathHz: number, type: OscillatorType = "sine", detune = 0) => {
       const o = ctx.createOscillator();
       o.type = type;
       o.frequency.value = hz;
+      o.detune.value = detune;
       const g = ctx.createGain();
       g.gain.value = gain;
       o.connect(g).connect(filter);
       o.start();
-      return o;
+      return [o, lfo(breathHz, gain * 0.6, g.gain)];
     };
 
-    // Air: looped, band-passed noise.
-    const len = ctx.sampleRate * 3;
+    // Solar wind: looped noise, band-passed high and kept very low.
+    const len = ctx.sampleRate * 4;
     const buf = ctx.createBuffer(1, len, ctx.sampleRate);
     const data = buf.getChannelData(0);
     for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
@@ -81,14 +96,21 @@ class AudioEngine {
     noise.loop = true;
     const band = ctx.createBiquadFilter();
     band.type = "bandpass";
-    band.frequency.value = 900;
-    band.Q.value = 0.6;
+    band.frequency.value = 1400;
+    band.Q.value = 0.5;
     const ng = ctx.createGain();
-    ng.gain.value = 0.025;
+    ng.gain.value = 0.012;
     noise.connect(band).connect(ng).connect(this.ambientBus!);
     noise.start();
+    const gust = lfo(0.017, 600, band.frequency);
 
-    this.ambientNodes = [lfo, drone(55, 0.18, "sine"), drone(82.6, 0.1, "sine"), drone(110.4, 0.05, "triangle"), noise];
+    this.ambientNodes = [
+      sweep, gust, noise,
+      ...voice(41.2, 0.2, 0.021), // E1: the floor
+      ...voice(82.4, 0.08, 0.034, "sine", -4), // E2
+      ...voice(123.5, 0.05, 0.027, "triangle", 5), // B2: the open fifth
+      ...voice(164.8, 0.025, 0.041, "sine", 3), // E3: a little air
+    ];
   }
 
   async setEnabled(on: boolean) {
@@ -98,17 +120,19 @@ class AudioEngine {
       if (ctx.state === "suspended") await ctx.resume();
       if (!this.ambientNodes.length) this.startAmbient();
       this.master!.gain.cancelScheduledValues(ctx.currentTime);
-      this.master!.gain.setTargetAtTime(0.55, ctx.currentTime, 0.8);
+      // A slow fade in; the level stays low enough to sit under anything.
+      this.master!.gain.setTargetAtTime(0.32, ctx.currentTime, 2.5);
     } else if (this.ctx && this.master) {
       this.master.gain.cancelScheduledValues(this.ctx.currentTime);
       this.master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.25);
     }
   }
 
-  setVolumes(ambient: number, effects: number) {
-    if (!this.ctx) return;
-    this.ambientBus?.gain.setTargetAtTime(ambient, this.ctx.currentTime, 0.2);
-    this.fxBus?.gain.setTargetAtTime(effects, this.ctx.currentTime, 0.2);
+  /** Rest while the tab is hidden; pick up where it left off. */
+  async setSuspended(hidden: boolean) {
+    if (!this.ctx || !this.enabled) return;
+    if (hidden && this.ctx.state === "running") await this.ctx.suspend();
+    else if (!hidden && this.ctx.state === "suspended") await this.ctx.resume();
   }
 
   private ok() {

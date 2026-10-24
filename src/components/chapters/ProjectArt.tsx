@@ -1,6 +1,4 @@
 import type { Project } from "@/content/types";
-import { getSkillsForProject } from "@/content/graph";
-import { BrandLogo, SkillLogo, stackBrands } from "../ui/TechLogo";
 
 const W = 320, H = 150;
 
@@ -104,12 +102,10 @@ function Form({ p, color }: { p: Project; color: string }) {
   }
 }
 
-/** The picture at the top of a project card: its form in light, and the logos of what it is built with. */
+/** The picture at the top of a project card: its form in light. */
 export function ProjectArt({ p }: { p: Project }) {
   const warm = p.status === "live" || p.status === "internship";
   const color = warm ? "#ffb27a" : "#9fd0ff";
-  const brands = stackBrands(p.stack).slice(0, 6);
-  const skills = brands.length ? [] : getSkillsForProject(p.id).slice(0, 5);
   return (
     <div
       aria-hidden
@@ -119,10 +115,6 @@ export function ProjectArt({ p }: { p: Project }) {
       <svg viewBox={`0 0 ${W} ${H}`} className="relative block h-auto w-full transition-[filter] duration-500 [filter:drop-shadow(0_0_4px_rgba(255,170,90,0.35))] group-hover:[filter:drop-shadow(0_0_8px_rgba(255,170,90,0.7))]">
         <Form p={p} color={color} />
       </svg>
-      <span className="absolute bottom-2.5 left-3 flex items-center gap-2 rounded-full bg-[#050608]/70 px-2.5 py-1.5 backdrop-blur-sm">
-        {brands.map((b) => <BrandLogo key={b.slug} icon={b} size={14} />)}
-        {skills.map((s) => <SkillLogo key={s.id} id={s.id} size={14} />)}
-      </span>
     </div>
   );
 }

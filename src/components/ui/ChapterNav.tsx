@@ -45,7 +45,8 @@ export function ChapterNav() {
               />
               <span
                 className={`mono pointer-events-none absolute right-6 whitespace-nowrap transition-all duration-500 ${
-                  i === chapter ? "translate-x-0 text-ivory opacity-100" : "translate-x-2 text-mist opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:opacity-100"
+                  // Labels only on hover or focus, so the rail never sits on top of a section's content.
+                  i === chapter ? "translate-x-2 text-ivory opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:opacity-100" : "translate-x-2 text-mist opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:opacity-100"
                 }`}
               >
                 <span className="text-gold">{c.n}</span> {c.title}

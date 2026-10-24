@@ -4,7 +4,7 @@
  */
 import { chapterIndex } from "@/lib/chapters";
 import { introAmounts } from "@/lib/intro";
-import { STICKY, smooth, world } from "@/lib/world";
+import { STICKY, world } from "@/lib/world";
 import { achievementOrder, centroid, experienceOrder, projectOrder, type Vec3 } from "./layout";
 
 export type Shot = { pos: Vec3; look: Vec3; fov: number; orbit?: boolean };
@@ -47,10 +47,8 @@ export function shotAt(t: number, aspect: number): Shot {
     case chapterIndex.converge:
       // Where her paths met, all at once.
       return { pos: add(achievementsCentre, [2 - p * 4, 4, portrait ? 30 : 24]), look: achievementsCentre, fov };
-    default: {
-      // Pull back until everything visited is in frame at once.
-      const e = smooth(0, 0.7, p);
-      return { pos: [0, 4 + e * 6, 24 + e * (portrait ? 40 : 24)], look: [0, 0.5, 0], fov };
-    }
+    default:
+      // Pulled all the way back, so her name and the whole network sit inside the frame the moment you arrive.
+      return { pos: [0, 10, portrait ? 64 : 48], look: [0, 0.5, 0], fov };
   }
 }

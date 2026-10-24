@@ -25,6 +25,19 @@ export function AkshitaChapter() {
             ))}
           </div>
 
+          <table className="mt-6 w-full border-collapse overflow-hidden rounded-xl text-left text-[13.5px]">
+            <caption className="sr-only">Facts about Akshita</caption>
+            <tbody>
+              {about.facts.map(([k, v, when], i) => (
+                <tr key={i} className={k || i === 0 ? "border-t border-hair" : ""}>
+                  <th scope="row" className="title-face w-[6.5rem] py-2 pr-4 align-top text-[0.62rem] font-medium uppercase tracking-[0.2em] text-[#e58237]">{k}</th>
+                  <td className="py-2 pr-3 align-top leading-snug text-ivory/85">{v}</td>
+                  <td className="mono whitespace-nowrap py-2 text-right align-top text-faint">{when}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
           <div className="mt-7 flex flex-wrap items-center gap-x-7 gap-y-3">
             <button type="button" onClick={() => scrollToChapter("build")} className="thread-link mono text-gold" data-cursor="link">
               See what she has built <span aria-hidden>→</span>

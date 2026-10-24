@@ -9,7 +9,7 @@ import type { Project } from "@/content/types";
 import { sfx } from "@/audio/useSound";
 import { useUI } from "@/lib/store";
 import { ProjectDemo } from "../demos/ProjectDemo";
-import { BrandLogo, SkillLogo, stackBrands } from "../ui/TechLogo";
+import { BrandLogo, SkillLogo, StackLogos, stackBrands } from "../ui/TechLogo";
 import { ProjectArt } from "./ProjectArt";
 import { Chapter, Kicker } from "./Chapter";
 
@@ -163,7 +163,9 @@ function Card({ p, onOpen }: { p: Project; onOpen: () => void }) {
       </span>
       <span className="display mt-5 block text-[1.85rem] leading-[1.02] text-ivory transition-colors duration-300 group-hover:text-[#ecd6b8]">{p.name}</span>
       <span className="mt-3 block text-sm leading-relaxed text-mist">{p.tagline}</span>
-      <span className="mono mt-auto block pt-6 leading-relaxed text-ivory/50">{p.stack.slice(0, 4).join(" · ")}</span>
+      <span className="mt-auto block pt-6">
+        <StackLogos stack={p.stack} skills={getSkillsForProject(p.id)} />
+      </span>
       <span className="mono mt-4 inline-flex items-center gap-2 text-[#dfbe88]">
         View project <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
       </span>

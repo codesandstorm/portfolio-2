@@ -87,3 +87,23 @@ export function stackBrands(stack: string[]) {
 export function BrandLogo({ icon, size = 16 }: { icon: SimpleIcon; size?: number }) {
   return <Brand icon={icon} size={size} />;
 }
+
+/**
+ * What a project is built with, as a row of logos: the named technologies in
+ * its stack, or — for hackathon builds without a named stack — the skills it used.
+ */
+export function StackLogos({ stack, skills, size = 18 }: { stack: string[]; skills: { id: string; name: string }[]; size?: number }) {
+  const brands = stackBrands(stack).slice(0, 8);
+  const items = brands.length
+    ? brands.map((b) => ({ key: b.slug, name: b.title, node: <Brand icon={b} size={size} /> }))
+    : skills.filter((s) => s.id in BY_SKILL).slice(0, 6).map((s) => ({ key: s.id, name: s.name, node: <SkillLogo id={s.id} size={size} /> }));
+  return (
+    <ul className="flex flex-wrap items-center gap-2" aria-label="Built with">
+      {items.map((it) => (
+        <li key={it.key} title={it.name} className="flex h-8 w-8 items-center justify-center rounded-lg border border-hair bg-[#0b0c10] transition-colors group-hover:border-[#dfbe88]/30">
+          {it.node}
+        </li>
+      ))}
+    </ul>
+  );
+}

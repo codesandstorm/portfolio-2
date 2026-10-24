@@ -2,39 +2,10 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect } from "react";
-import { useSound } from "@/audio/useSound";
 import { chapters } from "@/lib/chapters";
 import { scrollToChapter } from "@/lib/scroll";
 import { useUI } from "@/lib/store";
 import { useTour } from "@/lib/tour";
-
-function SoundToggle() {
-  const enabled = useSound((s) => s.enabled);
-  const toggle = useSound((s) => s.toggle);
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      aria-pressed={enabled}
-      aria-label={enabled ? "Turn sound off" : "Turn sound on"}
-      className="group flex h-9 items-center gap-2.5 px-1 text-mist transition-colors hover:text-ivory"
-      data-cursor="link"
-    >
-      <span className="flex h-3 items-end gap-[2px]" aria-hidden>
-        {[0.45, 1, 0.7, 0.85].map((h, i) => (
-          <motion.span
-            key={i}
-            className="w-px bg-gold"
-            animate={enabled ? { scaleY: [h * 0.4, h, h * 0.55] } : { scaleY: 0.18 }}
-            transition={enabled ? { duration: 1.1 + i * 0.2, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" } : { duration: 0.4 }}
-            style={{ height: 12, originY: 1 }}
-          />
-        ))}
-      </span>
-      <span className="mono hidden sm:inline">{enabled ? "Sound on" : "Sound off"}</span>
-    </button>
-  );
-}
 
 /** The sections a visitor looks for, in the order they come; every chapter is also in the Index (M). */
 const NAV = [
@@ -138,7 +109,6 @@ export function TopBar() {
               <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_8px_#ffb347]" aria-hidden />
               Ask
             </button>
-            <SoundToggle />
             <button
               type="button"
               onClick={() => setIndexOpen(!indexOpen)}

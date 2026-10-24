@@ -1,40 +1,30 @@
 "use client";
 
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { useEffect } from "react";
 import { audio } from "@/lib/audio/engine";
 
-type SoundState = {
-  enabled: boolean;
-  ambientVolume: number;
-  effectsVolume: number;
-  /** Narration is text-only captions until authentic audio is supplied. */
-  narrationEnabled: boolean;
-  toggle: () => void;
-  setEnabled: (v: boolean) => void;
-};
+const GESTURES = ["pointerdown", "keydown", "touchend"] as const;
 
-export const useSound = create<SoundState>()(
-  persist(
-    (set, get) => ({
-      enabled: false,
-      ambientVolume: 0.5,
-      effectsVolume: 0.5,
-      narrationEnabled: false,
-      toggle: () => get().setEnabled(!get().enabled),
-      setEnabled: (enabled) => {
-        set({ enabled });
-        void audio.setEnabled(enabled);
-        audio.setVolumes(get().ambientVolume, get().effectsVolume);
-      },
-    }),
-    {
-      name: "sutra-sound",
-      // Sound always starts off; only the mix is remembered.
-      partialize: (s) => ({ ambientVolume: s.ambientVolume, effectsVolume: s.effectsVolume }),
-    },
-  ),
-);
+/**
+ * Sound is always on: a quiet bed of space ambience under the whole site.
+ * Browsers only allow audio after the visitor's first click, tap or key, so it
+ * begins then; it rests while the tab is hidden.
+ */
+export function useAmbientSound() {
+  useEffect(() => {
+    const start = () => {
+      void audio.setEnabled(true);
+      GESTURES.forEach((g) => window.removeEventListener(g, start));
+    };
+    GESTURES.forEach((g) => window.addEventListener(g, start, { passive: true }));
+    const onVisibility = () => void audio.setSuspended(document.hidden);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      GESTURES.forEach((g) => window.removeEventListener(g, start));
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
+}
 
 export const sfx = {
   shimmer: (step?: number) => audio.shimmer(step),

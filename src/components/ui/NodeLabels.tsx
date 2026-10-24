@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { getNeighbors, getNode, nodes, CORE_ID } from "@/content/graph";
+import { getNeighbors, getNode, CORE_ID } from "@/content/graph";
 import type { NodeKind } from "@/content/types";
 import { sfx } from "@/audio/useSound";
 import { chapterIndex } from "@/lib/chapters";
@@ -27,8 +27,6 @@ const KIND_NAME: Record<NodeKind, string> = {
   achievement: "Achievement",
 };
 
-const byKind = (k: NodeKind) => nodes.filter((n) => n.kind === k).map((n) => n.id);
-
 /**
  * Every node with a visible name is a real button laid over the 3D world.
  * The constellation's projector moves them each frame.
@@ -45,7 +43,6 @@ export function NodeLabels() {
   const ids = useMemo(() => {
     const set = new Set<string>();
     // People stay unnamed points of light; only the places and things they share with her are labelled.
-    if (chapter === chapterIndex.learn) byKind("skill").forEach((id) => set.add(id));
     const around = (id: string | null, limit: number) => {
       if (!id) return;
       set.add(id);
@@ -60,7 +57,7 @@ export function NodeLabels() {
   }, [chapter, hovered, selected, scrollFocus]);
 
   // Not over her portrait, the full-width pages (projects, achievements), or the finale.
-  if (chapter <= chapterIndex.akshita || chapter === chapterIndex.collaborate || chapter === chapterIndex.build || chapter === chapterIndex.converge || chapter === chapterIndex.lead || chapter === chapterIndex.continue) return null;
+  if (chapter <= chapterIndex.akshita || chapter === chapterIndex.collaborate || chapter === chapterIndex.build || chapter === chapterIndex.learn || chapter === chapterIndex.converge || chapter === chapterIndex.lead || chapter === chapterIndex.continue) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden" role="group" aria-label="Nodes in view">

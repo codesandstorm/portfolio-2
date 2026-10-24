@@ -146,3 +146,6 @@ html[data-cursor="on"], html[data-cursor="on"] * { cursor: none !important; }
 
 /* Film-title capitals (Trajan-style): her name, section titles, navigation. */
 .title-face { font-family: var(--font-cinzel), "Trajan Pro", serif; font-weight: 500; }
+
+/* Latest: the far particle layer drifts very slowly. */
+@keyframes latest-drift { to { background-position: 46px -92px; } }

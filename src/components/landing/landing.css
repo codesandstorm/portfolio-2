@@ -133,7 +133,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   /* Same stops as typeLayer.ts NAME_STOPS, so the grains settle into exactly this colour. */
-  background-image: linear-gradient(180deg, #fff1d6 0%, #f7c983 38%, #ec9a4c 72%, #cf7433 100%);
+  background-image: linear-gradient(180deg, #fff4df 0%, #ffd59e 30%, #ffb067 65%, #ff9445 100%);
   opacity: 0;
   transition: opacity 0.9s ease;
 }
