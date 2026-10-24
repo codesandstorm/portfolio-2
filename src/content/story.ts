@@ -23,18 +23,15 @@ export const landing = {
 export const about = {
   line: "Full-stack developer · Public speaker · Indore",
   paragraphs: [
-    "Akshita is a computer science (CSIT) student at Symbiosis University of Applied Sciences in Indore, and a full-stack developer who builds things people actually use. A year before her internship at IIT Indore she was the quiet student in class, still learning JavaScript. She built projects, applied every day and took the rejections — then four internship offers arrived in fifteen days.",
-    "She works across the whole stack: React and TypeScript on the front end, Node.js, Express, PostgreSQL and MongoDB behind it, with Prisma, REST APIs and JWT auth in between — and she ships. Her enterprise HRMS, with 33 data models, runs live on Vercel and Render. At IIT Indore she built the role-based dashboards of an AI platform for breast cancer detection, validated with a radiation oncologist at AIIMS Bhopal; digital healthcare is where she wants to go next.",
+    "A CSIT student at Symbiosis University of Applied Sciences and a full-stack developer who builds things people use. A year before IIT Indore she was still learning JavaScript — then four internship offers arrived in fifteen days.",
+    "She works across the stack — React and TypeScript, Node.js, Express, PostgreSQL and MongoDB — and ships: her enterprise HRMS runs live with 33 data models. At IIT Indore she built the dashboards of an AI platform for breast cancer detection; digital healthcare is where she is headed.",
   ],
-  /** The plain facts, as a table under the prose. */
+  /** The plain facts, as four cards under the prose. */
   facts: [
-    ["Studies", "B.Tech Computer Science (CSIT) · Symbiosis University of Applied Sciences, Indore", "Currently studying · 2025 – 2029"],
-    ["Was", "Full Stack Engineer intern · IIT Indore (IITI DRISHTI CPS Foundation)", "Jul – Aug 2026"],
-    ["", "Full Stack Engineer intern · i-SOFTZONE, Indore", "Jun – Jul 2026"],
-    ["Belongs to", "IEEE · IEEE Women in Engineering · SUAS ACM-W", "Since 2025"],
-    ["School", "Marthoma Higher Secondary School · Class XII, PCM — 92%", "Apr 2022"],
-    ["Based in", "Indore, Madhya Pradesh", ""],
-    ["Open to", "Full Stack Engineer roles · digital healthcare", ""],
+    { label: "Studying", title: "B.Tech Computer Science (CSIT)", detail: "Symbiosis University of Applied Sciences, Indore · 2025 – 2029" },
+    { label: "Interned at", title: "IIT Indore · i-SOFTZONE", detail: "Full Stack Engineer intern · Jun – Aug 2026" },
+    { label: "Communities", title: "IEEE · IEEE WIE · SUAS ACM-W", detail: "Member and Membership Development Vice Chair" },
+    { label: "Open to", title: "Full Stack Engineer roles", detail: "With an interest in digital healthcare" },
   ],
 } as const;
 
