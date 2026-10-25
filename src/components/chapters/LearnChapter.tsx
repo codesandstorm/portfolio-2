@@ -61,31 +61,6 @@ function Stage({ n, title, note, items, tone }: { n: string; title: string; note
   );
 }
 
-/** The right-hand curve: learned → applied → proven, each node lit by how much evidence it has. */
-function Journey({ counts }: { counts: [number, number, number] }) {
-  const pts = [[30, 150], [170, 95], [120, 30]] as const;
-  const labels = ["Learned", "Applied", "Proven"];
-  return (
-    <svg viewBox="0 0 220 180" className="h-auto w-full" aria-hidden>
-      <defs>
-        <linearGradient id="journey-g" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0" stopColor="#8fc3f5" />
-          <stop offset="0.5" stopColor="#ffb27a" />
-          <stop offset="1" stopColor="#b9a7ff" />
-        </linearGradient>
-      </defs>
-      <path d="M 10 170 C 40 160, 20 150, 30 150 S 140 140, 170 95 S 100 50, 120 30 S 200 10, 210 6" fill="none" stroke="url(#journey-g)" strokeWidth="2" style={{ filter: "drop-shadow(0 0 5px rgba(255,170,90,0.8))" }} />
-      {pts.map(([x, y], i) => (
-        <g key={i}>
-          <circle cx={x} cy={y} r={counts[i] ? 7 : 4} fill="#140c06" stroke={["#8fc3f5", "#ffb27a", "#b9a7ff"][i]} strokeWidth="2" opacity={counts[i] ? 1 : 0.4} />
-          <text x={x + 12} y={y + 4} fill="#f4ecdf" fontSize="11">{labels[i]}</text>
-          <text x={x + 12} y={y + 17} fill="rgba(244,236,223,0.5)" fontSize="9">{counts[i]} on record</text>
-        </g>
-      ))}
-    </svg>
-  );
-}
-
 /** 04 — Skills. Every skill has a story: where she learned it, where she applied it, and what it led to. */
 export function LearnChapter() {
   const select = useUI((s) => s.select);
@@ -236,11 +211,7 @@ export function LearnChapter() {
           </article>
 
           {/* Journey and related skills */}
-          <aside aria-label="Skill journey" className="space-y-5 lg:col-span-2 xl:col-span-1">
-            <section className="rounded-2xl border border-hair bg-[#07080a]/85 p-5">
-              <h4 className="title-face text-[0.72rem] uppercase tracking-[0.24em] text-ivory/80">Skill journey</h4>
-              <Journey counts={[learned.length, applied.length, proven.length]} />
-            </section>
+          <aside aria-label="Related skills" className="space-y-5 lg:col-span-2 xl:col-span-1">
             <section className="rounded-2xl border border-hair bg-[#07080a]/85 p-5">
               <h4 className="title-face flex items-center gap-2 text-[0.72rem] uppercase tracking-[0.24em] text-[#ffb27a]">
                 <Sparkles aria-hidden className="h-4 w-4" /> Related skills

@@ -7,13 +7,14 @@ import { scrollToChapter } from "@/lib/scroll";
 import { useUI } from "@/lib/store";
 import { useTour } from "@/lib/tour";
 
-/** The sections a visitor looks for, in the order they come; every chapter is also in the Index (M). */
+/** Every section, in the order they come; on tablets and phones they live in the Menu (M). */
 const NAV = [
   { id: "akshita", label: "About" },
   { id: "collaborate", label: "Experience" },
   { id: "build", label: "Projects" },
   { id: "learn", label: "Skills" },
   { id: "converge", label: "Achievements" },
+  { id: "lead", label: "Latest" },
   { id: "continue", label: "Connect" },
 ] as const;
 
@@ -45,7 +46,7 @@ export function TopBar() {
     return () => window.removeEventListener("keydown", onKey);
   }, [setIndexOpen]);
 
-  const item = "title-face relative text-[0.7rem] font-medium uppercase tracking-[0.24em] transition-[color,text-shadow] duration-300 hover:text-white hover:[text-shadow:0_0_12px_rgba(255,255,255,0.4)]";
+  const item = "title-face relative text-[0.64rem] font-medium uppercase tracking-[0.14em] xl:text-[0.7rem] xl:tracking-[0.22em] transition-[color,text-shadow] duration-300 hover:text-white hover:[text-shadow:0_0_12px_rgba(255,255,255,0.4)]";
 
   return (
     <>
@@ -73,7 +74,7 @@ export function TopBar() {
             <Indicator on={here === "signal"} />
           </a>
           <nav aria-label="Primary" className="pointer-events-auto flex items-center gap-5 sm:gap-7">
-            <ul className="hidden items-center gap-[2.4rem] xl:flex">
+            <ul className="hidden items-center gap-[1.1rem] lg:flex xl:gap-[2rem]">
               {NAV.map((n) => (
                 <li key={n.id}>
                   <a
@@ -114,12 +115,11 @@ export function TopBar() {
               onClick={() => setIndexOpen(!indexOpen)}
               aria-expanded={indexOpen}
               aria-controls="chapter-index"
-              className="mono flex h-9 items-center gap-2 text-mist transition-colors hover:text-ivory"
+              className="mono flex h-9 items-center gap-2 text-mist transition-colors hover:text-ivory lg:hidden"
               data-cursor="link"
             >
               <span aria-hidden className="text-gold">{chapters[chapter]?.n}</span>
-              <span className="xl:hidden">Menu</span>
-              <span className="hidden xl:inline">Index</span>
+              Menu
             </button>
           </nav>
         </div>
