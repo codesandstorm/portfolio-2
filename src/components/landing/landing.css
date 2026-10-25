@@ -83,7 +83,8 @@
 
 .cinematic-experience .hero-title-wrapper {
   position: absolute;
-  top: 57.5vh;
+  /* Anchored to the bottom: the call to action always sits just above the edge, whatever the screen's height. */
+  bottom: 3.5vh;
   left: 50%;
   transform: translateX(-50%);
   width: 90vw;
@@ -108,7 +109,8 @@
   display: block;
   white-space: nowrap;
   /* Set heavy and large, as in the reference frame: white-hot capitals with a fire-lit edge. */
-  font-size: clamp(2.6rem, 8.4vw, 10rem);
+  /* By width or by height, whichever is tighter, so short laptop screens fit the whole stack. */
+  font-size: clamp(2.4rem, min(8.4vw, 14.5vh), 10rem);
   letter-spacing: 0.3em;
   margin-right: -0.3em;
   font-weight: 600;
@@ -119,7 +121,7 @@
   display: block;
   white-space: nowrap;
   margin-top: 0.38em;
-  font-size: clamp(1.15rem, 3.2vw, 3.7rem);
+  font-size: clamp(1.05rem, min(3.2vw, 5.5vh), 3.7rem);
   letter-spacing: 0.72em;
   margin-right: -0.72em;
   font-weight: 500;
@@ -222,7 +224,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: clamp(2.4rem, 8.6vh, 6.4rem) 0 0;
+  margin: clamp(1.4rem, 7vh, 6.4rem) 0 0;
   pointer-events: auto;
 }
 
@@ -271,7 +273,6 @@
 /* ── Responsive ────────────────────────────────────────────────────────── */
 @media (max-width: 992px) {
   .cinematic-experience .hero-title-wrapper {
-    top: 60vh;
     width: 94vw;
   }
 
@@ -283,10 +284,6 @@
 }
 
 @media (max-width: 640px) {
-  .cinematic-experience .hero-title-wrapper {
-    top: 60vh;
-  }
-
   .cinematic-experience .hero-first {
     font-size: clamp(1.9rem, 9.6vw, 3rem);
     letter-spacing: 0.2em;

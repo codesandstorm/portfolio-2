@@ -31,6 +31,7 @@ export default function OnePage() {
         </p>
         <p className="mt-1 text-[15px] text-mist print:text-neutral-700">Open to {profile.openTo}; interested in {profile.interest.toLowerCase()}.</p>
         <p className="mono mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[11px]">
+          <a href={`mailto:${profile.email}`} className="text-gold underline-offset-4 hover:underline print:text-neutral-900">{profile.email}</a>
           <a href={profile.links.linkedin} className="text-gold underline-offset-4 hover:underline print:text-neutral-900">LinkedIn ↗</a>
           <a href={profile.links.github} className="text-gold underline-offset-4 hover:underline print:text-neutral-900">GitHub ↗</a>
         </p>

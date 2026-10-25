@@ -28,9 +28,16 @@ export function shotAt(t: number, aspect: number): Shot {
       const a = introAmounts(world.intro);
       return { pos: [0, 0, 46 - a.portrait * 1.5], look: [0, 0, 0], fov };
     }
-    case chapterIndex.akshita:
-      // Her portrait sits left of centre; the right half belongs to the words.
-      return { pos: [0, 0.2, portrait ? 12 : 9.5], look: portrait ? [0, -1.2, 0] : [3.2, 0.1, 0], fov };
+    case chapterIndex.akshita: {
+      if (portrait) return { pos: [0, 0.2, 12], look: [0, -1.2, 0], fov };
+      // Her portrait (6.6 units wide) keeps to the left half whatever the screen's shape: the camera
+      // stands back far enough that she is at most 38% of the width, and aims so her right edge
+      // lands at 45% — the words (capped at 42% of the width, right-aligned) start past 50%.
+      const d = Math.max(9.5, 18.6 / aspect);
+      const w = 2 * d * Math.tan((fov * Math.PI) / 360) * aspect;
+      const centre = 0.45 - 3.3 / w;
+      return { pos: [0, 0.2, d + 0.2], look: [(0.5 - centre) * w, 0.1, 0], fov };
+    }
     case chapterIndex.collaborate:
       // The places she has worked, all in view behind the timeline.
       return { pos: add(experienceCentre, [-2 + p * 4, 2.5, portrait ? 30 : 22]), look: experienceCentre, fov };

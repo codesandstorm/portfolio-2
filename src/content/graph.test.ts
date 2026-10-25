@@ -64,9 +64,11 @@ describe("content integrity", () => {
   });
 
   it("does not credit HR-Enterprise- or expose private contact data", () => {
-    const blob = JSON.stringify({ profile, projects, signals, experiences });
+    // The one address she chose to publish is allowed; no other email may appear.
+    const blob = JSON.stringify({ profile: { ...profile, email: "" }, projects, signals, experiences });
     expect(blob).not.toMatch(/HR-Enterprise/);
     expect(blob).not.toMatch(/@[a-z0-9-]+\.(com|in|org)/i);
+    expect(profile.email).toBe("mahajanakshita03@gmail.com");
   });
 });
 

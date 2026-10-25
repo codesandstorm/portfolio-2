@@ -72,7 +72,7 @@ export function Chapter({
   const style = { "--h-d": `${c.vh[0]}vh`, "--h-m": `${c.vh[1]}vh` } as CSSProperties;
   if (free && !flow) {
     return (
-      <section id={id} data-chapter={id} aria-labelledby={`${id}-title`} className="relative z-10 min-h-svh">
+      <section id={id} data-chapter={id} aria-labelledby={`${id}-title`} className="relative z-10 min-h-svh overflow-x-clip">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,transparent,rgba(5,6,8,0.72)_14%,rgba(5,6,8,0.72)_86%,transparent)]" />
         <Content id={id} className={`px-[var(--gutter)] pb-[14svh] pt-[16svh] ${className}`}>{children}</Content>
       </section>

@@ -40,8 +40,16 @@ export function scrollToChapter(id: string) {
   const el = document.getElementById(id);
   if (!el) return;
   const top = el.getBoundingClientRect().top + window.scrollY;
-  if (lenis) lenis.scrollTo(top, { duration: 1.6 });
-  else window.scrollTo({ top, behavior: "auto" });
+  if (lenis) {
+    lenis.scrollTo(top, {
+      duration: 1.6,
+      // If anything above moved while we were flying (fonts, a slow device), land exactly on the section anyway.
+      onComplete: (l) => {
+        const off = el.getBoundingClientRect().top;
+        if (Math.abs(off) > 2) l.scrollTo(window.scrollY + off, { immediate: true, force: true });
+      },
+    });
+  } else window.scrollTo({ top, behavior: "auto" });
   history.replaceState(null, "", `#${id}`);
 }
 

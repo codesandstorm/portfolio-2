@@ -29,6 +29,8 @@ export const profile = {
     linkedinActivity: "https://www.linkedin.com/in/akshita-mahajan-73ba56370/recent-activity/all/",
     github: "https://github.com/akshita-mahajan",
   },
+  /** Her contact email (supplied 25 Oct 2026). */
+  email: "mahajanakshita03@gmail.com",
   /**
    * Short clips Akshita records herself (e.g. "/akshita/voice/signoff.mp3").
    * Leave null until she supplies them; her voice is never synthesised.

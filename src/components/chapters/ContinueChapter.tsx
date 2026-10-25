@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback } from "react";
+import { Check, Copy, Mail } from "lucide-react";
+import { useCallback, useState } from "react";
 import { profile } from "@/content/data";
 import { finale } from "@/content/story";
 import { sfx } from "@/audio/useSound";
@@ -9,7 +10,32 @@ import { LastThread } from "../finale/LastThread";
 import { HerVoice } from "../ui/HerVoice";
 import { Chapter, Kicker, useChapterArrived, useFlow } from "./Chapter";
 
-/** 07 — Connect. Her name in light, and one thread left to draw: yours. */
+/** Her email, always on show: click to write, or copy it. */
+function EmailLine() {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(profile.email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      /* clipboard blocked: the address is still on screen to select */
+    }
+  };
+  return (
+    <div className="mt-4 inline-flex items-center gap-1 rounded-full border border-hair bg-[#07080a]/80 py-1.5 pl-4 pr-1.5">
+      <a href={`mailto:${profile.email}`} className="inline-flex items-center gap-2.5 text-[15px] text-ivory transition-colors hover:text-[#ffb27a]" data-cursor="link">
+        <Mail aria-hidden className="h-4 w-4 text-[#ffb27a]" />
+        {profile.email}
+      </a>
+      <button type="button" onClick={copy} aria-label={copied ? "Email address copied" : "Copy email address"} className="ml-2 flex h-8 w-8 items-center justify-center rounded-full text-mist transition-colors hover:bg-white/5 hover:text-ivory" data-cursor="link">
+        {copied ? <Check className="h-4 w-4 text-[#5fd38a]" /> : <Copy className="h-4 w-4" />}
+      </button>
+    </div>
+  );
+}
+
+/** 07 — Connect. Her name in light, one thread left to draw — yours — and her email. */
 export function ContinueChapter() {
   const flow = useFlow();
   const arrived = useChapterArrived();
@@ -38,6 +64,7 @@ export function ContinueChapter() {
             <span className="display text-[clamp(1.1rem,2vw,1.5rem)] text-ivory">Connect with her on LinkedIn</span>
             <span aria-hidden className="text-xl text-[#ffb27a] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5">↗</span>
           </a>
+          <EmailLine />
           <div className="mt-5 flex flex-wrap justify-center gap-x-8 gap-y-2">
             <a href={profile.links.github} target="_blank" rel="noreferrer" className="thread-link mono" data-cursor="external">
               GitHub <span aria-hidden>↗</span>

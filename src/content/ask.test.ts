@@ -24,7 +24,7 @@ describe("ask the constellation", () => {
     expect(answer("Show me her leadership").chapter).toBe("lead");
     const c = answer("How do I contact her?");
     expect(c.chapter).toBe("continue");
-    expect(c.text).toContain("hasn't listed a public email");
+    expect(c.text).toContain("mahajanakshita03@gmail.com");
   });
 
   it("says so instead of guessing when it can't ground an answer", () => {
