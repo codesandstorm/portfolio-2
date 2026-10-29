@@ -118,6 +118,8 @@ export function HeroTitle({ flow, children }: { flow: boolean; children?: ReactN
     const host = wrap.current, c = canvas.current;
     if (!host || !c) return;
     const w = Math.round(c.clientWidth), h = Math.round(c.clientHeight);
+    // Not laid out yet (a hidden or unsized window): try again next frame.
+    if (!w || !h) return;
     if (c.width !== w || c.height !== h) {
       c.width = w;
       c.height = h;
