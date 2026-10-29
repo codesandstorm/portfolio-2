@@ -69,8 +69,8 @@ export function ContinueChapter() {
             <a href={profile.links.github} target="_blank" rel="noreferrer" className="thread-link mono" data-cursor="external">
               GitHub <span aria-hidden>↗</span>
             </a>
-            <a href="/one-page" className="thread-link mono" data-cursor="link">
-              One-page summary
+            <a href={profile.resume} target="_blank" rel="noreferrer" className="thread-link mono" data-cursor="external">
+              Resume <span aria-hidden>↗</span>
             </a>
             <button type="button" onClick={() => scrollToChapter("signal")} className="thread-link mono" data-cursor="link">
               ↺ Back to the start
@@ -78,7 +78,7 @@ export function ContinueChapter() {
           </div>
           <HerVoice clip="justStart" />
           <p className="mono mt-6 max-w-xl text-[10px] leading-relaxed text-faint/70">
-            {finale.advice} — her advice to anyone still in the quiet seat. Every fact here comes from her LinkedIn and GitHub.
+            {finale.advice} — her advice to anyone still in the quiet seat. Every fact here comes from her LinkedIn and GitHub. Music: “The Haze” by Musinova.
           </p>
         </div>
       </div>

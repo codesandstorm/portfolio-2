@@ -31,6 +31,8 @@ export const profile = {
   },
   /** Her contact email (supplied 25 Oct 2026). */
   email: "mahajanakshita03@gmail.com",
+  /** Her resume as a PDF in public/ (supplied 29 Oct 2026). */
+  resume: "/Akshita_Mahajan_Resume.pdf",
   /**
    * Short clips Akshita records herself (e.g. "/akshita/voice/signoff.mp3").
    * Leave null until she supplies them; her voice is never synthesised.

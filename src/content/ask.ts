@@ -141,7 +141,7 @@ export function answer(question: string): Answer {
   if (has(q, "contact", "reach", "hire", "email", "mail", "linkedin", "connect with", "get in touch", "message"))
     return say(`Email her at ${profile.email}, or connect on LinkedIn — both are in the Connect section at the end. Her code is on GitHub.`, { chapter: "continue" });
   if (has(q, "resume", "cv", "one page", "one-page", "pdf", "printable"))
-    return say("There's a one-page summary built from the same verified data — the One-page summary link at the end of the site — and you can print it or save it as a PDF.", { chapter: "continue" });
+    return say("Her resume is linked in About and at the end of the site — open it, or download the PDF.", { chapter: "continue" });
   if (has(q, "github", "code", "repo", "repos", "repository"))
     return say("Her public code is on GitHub: the HRMS, BreastCare AI and FoodHub repositories. Each project chapter links straight to its source.", { chapter: "build" });
 

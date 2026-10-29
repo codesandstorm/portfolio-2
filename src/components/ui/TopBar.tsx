@@ -6,6 +6,7 @@ import { chapters } from "@/lib/chapters";
 import { scrollToChapter } from "@/lib/scroll";
 import { useUI } from "@/lib/store";
 import { useTour } from "@/lib/tour";
+import { useSound } from "@/audio/useSound";
 
 /** Every section, in the order they come; on tablets and phones they live in the Menu (M). */
 const NAV = [
@@ -25,6 +26,35 @@ function Indicator({ on }: { on: boolean }) {
       aria-hidden
       className={`absolute -bottom-[7px] left-1/2 h-[1.5px] w-7 -translate-x-1/2 bg-gradient-to-r from-[#d48b3b] to-[#f5be74] shadow-[0_0_8px_rgba(212,139,59,0.6)] transition-[opacity,transform] duration-500 ${on ? "scale-x-100 opacity-100" : "scale-x-0 opacity-0"}`}
     />
+  );
+}
+
+/** The music, on or off; the bars move while it plays. */
+function SoundToggle() {
+  const on = useSound((s) => s.on);
+  const toggle = useSound((s) => s.toggle);
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-pressed={on}
+      aria-label={on ? "Turn sound off" : "Turn sound on"}
+      className="flex h-9 items-center gap-2 text-mist transition-colors hover:text-ivory"
+      data-cursor="link"
+    >
+      <span className="flex h-3 items-end gap-[2px]" aria-hidden>
+        {[0.45, 1, 0.7, 0.85].map((h, i) => (
+          <motion.span
+            key={i}
+            className="w-px bg-gold"
+            animate={on ? { scaleY: [h * 0.4, h, h * 0.55] } : { scaleY: 0.18 }}
+            transition={on ? { duration: 1.1 + i * 0.2, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" } : { duration: 0.4 }}
+            style={{ height: 12, originY: 1 }}
+          />
+        ))}
+      </span>
+      <span className="mono hidden sm:inline">{on ? "Sound on" : "Sound off"}</span>
+    </button>
   );
 }
 
@@ -110,6 +140,7 @@ export function TopBar() {
               <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_8px_#ffb347]" aria-hidden />
               Ask
             </button>
+            <SoundToggle />
             <button
               type="button"
               onClick={() => setIndexOpen(!indexOpen)}

@@ -1,9 +1,8 @@
 "use client";
 
-import { Briefcase, GraduationCap, Target, Users, type LucideIcon } from "lucide-react";
+import { Briefcase, Download, FileText, GraduationCap, Target, Users, type LucideIcon } from "lucide-react";
 import { profile } from "@/content/data";
 import { about } from "@/content/story";
-import { scrollToChapter } from "@/lib/scroll";
 import { Chapter, Kicker, useFlow } from "./Chapter";
 
 const ICONS: LucideIcon[] = [GraduationCap, Briefcase, Users, Target];
@@ -48,9 +47,13 @@ export function AkshitaChapter() {
           </ul>
 
           <div className="mt-5 flex flex-wrap items-center gap-x-7 gap-y-3 md:mt-6 [@media(max-height:760px)]:mt-4">
-            <button type="button" onClick={() => scrollToChapter("build")} className="thread-link mono text-gold" data-cursor="link">
-              See what she has built <span aria-hidden>→</span>
-            </button>
+            <a href={profile.resume} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-2 rounded-full border border-[#e58237]/60 px-4 py-2 transition-[border-color,box-shadow] hover:border-[#ffb27a] hover:shadow-[0_0_22px_-6px_rgba(229,130,55,0.8)]" data-cursor="external">
+              <FileText aria-hidden className="h-4 w-4 text-[#ffb27a]" />
+              <span className="mono text-ivory">Resume</span>
+            </a>
+            <a href={profile.resume} download className="text-mist transition-colors hover:text-[#ffb27a]" aria-label="Download her resume (PDF)" data-cursor="link">
+              <Download aria-hidden className="h-4 w-4" />
+            </a>
             <a href={profile.links.linkedin} target="_blank" rel="noreferrer" className="thread-link mono text-mist" data-cursor="external">
               LinkedIn <span aria-hidden>↗</span>
             </a>
